@@ -79,7 +79,14 @@ type ProjectConfig = {
     organizationId: string;
     projectId: string;
 }
-type UrlPath = {
+type UrlUserPath = {
+    register(): string
+    login(): string
+    organization(id?: string): string
+    account(orgId: string, id?: string): string
+    project(orgId: string, id?: string): string
+}
+type UrlProjectPath = {
     project(): string
     view(id?: string): string
     field(viewId: string, fieldId?: string): string
@@ -109,9 +116,9 @@ class MemberImpl implements Member {
     name: string;
     email: string;
     role: Role;
-    _url: UrlPath;
+    _url: UrlProjectPath;
     _token: string;
-    constructor(params: APIMember & { url: UrlPath, jwtToken: string }) {
+    constructor(params: APIMember & { url: UrlProjectPath, jwtToken: string }) {
         this.id = params.id
         this.email = params.email
         this.name = params.name
@@ -137,9 +144,9 @@ class RoleImpl implements Role {
     id;
     name;
     permissions;
-    _url: UrlPath;
+    _url: UrlProjectPath;
     _token: string;
-    constructor(params: APIRole & { url: UrlPath, jwtToken: string }) {
+    constructor(params: APIRole & { url: UrlProjectPath, jwtToken: string }) {
         this.id = params.id
         this.permissions = params.permissions
         this.name = params.name
@@ -150,9 +157,9 @@ class RoleImpl implements Role {
 class RowImpl implements Row {
     parentId: string;
     id: string;
-    _url: UrlPath;
+    _url: UrlProjectPath;
     _token: string;
-    constructor(params: { url: UrlPath, jwtToken: string, parentId: string, rowId: string }) {
+    constructor(params: { url: UrlProjectPath, jwtToken: string, parentId: string, rowId: string }) {
         this.parentId = params.parentId
         this.id = params.rowId
         this._url = params.url
@@ -242,9 +249,9 @@ class RowImpl implements Row {
 class ViewImpl implements View {
     id;
     _vields: APIViewVield<keyof Types>[];
-    _url: UrlPath;
+    _url: UrlProjectPath;
     _token: string;
-    constructor(params: APIView & { url: UrlPath, jwtToken: string }) {
+    constructor(params: APIView & { url: UrlProjectPath, jwtToken: string }) {
         this.id = params.id
         this._vields = params.vields
         this._url = params.url
@@ -297,7 +304,7 @@ class ViewImpl implements View {
         }, this._token)
     }
 }
-function generateUrlPath(config) {
+function generateUrlProjectPath(config) {
     const url = {
         project() {
             return `/orgs/${config.organizationId}/projects/${config.projectId}`
@@ -338,8 +345,20 @@ function generateUrlPath(config) {
     }
     return url
 }
-const core = (config: ProjectConfig) => {
-    const url: UrlPath = generateUrlPath(config)
+function generateUrlUserPath() {
+    const url = {
+        register(): string {
+            return '/register'
+        },
+        login(): string { return '/login' },
+        organization(id?: string): string { return id ? '/orgs/' + id : '/orgs' },
+        account(orgId: string, id?: string): string { return url.organization(orgId) + (id ? '/' + id : '') },
+        project(orgId: string, id?: string): string { return url.organization(orgId) + (id ? '/' + id : '') }
+    }
+    return url
+}
+export const coreProject = (config: ProjectConfig) => {
+    const url: UrlProjectPath = generateUrlProjectPath(config)
     let jwtToken;
     return {
         createView: async (params: { name: string, tableId: string }): Promise<string> => {
@@ -413,4 +432,201 @@ const core = (config: ProjectConfig) => {
         }
     }
 }
-export default core
+type APIOrganization = {
+    id: string;
+    name: string;
+    category: string;
+    size: string;
+}
+type APIUser = {
+    id: string;
+    name: string;
+    email: string;
+    token: string
+}
+type APIAccount = {
+    id: string
+    user: APIUser
+    type: string
+}
+type Account = APIAccount & {
+    delete(): Promise<void>
+    updateType(type: string): Promise<void>
+}
+type APIProject = {
+    id: string;
+    name: string
+}
+type Project = APIProject & {
+    delete(): Promise<void>
+    updateName(name: string): Promise<void>
+}
+type Organization = APIOrganization & {
+    accounts(limit?: number, offset?: number): Promise<Account[]>
+    inviteAccount(params: { email: string, type: string }): Promise<void>
+    createProject(params: { name: string }): Promise<string>
+    projects(limit?: number, offset?: number): Promise<Project[]>
+    project(id: string): Promise<Project>
+    delete(): Promise<void>
+}
+class AccountImpl implements Account {
+    id: string
+    user: APIUser
+    type: string
+    _orgId: string;
+    _url: UrlUserPath;
+    _token: string;
+    constructor(params: APIAccount & { url: UrlUserPath, userToken: string, orgId: string }) {
+        this.id = params.id
+        this.user = params.user
+        this.type = params.type
+        this._orgId = params.orgId
+        this._url = params.url
+        this._token = params.userToken
+    }
+    async updateType(type: string) {
+        await callApi({
+            method: "patch",
+            url: this._url.account(this._orgId, this.id),
+            data: { type }
+        }, this._token)
+    }
+    async delete() {
+        await callApi({
+            method: "delete",
+            url: this._url.account(this._orgId, this.id),
+        }, this._token)
+    }
+}
+class ProjectImpl implements Project {
+    id: string;
+    name: string
+    _orgId: string;
+    _url: UrlUserPath;
+    _token: string;
+    constructor(params: APIProject & { url: UrlUserPath, userToken: string, orgId: string }) {
+        this.id = params.id
+        this.name = params.name
+        this._orgId = params.orgId
+        this._url = params.url
+        this._token = params.userToken
+    }
+    async delete() {
+        await callApi({
+            method: "delete",
+            url: this._url.project(this._orgId, this.id),
+        }, this._token)
+    }
+    async updateName(name: string) {
+        await callApi({
+            method: "patch",
+            url: this._url.project(this._orgId, this.id),
+            data: { name }
+        }, this._token)
+    }
+}
+class OrganizationImpl implements Organization {
+    id: string;
+    name: string;
+    category: string;
+    size: string;
+    _url: UrlUserPath;
+    _token: string;
+    constructor(params: APIOrganization & { url: UrlUserPath, userToken: string }) {
+        this.id = params.id
+        this.name = params.name
+        this.category = params.category
+        this.size = params.size
+        this._url = params.url
+        this._token = params.userToken
+    }
+    async accounts(limit?: number, offset?: number): Promise<Account[]> {
+        const { nodes } = await callApi({
+            method: "get",
+            url: this._url.account(this.id),
+            params: { limit, offset }
+        }, this._token)
+        return nodes.map(row => new AccountImpl({ ...row, userToken: this._token, url: this._url, orgId: this.id }))
+    }
+    async inviteAccount(params: { email: string, type: string }): Promise<void> {
+        await callApi({
+            method: "post",
+            url: this._url.account(this.id),
+            data: params
+        }, this._token)
+    }
+    async createProject(params: { name: string }): Promise<string> {
+        const { id } = await callApi({
+            method: "post",
+            url: this._url.project(this.id),
+            data: params
+        }, this._token)
+        return id
+    }
+    async projects(limit = 10, offset = 0): Promise<Project[]> {
+        const { nodes } = await callApi({
+            method: "get",
+            url: this._url.project(this.id),
+            params: { limit, offset }
+        }, this._token)
+        return nodes.map(row => new ProjectImpl({ ...row, userToken: this._token, url: this._url, orgId: this.id }))
+    }
+    async project(id: string): Promise<Project> {
+        const project = await callApi({
+            method: "get",
+            url: this._url.project(this.id, id),
+        }, this._token)
+        return new ProjectImpl({ ...project, userToken: this._token, url: this._url, orgId: this.id })
+    }
+    async delete(): Promise<void> {
+        await callApi({
+            method: "delete",
+            url: this._url.organization(this.id)
+        }, this._token)
+    }
+}
+export const coreUser = () => {
+    let user: APIUser;
+    const url = generateUrlUserPath()
+    return {
+        async register(params: { email: string, name: string, password: string }): Promise<void> {
+            user = await callApi({
+                method: "post",
+                url: url.register(),
+                data: params
+            })
+        },
+        async login(username: string, password: string): Promise<void> {
+            user = await callApi({
+                method: "post",
+                url: url.login(),
+                data: { username, password }
+            })
+        },
+        async createOrganization(params: { name: string, category: string, size: string }): Promise<string> {
+            const { id } = await callApi({
+                method: "post",
+                url: url.organization(),
+                data: params
+            })
+            return id
+        },
+        async organizations(limit?: number, offset?: number): Promise<Organization[]> {
+            const { nodes } = await callApi({
+                method: "get",
+                url: this._url.organization(),
+                params: { limit, offset }
+            }, this._token)
+            return nodes.map(row => new OrganizationImpl({ ...row, userToken: this._token, url: this._url, orgId: this.id }))
+        },
+        async organization(id: string): Promise<Organization> {
+            const org = await callApi({
+                method: "get",
+                url: this._url.organization(id),
+            }, this._token)
+            return new OrganizationImpl({ ...org, userToken: this._token, url: this._url, orgId: this.id })
+        },
+        user
+    }
+
+}
