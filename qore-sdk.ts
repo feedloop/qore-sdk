@@ -25,10 +25,17 @@ type FormulaField = BaseField & { type: 'formula', defaultValue: number | string
 type ActionField = BaseField & { type: 'action' }
 
 type keyTypes = Types[keyof Types]['type']
-type APIViewVield<T extends keyof Types> = Types[T] & { display: boolean }
+type APIVield<T extends keyof Types> = Types[T] & { display: boolean }
+type APIField<T extends keyof Types> = Types[T]
 type APIView = {
     id: string;
-    vields: APIViewVield<keyof Types>[]
+    vields: APIVield<keyof Types>[];
+    filters: string[]
+    sort: { order: string, by: string }[]
+}
+type APITable = {
+    id: string;
+    fields: APIField<keyof Types>[];
 }
 type APIMember = {
     id: string
@@ -43,11 +50,27 @@ type APIRole = {
 }
 interface View {
     id: string;
+    addVield<T extends Types[keyTypes]>(field: T): Promise<string>
     vields(): Promise<Vield[]>;
     rows(): Promise<Row[]>
     row(rowId: string): Promise<Row>
     addRow(): Promise<string>
+    update(view: Partial<APIView>): Promise<void>
     delete(): Promise<void>
+}
+interface Table {
+    id: string;
+    addField(field: Types[keyTypes]): Promise<string>
+    fields(): Promise<Field[]>;
+    rows(): Promise<Row[]>
+    row(rowId: string): Promise<Row>
+    addRow(): Promise<string>
+    delete(): Promise<void>
+    update(view: Partial<APITable>): Promise<void>
+}
+type Field = Types[keyTypes] & {
+    delete(): Promise<void>
+    update(field: Types[keyTypes]): Promise<void>
 }
 type Vield = Types[keyTypes] & {
     hide(): Promise<void>
@@ -89,7 +112,9 @@ type UrlUserPath = {
 type UrlProjectPath = {
     project(): string
     view(id?: string): string
-    field(viewId: string, fieldId?: string): string
+    table(id?: string): string
+    field(tableId: string, fieldId?: string): string
+    vield(viewId: string, fieldId?: string): string
     row(viewId: string, rowId?: string): string
     addRowRelation(viewId: string, rowId: string, fieldId: string): string
     removeRowRelation(viewId: string, rowId: string, fieldId: string, refRowId: string): string
@@ -248,7 +273,7 @@ class RowImpl implements Row {
 }
 class ViewImpl implements View {
     id;
-    _vields: APIViewVield<keyof Types>[];
+    _vields: APIVield<keyof Types>[];
     _url: UrlProjectPath;
     _token: string;
     constructor(params: APIView & { url: UrlProjectPath, jwtToken: string }) {
@@ -257,21 +282,34 @@ class ViewImpl implements View {
         this._url = params.url
         this._token = params.jwtToken
     }
+    async update(view: Partial<APIView>): Promise<void> {
+        await callApi({
+            method: "patch",
+            url: this._url.view(this.id),
+            data: view
+        }, this._token)
+    }
+    async addVield<T extends Types[keyTypes]>(field: T): Promise<string> {
+        const { id } = await callApi({
+            method: "post",
+            url: this._url.vield(this.id),
+            data: field
+        }, this._token)
+        return id
+    }
     async vields(): Promise<Vield[]> {
         return this._vields.map(field => ({
             ...field,
             hide: async (): Promise<void> => {
                 await callApi({
-                    method: "patch",
-                    url: this._url.field(this.id, field.id),
-                    data: { display: false }
+                    method: "delete",
+                    url: this._url.vield(this.id, field.id),
                 }, this._token)
             },
             show: async (): Promise<void> => {
                 await callApi({
                     method: "patch",
-                    url: this._url.field(this.id, field.id),
-                    data: { display: true }
+                    url: this._url.vield(this.id, field.id),
                 }, this._token)
             }
         }))
@@ -304,6 +342,78 @@ class ViewImpl implements View {
         }, this._token)
     }
 }
+class TableImpl implements Table {
+    id;
+    _fields: APIField<keyof Types>[];
+    _url: UrlProjectPath;
+    _token: string;
+    constructor(params: APIView & { url: UrlProjectPath, jwtToken: string }) {
+        this.id = params.id
+        this._fields = params.vields
+        this._url = params.url
+        this._token = params.jwtToken
+    }
+    async addField(field: Types[keyTypes]): Promise<string> {
+        const { id } = await callApi({
+            method: "post",
+            url: this._url.field(this.id),
+            data: field
+        }, this._token)
+        return id
+    }
+    async fields(): Promise<Field[]> {
+        return this._fields.map(field => ({
+            ...field,
+            delete: async (): Promise<void> => {
+                await callApi({
+                    method: "delete",
+                    url: this._url.field(this.id, field.id),
+                }, this._token)
+            },
+            update: async (field: Partial<Types[keyTypes]>): Promise<void> => {
+                await callApi({
+                    method: "patch",
+                    url: this._url.field(this.id, field.id),
+                    data: field
+                }, this._token)
+            }
+        }))
+    }
+    async rows(): Promise<Row[]> {
+        const { nodes } = await callApi({
+            method: "get",
+            url: this._url.row(this.id)
+        }, this._token)
+        return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id }))
+    }
+    async row(rowId: string): Promise<Row> {
+        const row = await callApi({
+            method: "get",
+            url: this._url.row(this.id, rowId)
+        }, this._token)
+        return new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id })
+    }
+    async addRow(): Promise<string> {
+        const { id } = await callApi({
+            method: "post",
+            url: this._url.row(this.id)
+        }, this._token)
+        return id
+    }
+    async update(table: Partial<APITable>): Promise<void> {
+        await callApi({
+            method: "patch",
+            url: this._url.row(this.id),
+            data: table
+        }, this._token)
+    }
+    async delete(): Promise<void> {
+        await callApi({
+            method: "delete",
+            url: this._url.row(this.id)
+        }, this._token)
+    }
+}
 function generateUrlProjectPath(config) {
     const url = {
         project() {
@@ -313,7 +423,17 @@ function generateUrlProjectPath(config) {
             if (!id) return "/views"
             return url.project() + "/views/" + id
         },
-        field(viewId: string, fieldId?: string) {
+        table(id?: string) {
+            if (!id) return "/tables"
+            return url.project() + "/tables/" + id
+        },
+        field(tableId: string, fieldId?: string) {
+            const tableUrl = url.table(tableId)
+            const fieldUrl = tableUrl + "/fields"
+            if (!fieldId) return fieldUrl
+            return fieldUrl + "/" + fieldId
+        },
+        vield(viewId: string, fieldId?: string) {
             const viewUrl = url.view(viewId)
             const fieldUrl = viewUrl + "/fields"
             if (!fieldId) return fieldUrl
@@ -361,6 +481,28 @@ export const coreProject = (config: ProjectConfig) => {
     const url: UrlProjectPath = generateUrlProjectPath(config)
     let jwtToken;
     return {
+        createTable: async (params: Partial<APITable>): Promise<string> => {
+            const { id } = await callApi({
+                method: "post",
+                url: url.table(),
+                data: params
+            }, jwtToken)
+            return id
+        },
+        tables: async (): Promise<Table[]> => {
+            const views = await callApi({
+                method: "post",
+                url: url.table()
+            }, jwtToken)
+            return views.map(view => new TableImpl({ ...view, jwtToken, url }))
+        },
+        table: async (id: string): Promise<Table> => {
+            const view = await callApi({
+                method: "post",
+                url: url.table(id)
+            }, jwtToken)
+            return new TableImpl({ ...view, jwtToken, url })
+        },
         createView: async (params: { name: string, tableId: string }): Promise<string> => {
             const { id } = await callApi({
                 method: "post",
