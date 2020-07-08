@@ -1,0 +1,9 @@
+{
+    "spec_dir": "./",
+    "spec_files": [
+        "**/*.test.ts"
+    ],
+    "defaultTimeoutInterval": 10000,
+    "stopSpecOnExpectationFailure": false,
+    "random": false
+}

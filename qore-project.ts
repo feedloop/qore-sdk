@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import { callApi } from './common';
 type BaseField = {
     id: string;
     name: string;
@@ -52,21 +52,21 @@ interface View {
     id: string;
     addVield<T extends Types[keyTypes]>(field: T): Promise<string>
     vields(): Promise<Vield[]>;
-    rows(): Promise<Row[]>
+    rows(limit?: number, offset?: number): Promise<Row[]>
     row(rowId: string): Promise<Row>
     addRow(): Promise<string>
-    update(view: Partial<APIView>): Promise<void>
+    update(view: Omit<APIView, "id">): Promise<void>
     delete(): Promise<void>
 }
 interface Table {
     id: string;
     addField(field: Types[keyTypes]): Promise<string>
     fields(): Promise<Field[]>;
-    rows(): Promise<Row[]>
+    rows(limit?: number, offset?: number): Promise<Row[]>
     row(rowId: string): Promise<Row>
     addRow(): Promise<string>
     delete(): Promise<void>
-    update(view: Partial<APITable>): Promise<void>
+    update(view: Omit<APITable, "id">): Promise<void>
 }
 type Field = Types[keyTypes] & {
     delete(): Promise<void>
@@ -97,17 +97,13 @@ type Member = APIMember & {
     delete(): Promise<void>
     updateRole(roleId: string): Promise<void>
 }
-type Role = APIRole & {}
+type Role = APIRole & {
+    delete(): Promise<void>
+    update(role: Partial<Omit<APIRole, "id">>): Promise<void>
+}
 type ProjectConfig = {
     organizationId: string;
     projectId: string;
-}
-type UrlUserPath = {
-    register(): string
-    login(): string
-    organization(id?: string): string
-    account(orgId: string, id?: string): string
-    project(orgId: string, id?: string): string
 }
 type UrlProjectPath = {
     project(): string
@@ -121,20 +117,6 @@ type UrlProjectPath = {
     projectLogin(): string
     member(memberId?: string): string
     role(roleId?: string): string
-}
-const API_URL = ""
-async function callApi(params: { method: "get" | "post" | "put" | "delete" | "patch", url: string, data?: { [key: string]: any }, params?: { [key: string]: any } }, token?: string) {
-    const headers = {}
-    if (token) {
-        headers['Authorization'] = 'Bearer ' + token
-    }
-    try {
-        return (await Axios({ ...params, headers, url: API_URL + params.url })).data
-    } catch (error) {
-        const data = error.response.data
-        if (data && data.error) throw new Error(data.error)
-        throw new Error('Cannot get response from server')
-    }
 }
 class MemberImpl implements Member {
     id;
@@ -177,6 +159,19 @@ class RoleImpl implements Role {
         this.name = params.name
         this._url = params.url
         this._token = params.jwtToken
+    }
+    async delete(): Promise<void> {
+        await callApi({
+            method: "delete",
+            url: this._url.role(this.id)
+        }, this._token)
+    }
+    async update(role: Partial<Omit<APIRole, "id">>): Promise<void> {
+        await callApi({
+            method: "patch",
+            url: this._url.role(this.id),
+            data: role
+        }, this._token)
     }
 }
 class RowImpl implements Row {
@@ -282,7 +277,7 @@ class ViewImpl implements View {
         this._url = params.url
         this._token = params.jwtToken
     }
-    async update(view: Partial<APIView>): Promise<void> {
+    async update(view: Partial<Omit<APIView, "id">>): Promise<void> {
         await callApi({
             method: "patch",
             url: this._url.view(this.id),
@@ -314,10 +309,11 @@ class ViewImpl implements View {
             }
         }))
     }
-    async rows(): Promise<Row[]> {
+    async rows(limit?: number, offset?: number): Promise<Row[]> {
         const { nodes } = await callApi({
             method: "get",
-            url: this._url.row(this.id)
+            url: this._url.row(this.id),
+            params: { limit, offset }
         }, this._token)
         return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id }))
     }
@@ -379,10 +375,11 @@ class TableImpl implements Table {
             }
         }))
     }
-    async rows(): Promise<Row[]> {
+    async rows(limit?: number, offset?: number): Promise<Row[]> {
         const { nodes } = await callApi({
             method: "get",
-            url: this._url.row(this.id)
+            url: this._url.row(this.id),
+            params: { limit, offset }
         }, this._token)
         return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id }))
     }
@@ -400,7 +397,7 @@ class TableImpl implements Table {
         }, this._token)
         return id
     }
-    async update(table: Partial<APITable>): Promise<void> {
+    async update(table: Partial<Omit<APITable, "id">>): Promise<void> {
         await callApi({
             method: "patch",
             url: this._url.row(this.id),
@@ -465,23 +462,11 @@ function generateUrlProjectPath(config) {
     }
     return url
 }
-function generateUrlUserPath() {
-    const url = {
-        register(): string {
-            return '/register'
-        },
-        login(): string { return '/login' },
-        organization(id?: string): string { return id ? '/orgs/' + id : '/orgs' },
-        account(orgId: string, id?: string): string { return url.organization(orgId) + (id ? '/' + id : '') },
-        project(orgId: string, id?: string): string { return url.organization(orgId) + (id ? '/' + id : '') }
-    }
-    return url
-}
-export const coreProject = (config: ProjectConfig) => {
+export default (config: ProjectConfig) => {
     const url: UrlProjectPath = generateUrlProjectPath(config)
     let jwtToken;
     return {
-        createTable: async (params: Partial<APITable>): Promise<string> => {
+        createTable: async (params: Omit<APITable, "id">): Promise<string> => {
             const { id } = await callApi({
                 method: "post",
                 url: url.table(),
@@ -489,10 +474,11 @@ export const coreProject = (config: ProjectConfig) => {
             }, jwtToken)
             return id
         },
-        tables: async (): Promise<Table[]> => {
+        tables: async (limit?: number, offset?: number): Promise<Table[]> => {
             const views = await callApi({
                 method: "post",
-                url: url.table()
+                url: url.table(),
+                params: { limit, offset }
             }, jwtToken)
             return views.map(view => new TableImpl({ ...view, jwtToken, url }))
         },
@@ -511,10 +497,11 @@ export const coreProject = (config: ProjectConfig) => {
             }, jwtToken)
             return id
         },
-        views: async (): Promise<View[]> => {
+        views: async (limit?: number, offset?: number): Promise<View[]> => {
             const views = await callApi({
                 method: "post",
-                url: url.view()
+                url: url.view(),
+                params: { limit, offset }
             }, jwtToken)
             return views.map(view => new ViewImpl({ ...view, jwtToken, url }))
         },
@@ -532,36 +519,46 @@ export const coreProject = (config: ProjectConfig) => {
                     url: url.projectLogin(),
                     data: { userToken }
                 })
-                jwtToken = token
+                jwtToken = 'Bearer ' + token
             },
             signOut() { jwtToken = undefined }
         },
-        roles: async () => {
+        createRole: async (params: Omit<APIRole, "id">): Promise<string> => {
+            const { id } = await callApi({
+                method: "post",
+                url: url.role(),
+                data: params
+            }, jwtToken)
+            return id
+        },
+        roles: async (limit?: number, offset?: number): Promise<Role[]> => {
             const { nodes } = await callApi({
                 method: "get",
-                url: url.role()
+                url: url.role(),
+                params: { limit, offset }
             }, jwtToken)
             return nodes.map(role => new RoleImpl({ ...role, jwtToken, url }))
         },
-        role: async (roleId: string) => {
+        role: async (roleId: string): Promise<Role> => {
             const role = await callApi({
                 method: "get",
                 url: url.role(roleId)
             }, jwtToken)
             return new RoleImpl({ ...role, jwtToken, url })
         },
-        createMember: async (email: string, roleId?: string): Promise<string> => {
+        createMember: async (params: { email: string, roleId?: string }): Promise<string> => {
             const { id } = await callApi({
                 method: "post",
                 url: url.member(),
-                data: { email, roleId }
+                data: params
             }, jwtToken)
             return id
         },
-        members: async (): Promise<Member[]> => {
+        members: async (limit?: number, offset?: number): Promise<Member[]> => {
             const { nodes } = await callApi({
                 method: "get",
-                url: url.member()
+                url: url.member(),
+                params: { limit, offset }
             }, jwtToken)
             return nodes.map(member => new MemberImpl({ ...member, jwtToken, url }))
         },
@@ -573,202 +570,4 @@ export const coreProject = (config: ProjectConfig) => {
             return new MemberImpl({ ...member, jwtToken, url })
         }
     }
-}
-type APIOrganization = {
-    id: string;
-    name: string;
-    category: string;
-    size: string;
-}
-type APIUser = {
-    id: string;
-    name: string;
-    email: string;
-    token: string
-}
-type APIAccount = {
-    id: string
-    user: APIUser
-    type: string
-}
-type Account = APIAccount & {
-    delete(): Promise<void>
-    updateType(type: string): Promise<void>
-}
-type APIProject = {
-    id: string;
-    name: string
-}
-type Project = APIProject & {
-    delete(): Promise<void>
-    updateName(name: string): Promise<void>
-}
-type Organization = APIOrganization & {
-    accounts(limit?: number, offset?: number): Promise<Account[]>
-    inviteAccount(params: { email: string, type: string }): Promise<void>
-    createProject(params: { name: string }): Promise<string>
-    projects(limit?: number, offset?: number): Promise<Project[]>
-    project(id: string): Promise<Project>
-    delete(): Promise<void>
-}
-class AccountImpl implements Account {
-    id: string
-    user: APIUser
-    type: string
-    _orgId: string;
-    _url: UrlUserPath;
-    _token: string;
-    constructor(params: APIAccount & { url: UrlUserPath, userToken: string, orgId: string }) {
-        this.id = params.id
-        this.user = params.user
-        this.type = params.type
-        this._orgId = params.orgId
-        this._url = params.url
-        this._token = params.userToken
-    }
-    async updateType(type: string) {
-        await callApi({
-            method: "patch",
-            url: this._url.account(this._orgId, this.id),
-            data: { type }
-        }, this._token)
-    }
-    async delete() {
-        await callApi({
-            method: "delete",
-            url: this._url.account(this._orgId, this.id),
-        }, this._token)
-    }
-}
-class ProjectImpl implements Project {
-    id: string;
-    name: string
-    _orgId: string;
-    _url: UrlUserPath;
-    _token: string;
-    constructor(params: APIProject & { url: UrlUserPath, userToken: string, orgId: string }) {
-        this.id = params.id
-        this.name = params.name
-        this._orgId = params.orgId
-        this._url = params.url
-        this._token = params.userToken
-    }
-    async delete() {
-        await callApi({
-            method: "delete",
-            url: this._url.project(this._orgId, this.id),
-        }, this._token)
-    }
-    async updateName(name: string) {
-        await callApi({
-            method: "patch",
-            url: this._url.project(this._orgId, this.id),
-            data: { name }
-        }, this._token)
-    }
-}
-class OrganizationImpl implements Organization {
-    id: string;
-    name: string;
-    category: string;
-    size: string;
-    _url: UrlUserPath;
-    _token: string;
-    constructor(params: APIOrganization & { url: UrlUserPath, userToken: string }) {
-        this.id = params.id
-        this.name = params.name
-        this.category = params.category
-        this.size = params.size
-        this._url = params.url
-        this._token = params.userToken
-    }
-    async accounts(limit?: number, offset?: number): Promise<Account[]> {
-        const { nodes } = await callApi({
-            method: "get",
-            url: this._url.account(this.id),
-            params: { limit, offset }
-        }, this._token)
-        return nodes.map(row => new AccountImpl({ ...row, userToken: this._token, url: this._url, orgId: this.id }))
-    }
-    async inviteAccount(params: { email: string, type: string }): Promise<void> {
-        await callApi({
-            method: "post",
-            url: this._url.account(this.id),
-            data: params
-        }, this._token)
-    }
-    async createProject(params: { name: string }): Promise<string> {
-        const { id } = await callApi({
-            method: "post",
-            url: this._url.project(this.id),
-            data: params
-        }, this._token)
-        return id
-    }
-    async projects(limit = 10, offset = 0): Promise<Project[]> {
-        const { nodes } = await callApi({
-            method: "get",
-            url: this._url.project(this.id),
-            params: { limit, offset }
-        }, this._token)
-        return nodes.map(row => new ProjectImpl({ ...row, userToken: this._token, url: this._url, orgId: this.id }))
-    }
-    async project(id: string): Promise<Project> {
-        const project = await callApi({
-            method: "get",
-            url: this._url.project(this.id, id),
-        }, this._token)
-        return new ProjectImpl({ ...project, userToken: this._token, url: this._url, orgId: this.id })
-    }
-    async delete(): Promise<void> {
-        await callApi({
-            method: "delete",
-            url: this._url.organization(this.id)
-        }, this._token)
-    }
-}
-export const coreUser = () => {
-    let user: APIUser;
-    const url = generateUrlUserPath()
-    return {
-        async register(params: { email: string, name: string, password: string }): Promise<void> {
-            user = await callApi({
-                method: "post",
-                url: url.register(),
-                data: params
-            })
-        },
-        async login(username: string, password: string): Promise<void> {
-            user = await callApi({
-                method: "post",
-                url: url.login(),
-                data: { username, password }
-            })
-        },
-        async createOrganization(params: { name: string, category: string, size: string }): Promise<string> {
-            const { id } = await callApi({
-                method: "post",
-                url: url.organization(),
-                data: params
-            })
-            return id
-        },
-        async organizations(limit?: number, offset?: number): Promise<Organization[]> {
-            const { nodes } = await callApi({
-                method: "get",
-                url: this._url.organization(),
-                params: { limit, offset }
-            }, this._token)
-            return nodes.map(row => new OrganizationImpl({ ...row, userToken: this._token, url: this._url, orgId: this.id }))
-        },
-        async organization(id: string): Promise<Organization> {
-            const org = await callApi({
-                method: "get",
-                url: this._url.organization(id),
-            }, this._token)
-            return new OrganizationImpl({ ...org, userToken: this._token, url: this._url, orgId: this.id })
-        },
-        user
-    }
-
 }
