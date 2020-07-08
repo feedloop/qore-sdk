@@ -14,27 +14,30 @@ type Types = {
     formula: FormulaField
     action: ActionField
 };
-type TextField = BaseField & { type: 'text', defaultValue: string }
-type NumberField = BaseField & { type: 'number', defaultValue: number }
-type DateField = BaseField & { type: 'date', defaultValue: Date }
-type RollupField = BaseField & { type: 'rollup', defaultValue: number }
+type TextField = BaseField & { type: 'text', defaultValue?: string }
+type NumberField = BaseField & { type: 'number', defaultValue?: number }
+type DateField = BaseField & { type: 'date', defaultValue?: Date }
+type RollupField = BaseField & { type: 'rollup', defaultValue?: number }
 type LookupField = BaseField & { type: 'lookup' }
 type RelationField = BaseField & { type: 'relation' }
-type SelectField = BaseField & { type: 'select', defaultValue: string }
-type FormulaField = BaseField & { type: 'formula', defaultValue: number | string }
+type SelectField = BaseField & { type: 'select', defaultValue?: string }
+type FormulaField = BaseField & { type: 'formula', defaultValue?: number | string, formula: string }
 type ActionField = BaseField & { type: 'action' }
 
 type keyTypes = Types[keyof Types]['type']
-type APIVield<T extends keyof Types> = Types[T] & { display: boolean }
-type APIField<T extends keyof Types> = Types[T]
+type APIVield<T extends keyTypes> = Types[T] & { display: boolean }
+type APIField<T extends keyTypes> = Types[T]
 type APIView = {
     id: string;
+    name: string;
+    tableId: string;
     vields: APIVield<keyof Types>[];
     filters: string[]
-    sort: { order: string, by: string }[]
+    sorts: { order: string, by: string }[]
 }
 type APITable = {
     id: string;
+    name: string;
     fields: APIField<keyof Types>[];
 }
 type APIMember = {
@@ -50,27 +53,28 @@ type APIRole = {
 }
 interface View {
     id: string;
-    addVield<T extends Types[keyTypes]>(field: T): Promise<string>
+    addVield<T extends Omit<Types[keyTypes], "id">>(field: T): Promise<string>
     vields(): Promise<Vield[]>;
     rows(limit?: number, offset?: number): Promise<Row[]>
     row(rowId: string): Promise<Row>
-    addRow(): Promise<string>
-    update(view: Omit<APIView, "id">): Promise<void>
+    addRow(params?: { [key: string]: any }): Promise<string>
+    update(view: Omit<APIView, "id" | "vields"> & { vields: string[] }): Promise<void>
     delete(): Promise<void>
 }
 interface Table {
     id: string;
-    addField(field: Types[keyTypes]): Promise<string>
+    addField(field: Omit<Types[keyTypes], "id">): Promise<string>
     fields(): Promise<Field[]>;
+    field(id: string): Promise<Field>;
     rows(limit?: number, offset?: number): Promise<Row[]>
     row(rowId: string): Promise<Row>
-    addRow(): Promise<string>
+    addRow(params?: { [key: string]: any }): Promise<string>
     delete(): Promise<void>
-    update(view: Omit<APITable, "id">): Promise<void>
+    update(view: Partial<Omit<APITable, "id">>): Promise<void>
 }
 type Field = Types[keyTypes] & {
     delete(): Promise<void>
-    update(field: Types[keyTypes]): Promise<void>
+    update(field: Partial<Omit<Types[keyTypes], "id">>): Promise<void>
 }
 type Vield = Types[keyTypes] & {
     hide(): Promise<void>
@@ -90,7 +94,7 @@ type Column = {
 type Row = {
     parentId: string;
     id: string;
-    col<T extends Types[keyTypes]>(field: T): Column[T["type"]];
+    col<T extends keyTypes>(field: { id: string, type: T }): Column[T];
     delete(): Promise<void>
 }
 type Member = APIMember & {
@@ -111,7 +115,7 @@ type UrlProjectPath = {
     table(id?: string): string
     field(tableId: string, fieldId?: string): string
     vield(viewId: string, fieldId?: string): string
-    row(viewId: string, rowId?: string): string
+    row(tableId: string, rowId?: string): string
     addRowRelation(viewId: string, rowId: string, fieldId: string): string
     removeRowRelation(viewId: string, rowId: string, fieldId: string, refRowId: string): string
     projectLogin(): string
@@ -199,7 +203,7 @@ class RowImpl implements Row {
                             }
                         })
                     }
-                } as Column['text']
+                }
             case "date":
                 return {
                     async update(value?: Date) {
@@ -268,23 +272,31 @@ class RowImpl implements Row {
 }
 class ViewImpl implements View {
     id;
-    _vields: APIVield<keyof Types>[];
+    tableId: APIView['tableId'];
+    name: APIView['name'];
+    filters: APIView['filters'];
+    sorts: APIView['sorts'];
+    _vields: APIView['vields'];
     _url: UrlProjectPath;
     _token: string;
     constructor(params: APIView & { url: UrlProjectPath, jwtToken: string }) {
         this.id = params.id
+        this.name = params.name
+        this.filters = params.filters
+        this.sorts = params.sorts
+        this.tableId = params.tableId
         this._vields = params.vields
         this._url = params.url
         this._token = params.jwtToken
     }
-    async update(view: Partial<Omit<APIView, "id">>): Promise<void> {
+    async update(view: Omit<APIView, "id" | "vields"> & { vields: string[] }): Promise<void> {
         await callApi({
             method: "patch",
             url: this._url.view(this.id),
             data: view
         }, this._token)
     }
-    async addVield<T extends Types[keyTypes]>(field: T): Promise<string> {
+    async addVield<T extends Omit<Types[keyTypes], "id">>(field: T): Promise<string> {
         const { id } = await callApi({
             method: "post",
             url: this._url.vield(this.id),
@@ -312,22 +324,22 @@ class ViewImpl implements View {
     async rows(limit?: number, offset?: number): Promise<Row[]> {
         const { nodes } = await callApi({
             method: "get",
-            url: this._url.row(this.id),
+            url: this._url.row(this.tableId),
             params: { limit, offset }
         }, this._token)
-        return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id }))
+        return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.tableId, rowId: row.id }))
     }
     async row(rowId: string): Promise<Row> {
         const row = await callApi({
             method: "get",
-            url: this._url.row(this.id, rowId)
+            url: this._url.row(this.tableId, rowId)
         }, this._token)
-        return new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id })
+        return new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.tableId, rowId: row.id })
     }
     async addRow(): Promise<string> {
         const { id } = await callApi({
             method: "post",
-            url: this._url.row(this.id)
+            url: this._url.row(this.tableId)
         }, this._token)
         return id
     }
@@ -340,6 +352,7 @@ class ViewImpl implements View {
 }
 class TableImpl implements Table {
     id;
+    name: APITable['name'];
     _fields: APIField<keyof Types>[];
     _url: UrlProjectPath;
     _token: string;
@@ -374,6 +387,26 @@ class TableImpl implements Table {
                 }, this._token)
             }
         }))
+    }
+    async field(id: string): Promise<Field> {
+        const field = this._fields.find(v => v.id === id)
+        if (!field) throw new Error('Field not found')
+        return {
+            ...field,
+            delete: async (): Promise<void> => {
+                await callApi({
+                    method: "delete",
+                    url: this._url.field(this.id, field.id),
+                }, this._token)
+            },
+            update: async (field: Partial<Types[keyTypes]>): Promise<void> => {
+                await callApi({
+                    method: "patch",
+                    url: this._url.field(this.id, field.id),
+                    data: field
+                }, this._token)
+            }
+        }
     }
     async rows(limit?: number, offset?: number): Promise<Row[]> {
         const { nodes } = await callApi({
@@ -436,8 +469,8 @@ function generateUrlProjectPath(config) {
             if (!fieldId) return fieldUrl
             return fieldUrl + "/" + fieldId
         },
-        row(viewId: string, rowId?: string) {
-            const viewUrl = url.view(viewId)
+        row(tableId: string, rowId?: string) {
+            const viewUrl = url.table(tableId)
             const rowUrl = viewUrl + "/rows"
             if (!rowId) return rowUrl
             return rowUrl + "/" + rowId
@@ -466,7 +499,7 @@ export default (config: ProjectConfig) => {
     const url: UrlProjectPath = generateUrlProjectPath(config)
     let jwtToken;
     return {
-        createTable: async (params: Omit<APITable, "id">): Promise<string> => {
+        createTable: async (params: Omit<APITable, "id" | "fields"> & { fields: Omit<APIField<keyTypes>, "id">[] }): Promise<string> => {
             const { id } = await callApi({
                 method: "post",
                 url: url.table(),
@@ -489,7 +522,7 @@ export default (config: ProjectConfig) => {
             }, jwtToken)
             return new TableImpl({ ...view, jwtToken, url })
         },
-        createView: async (params: { name: string, tableId: string }): Promise<string> => {
+        createView: async (params: Omit<APIView, "id" | "vields"> & { vields: string[] }): Promise<string> => {
             const { id } = await callApi({
                 method: "post",
                 url: url.view(),
@@ -521,7 +554,8 @@ export default (config: ProjectConfig) => {
                 })
                 jwtToken = 'Bearer ' + token
             },
-            signOut() { jwtToken = undefined }
+            signOut() { jwtToken = undefined },
+            token() { return jwtToken }
         },
         createRole: async (params: Omit<APIRole, "id">): Promise<string> => {
             const { id } = await callApi({
