@@ -356,9 +356,9 @@ class TableImpl implements Table {
     _fields: APIField<keyof Types>[];
     _url: UrlProjectPath;
     _token: string;
-    constructor(params: APIView & { url: UrlProjectPath, jwtToken: string }) {
+    constructor(params: APITable & { url: UrlProjectPath, jwtToken: string }) {
         this.id = params.id
-        this._fields = params.vields
+        this._fields = params.fields
         this._url = params.url
         this._token = params.jwtToken
     }
@@ -450,11 +450,11 @@ function generateUrlProjectPath(config) {
             return `/orgs/${config.organizationId}/projects/${config.projectId}`
         },
         view(id?: string) {
-            if (!id) return "/views"
+            if (!id) return url.project() + "/views"
             return url.project() + "/views/" + id
         },
         table(id?: string) {
-            if (!id) return "/tables"
+            if (!id) return url.project() + "/tables"
             return url.project() + "/tables/" + id
         },
         field(tableId: string, fieldId?: string) {
@@ -508,16 +508,16 @@ export default (config: ProjectConfig) => {
             return id
         },
         tables: async (limit?: number, offset?: number): Promise<Table[]> => {
-            const views = await callApi({
-                method: "post",
+            const { nodes } = await callApi({
+                method: "get",
                 url: url.table(),
                 params: { limit, offset }
             }, jwtToken)
-            return views.map(view => new TableImpl({ ...view, jwtToken, url }))
+            return nodes.map(view => new TableImpl({ ...view, jwtToken, url }))
         },
         table: async (id: string): Promise<Table> => {
             const view = await callApi({
-                method: "post",
+                method: "get",
                 url: url.table(id)
             }, jwtToken)
             return new TableImpl({ ...view, jwtToken, url })
@@ -531,16 +531,16 @@ export default (config: ProjectConfig) => {
             return id
         },
         views: async (limit?: number, offset?: number): Promise<View[]> => {
-            const views = await callApi({
-                method: "post",
+            const { nodes } = await callApi({
+                method: "get",
                 url: url.view(),
                 params: { limit, offset }
             }, jwtToken)
-            return views.map(view => new ViewImpl({ ...view, jwtToken, url }))
+            return nodes.map(view => new ViewImpl({ ...view, jwtToken, url }))
         },
         view: async (id: string): Promise<View> => {
             const view = await callApi({
-                method: "post",
+                method: "get",
                 url: url.view(id)
             }, jwtToken)
             return new ViewImpl({ ...view, jwtToken, url })

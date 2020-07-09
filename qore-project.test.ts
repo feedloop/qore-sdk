@@ -8,7 +8,11 @@ const mockFirstRowId = "row-id-1"
 function getQoreProject() {
     return QoreProject({ organizationId: mockOrgId, projectId: mockProjectId })
 }
+
 describe('Qore Project', () => {
+    beforeAll(function () {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+    });
     describe('Auth', () => {
         it('should login with user token', async () => {
             const client = getQoreProject()
@@ -16,7 +20,7 @@ describe('Qore Project', () => {
         })
         it('should logout', async () => {
             const client = getQoreProject()
-            await expectAsync(client.auth.signOut()).toBeResolved()
+            client.auth.signOut()
             expect(client.auth.token()).toBeUndefined()
         })
     })
@@ -160,27 +164,27 @@ describe('Qore Project', () => {
                 await client.auth.signInWithUserToken(mockUserToken)
                 const node = await client.table(mockTable)
                 const [field] = await node.fields()
-                expect(field.id).toEqual("testAction-123")
+                expect(field.id).toEqual("serial-code-123")
             })
             it('should get field', async () => {
                 const client = getQoreProject()
                 await client.auth.signInWithUserToken(mockUserToken)
                 const node = await client.table(mockTable)
-                const field = await node.field("testAction-123")
-                expect(field.id).toEqual("testAction-123")
+                const field = await node.field("serial-code-123")
+                expect(field.id).toEqual("serial-code-123")
             })
             it('should delete field', async () => {
                 const client = getQoreProject()
                 await client.auth.signInWithUserToken(mockUserToken)
                 const node = await client.table(mockTable)
-                const field = await node.field("testAction-123")
+                const field = await node.field("serial-code-123")
                 expectAsync(field.delete()).toBeResolved()
             })
             it('should update field', async () => {
                 const client = getQoreProject()
                 await client.auth.signInWithUserToken(mockUserToken)
                 const node = await client.table(mockTable)
-                const field = await node.field("testAction-123")
+                const field = await node.field("serial-code-123")
                 expectAsync(field.update({
                     name: "newName"
                 })).toBeResolved()
@@ -319,7 +323,7 @@ describe('Qore Project', () => {
                 await client.auth.signInWithUserToken(mockUserToken)
                 const node = await client.view(mockView)
                 const [field] = await node.vields()
-                expect(field.id).toEqual("testAction-123")
+                expect(field.id).toEqual("serial-code-123")
             })
             it('should hide field', async () => {
                 const client = getQoreProject()
