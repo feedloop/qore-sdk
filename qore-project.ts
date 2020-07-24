@@ -13,18 +13,32 @@ type Types = {
     select: SelectField
     formula: FormulaField
     action: ActionField
+    boolean: BooleanField
 };
-type TextField = BaseField & { type: 'text', defaultValue?: string }
-type NumberField = BaseField & { type: 'number', defaultValue?: number }
-type DateField = BaseField & { type: 'date', defaultValue?: Date }
-type RollupField = BaseField & { type: 'rollup', defaultValue?: number }
-type LookupField = BaseField & { type: 'lookup' }
-type RelationField = BaseField & { type: 'relation' }
-type SelectField = BaseField & { type: 'select', defaultValue?: string }
-type FormulaField = BaseField & { type: 'formula', defaultValue?: number | string, formula: string }
-type ActionField = BaseField & { type: 'action' }
+type keyTypes = keyof Types
+type TextField = BaseField & { type: 'text' }
+type NumberField = BaseField & { type: 'number' }
+type BooleanField = BaseField & { type: 'boolean' }
+type DateField = BaseField & { type: 'date' }
+type RollupField = BaseField & { type: 'rollup', columns: string[], condition: string, aggregate: 'sum' | 'count' | 'min' | 'max' | 'avg' }
+type LookupField = BaseField & { type: 'lookup', columns: string[] }
+type RelationField = BaseField & { type: 'relation', table: string }
+type SelectField = BaseField & { type: 'select', select: string[] }
+type FormulaField = BaseField & { type: 'formula', returnType: 'number' | 'text', formula: string }
+type ActionField = BaseField & {
+    type: 'action',
+    parameters: { alias: string, type: 'text' | 'number' }[],
+    condition: string,
+    tasks: Array<{
+        type: 'update',
+        update: { [key: string]: string }
+    } | {
+        type: 'insert',
+        table: string,
+        insert: { [key: string]: string }
+    }>
+}
 
-type keyTypes = Types[keyof Types]['type']
 type APIVield<T extends keyTypes> = Types[T] & { display: boolean }
 type APIField<T extends keyTypes> = Types[T]
 type APIView = {
@@ -85,6 +99,7 @@ type Column = {
     number: { update(value?: number): Promise<void> }
     select: { update(value?: string): Promise<void> }
     date: { update(value?: Date): Promise<void> }
+    boolean: { update(value?: Date): Promise<void> }
     rollup: {}
     lookup: {}
     relation: { add(rowId: string): Promise<void>, remove(rowId: string): Promise<void> }
@@ -94,9 +109,9 @@ type Column = {
 type Row = {
     parentId: string;
     id: string;
-    col<T extends keyTypes>(field: { id: string, type: T }): Column[T];
+    col<T extends keyTypes>(fieldId: string): Column[T];
     delete(): Promise<void>
-}
+} & { [key: string]: any }
 type Member = APIMember & {
     delete(): Promise<void>
     updateRole(roleId: string): Promise<void>
@@ -108,6 +123,7 @@ type Role = APIRole & {
 type ProjectConfig = {
     organizationId: string;
     projectId: string;
+    token?: string;
 }
 type UrlProjectPath = {
     project(): string
@@ -116,8 +132,9 @@ type UrlProjectPath = {
     field(tableId: string, fieldId?: string): string
     vield(viewId: string, fieldId?: string): string
     row(tableId: string, rowId?: string): string
-    addRowRelation(viewId: string, rowId: string, fieldId: string): string
-    removeRowRelation(viewId: string, rowId: string, fieldId: string, refRowId: string): string
+    addRowRelation(tableId: string, rowId: string, fieldId: string): string
+    executeRow(tableId: string, rowId: string, fieldId: string): string
+    removeRowRelation(tableId: string, rowId: string, fieldId: string, refRowId: string): string
     projectLogin(): string
     member(memberId?: string): string
     role(roleId?: string): string
@@ -183,49 +200,54 @@ class RowImpl implements Row {
     id: string;
     _url: UrlProjectPath;
     _token: string;
-    constructor(params: { url: UrlProjectPath, jwtToken: string, parentId: string, rowId: string }) {
+    _fieldById: { [key: string]: keyTypes };
+    constructor(params: { url: UrlProjectPath, jwtToken: string, parentId: string, rowId: string, fieldById: { [key: string]: keyTypes } }) {
         this.parentId = params.parentId
         this.id = params.rowId
         this._url = params.url
         this._token = params.jwtToken
+        this._fieldById = params.fieldById
     }
-    col(field): any {
-        switch (field.type) {
+    col(fieldId: string): any {
+        const type = this._fieldById[fieldId]
+        if (!type) throw new Error('Field not found')
+        const params = { url: this._url, parentId: this.parentId, id: this.id, token: this._token }
+        switch (type) {
             case "select":
             case "text":
                 return {
                     async update(value?: string) {
                         await callApi({
-                            method: "put",
-                            url: this._url.row(this.parentId, this.id),
+                            method: "patch",
+                            url: params.url.row(params.parentId, params.id),
                             data: {
-                                [field.id]: value
+                                [fieldId]: value
                             }
-                        })
+                        }, params.token)
                     }
                 }
             case "date":
                 return {
                     async update(value?: Date) {
                         await callApi({
-                            method: "put",
-                            url: this._url.row(this.parentId, this.id),
+                            method: "patch",
+                            url: params.url.row(params.parentId, params.id),
                             data: {
-                                [field.id]: value
+                                [fieldId]: value
                             }
-                        })
+                        }, params.token)
                     }
                 }
             case "number":
                 return {
                     async update(value?: number) {
                         await callApi({
-                            method: "put",
-                            url: this._url.row(this.parentId, this.id),
+                            method: "patch",
+                            url: params.url.row(params.parentId, params.id),
                             data: {
-                                [field.id]: value
+                                [fieldId]: value
                             }
-                        })
+                        }, params.token)
                     }
                 }
             case "relation":
@@ -233,26 +255,24 @@ class RowImpl implements Row {
                     async add(value: string) {
                         await callApi({
                             method: "post",
-                            url: this._url.addRowRelation(this.parentId, this.id, field.id),
-                            data: {
-                                [field.id]: value
-                            }
-                        })
+                            url: params.url.addRowRelation(params.parentId, params.id, fieldId),
+                            data: { value }
+                        }, params.token)
                     },
                     async remove(value: string) {
                         await callApi({
                             method: "delete",
-                            url: this._url.removeRowRelation(this.parentId, this.id, field.id, value),
-                        })
+                            url: params.url.removeRowRelation(params.parentId, params.id, fieldId, value),
+                        }, params.token)
                     }
                 }
             case "action":
                 return {
                     async execute(params: { [key: string]: any }) {
                         await callApi({
-                            method: "delete",
-                            url: this._url.field(this.parentId, field.id),
-                            data: { rowId: this.id, params }
+                            method: "post",
+                            url: params.url.field(params.parentId, fieldId),
+                            data: { rowId: params.id, params }
                         })
                     }
                 }
@@ -279,6 +299,7 @@ class ViewImpl implements View {
     _vields: APIView['vields'];
     _url: UrlProjectPath;
     _token: string;
+    _fieldById: { [key: string]: keyTypes };
     constructor(params: APIView & { url: UrlProjectPath, jwtToken: string }) {
         this.id = params.id
         this.name = params.name
@@ -286,6 +307,7 @@ class ViewImpl implements View {
         this.sorts = params.sorts
         this.tableId = params.tableId
         this._vields = params.vields
+        this._fieldById = params.vields.reduce((map, v) => ({ ...map, [v.id]: v.type }), {})
         this._url = params.url
         this._token = params.jwtToken
     }
@@ -327,14 +349,14 @@ class ViewImpl implements View {
             url: this._url.row(this.tableId),
             params: { limit, offset }
         }, this._token)
-        return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.tableId, rowId: row.id }))
+        return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.tableId, rowId: row.id, fieldById: this._fieldById }))
     }
     async row(rowId: string): Promise<Row> {
         const row = await callApi({
             method: "get",
             url: this._url.row(this.tableId, rowId)
         }, this._token)
-        return new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.tableId, rowId: row.id })
+        return new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.tableId, rowId: row.id, fieldById: this._fieldById })
     }
     async addRow(): Promise<string> {
         const { id } = await callApi({
@@ -356,11 +378,13 @@ class TableImpl implements Table {
     _fields: APIField<keyof Types>[];
     _url: UrlProjectPath;
     _token: string;
+    _fieldById: { [key: string]: keyTypes };
     constructor(params: APITable & { url: UrlProjectPath, jwtToken: string }) {
         this.id = params.id
         this._fields = params.fields
         this._url = params.url
         this._token = params.jwtToken
+        this._fieldById = params.fields.reduce((map, v) => ({ ...map, [v.id]: v.type }), {})
     }
     async addField(field: Types[keyTypes]): Promise<string> {
         const { id } = await callApi({
@@ -414,14 +438,14 @@ class TableImpl implements Table {
             url: this._url.row(this.id),
             params: { limit, offset }
         }, this._token)
-        return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id }))
+        return nodes.map(row => new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id, fieldById: this._fieldById }))
     }
     async row(rowId: string): Promise<Row> {
         const row = await callApi({
             method: "get",
             url: this._url.row(this.id, rowId)
         }, this._token)
-        return new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id })
+        return new RowImpl({ jwtToken: this._token, url: this._url, parentId: this.id, rowId: row.id, fieldById: this._fieldById })
     }
     async addRow(): Promise<string> {
         const { id } = await callApi({
@@ -475,13 +499,17 @@ function generateUrlProjectPath(config) {
             if (!rowId) return rowUrl
             return rowUrl + "/" + rowId
         },
-        addRowRelation(viewId: string, rowId: string, fieldId: string) {
-            const viewUrl = url.view(viewId)
-            return viewUrl + "/rows" + "/" + rowId + "/" + fieldId
+        addRowRelation(tableId: string, rowId: string, fieldId: string) {
+            const viewUrl = url.table(tableId)
+            return viewUrl + "/rows" + "/" + rowId + "/relation/" + fieldId
         },
-        removeRowRelation(viewId: string, rowId: string, fieldId: string, refRowId: string) {
-            const viewUrl = url.view(viewId)
-            return viewUrl + "/rows" + "/" + rowId + "/" + fieldId + "/" + refRowId
+        executeRow(tableId: string, rowId: string, fieldId: string) {
+            const viewUrl = url.table(tableId)
+            return viewUrl + "/rows" + "/" + rowId + "/action/" + fieldId
+        },
+        removeRowRelation(tableId: string, rowId: string, fieldId: string, refRowId: string) {
+            const viewUrl = url.table(tableId)
+            return viewUrl + "/rows" + "/" + rowId + "/relation" + fieldId + "/" + refRowId
         },
         projectLogin() {
             return url.project() + "/authenticate"
@@ -497,7 +525,7 @@ function generateUrlProjectPath(config) {
 }
 export default (config: ProjectConfig) => {
     const url: UrlProjectPath = generateUrlProjectPath(config)
-    let jwtToken;
+    let jwtToken = config.token
     return {
         createTable: async (params: Omit<APITable, "id" | "fields"> & { fields: Omit<APIField<keyTypes>, "id">[] }): Promise<string> => {
             const { id } = await callApi({

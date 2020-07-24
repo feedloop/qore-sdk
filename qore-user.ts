@@ -8,9 +8,8 @@ type UrlUserPath = {
 }
 function generateUrlUserPath() {
     const url = {
-        register(): string {
-            return '/register'
-        },
+        register(): string { return '/register' },
+        verify(): string { return '/verify' },
         login(): string { return '/login' },
         organization(id?: string): string { return id ? '/orgs/' + id : '/orgs' },
         account(orgId: string, id?: string): string { return url.organization(orgId) + (id ? '/accounts/' + id : '/accounts') },
@@ -23,10 +22,9 @@ type APIOrganization = {
     name: string;
     category: string;
     size: string;
+    subdomain: string;
 }
 type APIUser = {
-    id: string;
-    name: string;
     email: string;
     token: string
 }
@@ -116,12 +114,14 @@ class OrganizationImpl implements Organization {
     id: string;
     name: string;
     category: string;
+    subdomain: string;
     size: string;
     _url: UrlUserPath;
     _token: string;
     constructor(params: APIOrganization & { url: UrlUserPath, userToken: string }) {
         this.id = params.id
         this.name = params.name
+        this.subdomain = params.subdomain
         this.category = params.category
         this.size = params.size
         this._url = params.url
@@ -183,26 +183,35 @@ export default () => {
     let user: APIUser;
     const url = generateUrlUserPath()
     return {
-        async register(params: { email: string, name: string, password: string }): Promise<void> {
-            user = await callApi({
+        async register(params: { email: string, password: string }): Promise<void> {
+            await callApi({
                 method: "post",
                 url: url.register(),
                 data: params
             })
         },
-        async login(username: string, password: string): Promise<void> {
-            user = await callApi({
+        async login(email: string, password: string): Promise<void> {
+            const { token } = await callApi({
                 method: "post",
                 url: url.login(),
-                data: { username, password }
+                data: { email, password }
             })
+            user = { email, token: 'Bearer ' + token }
+        },
+        async verify(email: string, activationCode: string): Promise<void> {
+            const { token } = await callApi({
+                method: "post",
+                url: url.verify(),
+                data: { email, activationCode }
+            })
+            user = { email, token }
         },
         async createOrganization(params: { name: string, category: string, size: string }): Promise<string> {
             const { id } = await callApi({
                 method: "post",
                 url: url.organization(),
                 data: params
-            })
+            }, user.token)
             return id
         },
         async organizations(limit?: number, offset?: number): Promise<Organization[]> {
