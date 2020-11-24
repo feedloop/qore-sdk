@@ -1,0 +1,15 @@
+stages:
+  - test
+
+cli-test:
+  image: node:latest
+  stage: test
+  script:
+    - cd cli
+    - yarn
+    - yarn test
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - cli/**/*
