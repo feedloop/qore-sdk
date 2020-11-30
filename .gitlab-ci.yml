@@ -13,3 +13,16 @@ cli-test:
       - merge_requests
     changes:
       - cli/**/*
+
+client-test:
+  image: node:latest
+  stage: test
+  script:
+    - cd client
+    - yarn
+    - yarn test
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - client/**/*
