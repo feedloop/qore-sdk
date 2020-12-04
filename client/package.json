@@ -20,6 +20,7 @@
     "nock": "^13.0.5",
     "normalizr": "^3.6.1",
     "sequency": "^0.19.2",
-    "type-fest": "^0.20.1"
+    "type-fest": "^0.20.1",
+    "wonka": "^4.0.15"
   }
 }
