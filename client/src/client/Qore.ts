@@ -1,5 +1,6 @@
 import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import produce from "immer";
+import Wonka from "wonka";
 import { schema, Schema, SchemaObject } from "normalizr";
 import { Field } from "../sdk/project/field";
 
@@ -37,11 +38,94 @@ class QoreProject {
   }
 }
 
-type CacheConfig = {
+type OperationConfig = {
   mode: "network" | "cache";
+  interval?: number;
 };
 
-const defaultCacheConfig: CacheConfig = { mode: "cache" };
+const defaultOperationConfig: OperationConfig = { mode: "cache" };
+
+type OperationResult<T> = {
+  loading: boolean;
+  data?: T;
+  error?: Error;
+};
+class OperationExecutor<T, A extends { config: OperationConfig }> {
+  execution: (args: A) => Promise<T>;
+  args: A;
+  reExecute: (args: Partial<A>) => void;
+  operation: Wonka.Source<OperationResult<T>>;
+  constructor(execution: (args: A) => Promise<T>, args: A) {
+    this.args = args;
+    this.execution = execution;
+    const execPublisher = Wonka.makeSubject();
+    this.reExecute = (args) => {
+      this.args = { ...this.args, ...args };
+      execPublisher.next(1);
+    };
+    const source = Wonka.make<OperationResult<T>>((observer) => {
+      observer.next({ loading: true });
+      this.execution(this.args)
+        .then((data) => {
+          observer.next({ loading: false, data });
+        })
+        .catch((error) => {
+          observer.next({ loading: false, error });
+        })
+        .finally(() => {
+          observer.complete();
+        });
+      return () => {};
+    });
+    const stream = this.args.config.interval
+      ? Wonka.concat([
+          Wonka.interval(this.args.config.interval),
+          execPublisher.source,
+        ])
+      : execPublisher.source;
+    this.operation = Wonka.pipe(
+      Wonka.concat([Wonka.fromValue(1), stream]),
+      Wonka.switchMap(() => source)
+    );
+  }
+  toPromise() {
+    return Wonka.pipe(
+      this.operation,
+      Wonka.skipWhile((data) => data.loading),
+      Wonka.take(1),
+      Wonka.toPromise
+    );
+  }
+  subscribe(listener: (result: OperationResult<T>) => void) {
+    return Wonka.pipe(this.operation, Wonka.subscribe(listener));
+  }
+}
+
+class ViewStream<T extends QoreRow> {
+  driver: ViewDriver<T>;
+  constructor(driver: ViewDriver<T>) {
+    this.driver = driver;
+  }
+  row(args: { id: string; config?: OperationConfig }) {
+    return new OperationExecutor(
+      ({ config, id }) => this.driver.readRow(id, config),
+      {
+        config: defaultOperationConfig,
+        ...args,
+      }
+    );
+  }
+  rows(args: {
+    opts: { offset?: number; limit?: number };
+    config?: OperationConfig;
+  }) {
+    return new OperationExecutor(
+      ({ opts, config }) =>
+        this.driver.readRows(opts, config || defaultOperationConfig),
+      { config: defaultOperationConfig, ...args }
+    );
+  }
+}
 
 class ViewDriver<T extends QoreRow = QoreRow> {
   id: string;
@@ -49,6 +133,7 @@ class ViewDriver<T extends QoreRow = QoreRow> {
   fields: Record<string, Field> = {};
   project: QoreProject;
   cache = new Map<string, T | T[]>();
+  viewStream: ViewStream<T>;
   constructor(
     project: QoreProject,
     id: string,
@@ -62,10 +147,11 @@ class ViewDriver<T extends QoreRow = QoreRow> {
       (map, field) => ({ ...map, [field.id]: field }),
       {}
     );
+    this.viewStream = new ViewStream(this);
   }
   async readRows(
     opts: { offset?: number; limit?: number } = {},
-    config: CacheConfig = defaultCacheConfig
+    config: OperationConfig = defaultOperationConfig
   ): Promise<T[]> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/views/${this.id}/v2rows`,
@@ -76,11 +162,12 @@ class ViewDriver<T extends QoreRow = QoreRow> {
     if (Array.isArray(cached) && config.mode === "cache") return cached;
     const resp = await this.project.axios.request<{ nodes: T[] }>(axiosConfig);
     this.cache.set(key, resp.data.nodes);
-    return this.readRows(opts, defaultCacheConfig);
+    return this.readRows(opts, defaultOperationConfig);
   }
+
   async readRow(
     id: string,
-    config: CacheConfig = defaultCacheConfig
+    config: OperationConfig = defaultOperationConfig
   ): Promise<T> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/views/${this.id}/v2rows/${id}`,
@@ -95,7 +182,7 @@ class ViewDriver<T extends QoreRow = QoreRow> {
       return cached;
     const resp = await this.project.axios.request<T>(axiosConfig);
     this.cache.set(key, resp.data);
-    return this.readRow(id, defaultCacheConfig);
+    return this.readRow(id, defaultOperationConfig);
   }
   async updateRow(id: string, input: Partial<T>): Promise<T> {
     const inputs = Object.entries(input);

@@ -120,19 +120,24 @@ const createMockServer = () =>
     });
 
 describe("Qore SDK", () => {
+  let scope: nock.Scope;
+  beforeEach(() => {
+    scope = createMockServer();
+  });
+  afterEach(() => {
+    scope.done();
+  });
   it("initialize sdk", async () => {
-    const scope = createMockServer();
     const qore = new QoreClient<{ allTasks: { id: string; name: string } }>({
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
     await qore.init();
     expect(qore.views.allTasks).toHaveProperty("readRows");
-    scope.done();
   });
 
   it("fetch view rows, read and write to cache", async () => {
-    const scope = createMockServer()
+    scope
       .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows?limit=1")
       .reply(200, {
         nodes: [
@@ -182,11 +187,70 @@ describe("Qore SDK", () => {
     expect(alltasks).toEqual(sameTasks);
     const fewerTasks = await qore.views.allTasks.readRows({ limit: 1 });
     expect(alltasks).not.toEqual(fewerTasks);
-    scope.done();
+  });
+
+  it("read from subscription", async (done) => {
+    scope
+      .get(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+      .reply(200, {
+        id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
+        description: null,
+        done: false,
+        name: "New task",
+        user: null,
+      })
+      .get(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+      .reply(200, {
+        id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
+        description: null,
+        done: false,
+        name: "Completely new task",
+        user: null,
+      });
+    const qore = new QoreClient<{ allTasks: { id: string; name: string } }>({
+      organisationId: "FAKE_ORG",
+      projectId: "FAKE_PROJECT",
+    });
+    await qore.init();
+    const readStream = qore.views.allTasks.viewStream.row({
+      id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
+    });
+
+    let resultsData: Array<{}> = [];
+
+    const subscription = readStream.subscribe((result) => {
+      if (result.error) done(result.error);
+      if (result.data) {
+        resultsData.push(result.data);
+      }
+      if (resultsData.length > 2) {
+        expect(resultsData[0]).toEqual({
+          id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
+          description: null,
+          done: false,
+          name: "New task",
+          user: null,
+        });
+        expect(resultsData[0]).toEqual(resultsData[1]);
+        expect(resultsData[0]).not.toEqual(resultsData[2]);
+        subscription.unsubscribe();
+        done();
+      }
+    });
+    setTimeout(() => {
+      readStream.reExecute({});
+      setTimeout(() => {
+        readStream.reExecute({ config: { mode: "network" } });
+      }, 1000);
+    }, 1000);
   });
 
   it("insert a new row, write and read from cache", async () => {
-    const scope = createMockServer()
+    scope
       .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
@@ -210,13 +274,14 @@ describe("Qore SDK", () => {
       name: "New task",
     });
     expect(newTask).toHaveProperty("name", "New task");
-    const cachedTask = await qore.views.allTasks.readRow(newTask.id);
+    const { data: cachedTask } = await qore.views.allTasks.viewStream
+      .row({ id: newTask.id })
+      .toPromise();
     expect(newTask).toEqual(cachedTask);
-    scope.done();
   });
 
   it("update a row", async () => {
-    const scope = createMockServer()
+    scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -260,11 +325,10 @@ describe("Qore SDK", () => {
       id: "9275e876-fd95-45a0-ad67-b947a1296c32",
       displayField: "rrmdn@pm.me",
     });
-    scope.done();
   });
 
   it("delete a row", async () => {
-    const scope = createMockServer()
+    scope
       .delete(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -288,6 +352,5 @@ describe("Qore SDK", () => {
     ]);
     await qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f");
     expect(qore.views.allTasks.cache.size).toEqual(0);
-    scope.done();
   });
 });
