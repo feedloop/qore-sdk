@@ -1,12 +1,24 @@
-import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import produce from "immer";
-import Wonka from "wonka";
+import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import Wonka, { merge } from "wonka";
 import { schema, Schema, SchemaObject } from "normalizr";
 import { Field } from "../sdk/project/field";
+import {
+  Exchange,
+  ExchangeInput,
+  ExchangeIO,
+  QoreOperation,
+  QoreOperationConfig,
+  QoreOperationResult,
+} from "../types";
+import debugExchange from "../exchanges/debugExchange";
+import networkExchange from "../exchanges/networkExchange";
+import { ViewDriver } from "./ViewDriver";
+import { NormalizedCache } from "./NormalizedCache";
+import cacheExchange from "../exchanges/cacheExchange";
 
-type RelationValue = { id: string } | Array<{ id: string }>;
+export type RelationValue = { id: string } | Array<{ id: string }>;
 
-type QoreRow = { id: string } & Record<
+export type QoreRow = { id: string } & Record<
   string,
   string | number | boolean | RelationValue
 >;
@@ -16,14 +28,19 @@ type QoreConfig = {
   organisationId: string;
 };
 
-class QoreProject {
+export const defaultOperationConfig: QoreOperationConfig = {
+  networkPolicy: "network-and-cache",
+  pollInterval: 0,
+};
+
+export class QoreProject {
   config: QoreConfig;
   axios: AxiosInstance;
   cache = new NormalizedCache();
   constructor(config: QoreConfig) {
     this.config = config;
     this.axios = Axios.create({
-      baseURL: `${process.env.QORE_API || ""}/orgs/${
+      baseURL: `${process.env.QORE_API || "http://localhost:8080"}/orgs/${
         this.config.organisationId
       }/projects/${this.config.projectId}`,
     });
@@ -38,265 +55,78 @@ class QoreProject {
   }
 }
 
-type OperationConfig = {
-  mode: "network" | "cache";
-  interval?: number;
-};
-
-const defaultOperationConfig: OperationConfig = { mode: "cache" };
-
-type OperationResult<T> = {
+export type OperationResult<T> = {
   loading: boolean;
   data?: T;
   error?: Error;
 };
-class OperationExecutor<T, A extends { config: OperationConfig }> {
-  execution: (args: A) => Promise<T>;
-  args: A;
-  reExecute: (args: Partial<A>) => void;
-  operation: Wonka.Source<OperationResult<T>>;
-  constructor(execution: (args: A) => Promise<T>, args: A) {
-    this.args = args;
-    this.execution = execution;
-    const execPublisher = Wonka.makeSubject();
-    this.reExecute = (args) => {
-      this.args = { ...this.args, ...args };
-      execPublisher.next(1);
-    };
-    const source = Wonka.make<OperationResult<T>>((observer) => {
-      observer.next({ loading: true });
-      this.execution(this.args)
-        .then((data) => {
-          observer.next({ loading: false, data });
-        })
-        .catch((error) => {
-          observer.next({ loading: false, error });
-        })
-        .finally(() => {
-          observer.complete();
-        });
-      return () => {};
-    });
-    const stream = this.args.config.interval
-      ? Wonka.concat([
-          Wonka.interval(this.args.config.interval),
-          execPublisher.source,
-        ])
-      : execPublisher.source;
-    this.operation = Wonka.pipe(
-      Wonka.concat([Wonka.fromValue(1), stream]),
-      Wonka.switchMap(() => source)
-    );
-  }
-  toPromise() {
-    return Wonka.pipe(
-      this.operation,
-      Wonka.skipWhile((data) => data.loading),
-      Wonka.take(1),
-      Wonka.toPromise
-    );
-  }
-  subscribe(listener: (result: OperationResult<T>) => void) {
-    return Wonka.pipe(this.operation, Wonka.subscribe(listener));
-  }
+export type ViewDriverObject<T> = T extends ViewDriver<infer U> ? U : never;
+
+export type CacheRef = { __ref: string };
+
+export const composeExchanges = (exchanges: Exchange[]) => ({
+  client,
+  forward,
+}: ExchangeInput) =>
+  exchanges.reduceRight(
+    (forward, exchange) =>
+      exchange({
+        client,
+        forward,
+      }),
+    forward
+  );
+
+export type PromisifiedSource<T = any> = Wonka.Source<T> & {
+  toPromise: () => Promise<T>;
+  revalidate: (config?: Partial<QoreOperationConfig>) => void;
+  subscribe: (callback: (data: T) => void) => Wonka.Subscription;
+};
+
+export function withHelpers<T>(
+  source$: Wonka.Source<T>,
+  client: QoreClient,
+  operation: QoreOperation
+): PromisifiedSource<T> {
+  (source$ as PromisifiedSource<T>).toPromise = () =>
+    Wonka.pipe(source$, Wonka.take(1), Wonka.toPromise);
+
+  (source$ as PromisifiedSource<T>).subscribe = (callback) =>
+    Wonka.subscribe(callback)(source$);
+
+  (source$ as PromisifiedSource<T>).revalidate = (
+    config = defaultOperationConfig
+  ) => {
+    client.revalidate({ ...defaultOperationConfig, ...operation, ...config });
+  };
+
+  return source$ as PromisifiedSource<T>;
 }
 
-class ViewStream<T extends QoreRow> {
-  driver: ViewDriver<T>;
-  constructor(driver: ViewDriver<T>) {
-    this.driver = driver;
-  }
-  row(args: { id: string; config?: OperationConfig }) {
-    return new OperationExecutor(
-      ({ config, id }) => this.driver.readRow(id, config),
-      {
-        config: defaultOperationConfig,
-        ...args,
-      }
-    );
-  }
-  rows(args: {
-    opts: { offset?: number; limit?: number };
-    config?: OperationConfig;
-  }) {
-    return new OperationExecutor(
-      ({ opts, config }) =>
-        this.driver.readRows(opts, config || defaultOperationConfig),
-      { config: defaultOperationConfig, ...args }
-    );
-  }
-}
-
-class ViewDriver<T extends QoreRow = QoreRow> {
-  id: string;
-  tableId: string;
-  fields: Record<string, Field> = {};
-  project: QoreProject;
-  cache = new Map<string, T | T[]>();
-  viewStream: ViewStream<T>;
-  constructor(
-    project: QoreProject,
-    id: string,
-    tableId: string,
-    fields: Field[]
-  ) {
-    this.id = id;
-    this.tableId = tableId;
-    this.project = project;
-    this.fields = fields.reduce(
-      (map, field) => ({ ...map, [field.id]: field }),
-      {}
-    );
-    this.viewStream = new ViewStream(this);
-  }
-  async readRows(
-    opts: { offset?: number; limit?: number } = {},
-    config: OperationConfig = defaultOperationConfig
-  ): Promise<T[]> {
-    const axiosConfig: AxiosRequestConfig = {
-      url: `/views/${this.id}/v2rows`,
-      params: opts,
-    };
-    const key = `${this.id}:opts:${JSON.stringify(opts)}`;
-    const cached = this.cache.get(key);
-    if (Array.isArray(cached) && config.mode === "cache") return cached;
-    const resp = await this.project.axios.request<{ nodes: T[] }>(axiosConfig);
-    this.cache.set(key, resp.data.nodes);
-    return this.readRows(opts, defaultOperationConfig);
-  }
-
-  async readRow(
-    id: string,
-    config: OperationConfig = defaultOperationConfig
-  ): Promise<T> {
-    const axiosConfig: AxiosRequestConfig = {
-      url: `/views/${this.id}/v2rows/${id}`,
-    };
-    const key = `${this.id}:id:${id}`;
-    const cached = this.cache.get(key);
-    if (
-      typeof cached === "object" &&
-      !Array.isArray(cached) &&
-      config.mode === "cache"
-    )
-      return cached;
-    const resp = await this.project.axios.request<T>(axiosConfig);
-    this.cache.set(key, resp.data);
-    return this.readRow(id, defaultOperationConfig);
-  }
-  async updateRow(id: string, input: Partial<T>): Promise<T> {
-    const inputs = Object.entries(input);
-    const nonRelational = inputs
-      .filter(([key]) => {
-        return this.fields[key].type !== "relation";
-      })
-      .reduce(
-        (obj, [key, value]): Record<string, any> => ({ ...obj, [key]: value }),
-        {}
-      );
-    const relational = inputs
-      .filter(([key]) => {
-        const fieldDef = this.fields[key];
-        return fieldDef.type === "relation";
-      })
-      .reduce((acc, [key, value]: [string, RelationValue]) => {
-        return {
-          ...acc,
-          [key]: Array.isArray(value) ? value.map((val) => val.id) : value.id,
-        };
-      });
-    await this.project.axios.patch<{ ok: boolean }>(
-      `/tables/${this.tableId}/rows/${id}`,
-      { ...nonRelational, ...relational }
-    );
-    const row = await this.readRow(id);
-    return row;
-  }
-  async deleteRow(id: string): Promise<boolean> {
-    const key = `${this.id}:id:${id}`;
-    const resp = await this.project.axios.delete<{ ok: boolean }>(
-      `/tables/${this.tableId}/rows/${id}`
-    );
-    this.cache.delete(key);
-    return resp.data.ok;
-  }
-  async insertRow(input: Omit<Partial<T>, "id">): Promise<T> {
-    const resp = await this.project.axios.post<{ id: string }>(
-      `/tables/${this.tableId}/rows`,
-      input
-    );
-    const row = await this.readRow(resp.data.id);
-    return row;
-  }
-  async addRelation(
-    id: string,
-    relation: string,
-    target: string
-  ): Promise<boolean> {
-    const resp = await this.project.axios.post<{ ok: true }>(
-      `/tables/${this.tableId}/rows/${id}/relation/${relation}`,
-      { value: target }
-    );
-    return resp.data.ok;
-  }
-}
-
-type ViewDriverObject<T> = T extends ViewDriver<infer U> ? U : never;
-
-type CacheRef = { __ref: string };
-
-// for future reference if normalized cache is necessary
-class NormalizedCache {
-  data: Record<
-    string,
-    Record<string, boolean | number | string | CacheRef>
-  > = {};
-  modify(modifier: (data: NormalizedCache["data"]) => void) {
-    this.data = produce(this.data, modifier);
-  }
-  identify(table: string, id: string) {
-    return `${table}:${id}`;
-  }
-  lookup(ref: CacheRef, depth = 0): Record<string, any> {
-    const record: Record<string, any> = {};
-    const [table, id] = ref.__ref.split(":");
-    const cacheKey = this.identify(table, id);
-    const cache = this.data[cacheKey];
-    for (const [key, value] of Object.entries(cache)) {
-      record[key] =
-        typeof value !== "object"
-          ? value
-          : depth > 0
-          ? this.lookup(value, depth - 1)
-          : undefined;
-    }
-    return record;
-  }
-  read<V extends ViewDriver>(view: V, id: string): ViewDriverObject<V> {
-    return this.lookup(
-      { __ref: this.identify(view.tableId, id) },
-      1
-    ) as ViewDriverObject<V>;
-  }
-  write<V extends ViewDriver, T extends QoreRow>(view: V, rows: T[]) {
-    for (const row of rows) {
-      const id = this.identify(view.tableId, row.id);
-      for (const field of Object.values(view.fields)) {
-        if (typeof row === "object") return;
-        this.modify((draft) => {
-          draft[id][field.id] = row[field.id];
-        });
-      }
-    }
-  }
-}
-
-export default class QoreClient<T extends Record<string, any>> {
+export default class QoreClient<T extends Record<string, any> = {}> {
+  results: Wonka.Source<QoreOperationResult<AxiosRequestConfig>>;
+  operations: Wonka.Source<QoreOperation<AxiosRequestConfig>>;
+  nextOperation: (operation: QoreOperation<AxiosRequestConfig>) => void;
+  activeOperations: Record<string, number> = {};
   project: QoreProject;
   // @ts-ignore
   views: { [K in keyof T]: ViewDriver<T[K]> } = {};
   constructor(config: QoreConfig) {
     this.project = new QoreProject(config);
+    const { next, source } = Wonka.makeSubject<
+      QoreOperation<AxiosRequestConfig>
+    >();
+    this.operations = source;
+    this.nextOperation = next;
+    const composedExchange = composeExchanges([cacheExchange, networkExchange]);
+
+    this.results = Wonka.share(
+      composedExchange({ client: this, forward: debugExchange })(
+        this.operations
+      )
+    );
+    // Keep the stream open
+    Wonka.publish(this.results);
   }
   async init() {
     const resp = await this.project.axios.get<{
@@ -308,6 +138,7 @@ export default class QoreClient<T extends Record<string, any>> {
           `/views/${view.id}/fields`
         );
         return new ViewDriver(
+          this,
           this.project,
           view.id,
           view.tableId,
@@ -323,5 +154,62 @@ export default class QoreClient<T extends Record<string, any>> {
       }),
       {}
     );
+  }
+  onOperationStart(operation: QoreOperation) {
+    this.activeOperations[operation.key] =
+      (this.activeOperations[operation.key] || 0) + 1;
+    this.nextOperation(operation);
+  }
+  onOperationEnd(operation: QoreOperation) {
+    this.activeOperations[operation.key] =
+      (this.activeOperations[operation.key] || 0) - 1;
+    // send teardown command when there are no subscribers anymore
+    if (this.activeOperations[operation.key] < 1) {
+      this.nextOperation({ ...operation, type: "teardown" });
+    }
+  }
+  revalidate(operation: QoreOperation) {
+    if ((this.activeOperations[operation.key] || 0) > 0) {
+      this.nextOperation(operation);
+    }
+  }
+  executeOperation(operation: QoreOperation) {
+    let resultStream = Wonka.pipe(
+      this.results,
+      Wonka.filter((result) => result.operation.key === operation.key)
+    );
+    // non GET operations should receive only one result
+    if (operation.type?.toLowerCase() !== "get") {
+      return Wonka.pipe(
+        resultStream,
+        Wonka.onStart(() => this.nextOperation(operation)),
+        Wonka.take(1)
+      );
+    }
+
+    const teardownStream = Wonka.pipe(
+      this.operations,
+      Wonka.filter((op) => op.key === operation.key && op.type === "teardown")
+    );
+
+    resultStream = Wonka.pipe(
+      resultStream,
+      Wonka.takeUntil(teardownStream),
+      Wonka.onStart(() => this.onOperationStart(operation)),
+      Wonka.onEnd(() => this.onOperationEnd(operation))
+    );
+
+    if (operation.pollInterval > 0) {
+      return Wonka.pipe(
+        merge([Wonka.fromValue(0), Wonka.interval(operation.pollInterval)]),
+        Wonka.switchMap(() => resultStream)
+      );
+    }
+    return resultStream;
+  }
+  execute<Data = any>(
+    operation: QoreOperation
+  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, Data>> {
+    return withHelpers(this.executeOperation(operation), this, operation);
   }
 }

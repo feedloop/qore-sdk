@@ -1,8 +1,9 @@
 import nock from "nock";
+import Wonka from "wonka";
 import QoreClient from "./Qore";
 
 const createMockServer = () =>
-  nock("http://localhost:80")
+  nock("http://localhost:8080")
     .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views")
     .reply(200, {
       nodes: [
@@ -182,10 +183,18 @@ describe("Qore SDK", () => {
       projectId: "FAKE_PROJECT",
     });
     await qore.init();
-    const alltasks = await qore.views.allTasks.readRows({ limit: 2 });
-    const sameTasks = await qore.views.allTasks.readRows({ limit: 2 });
-    expect(alltasks).toEqual(sameTasks);
-    const fewerTasks = await qore.views.allTasks.readRows({ limit: 1 });
+    const alltasks = await qore.views.allTasks
+      .readRows({ limit: 2 })
+      .toPromise();
+    const cachedTask = await qore.views.allTasks
+      .readRows({ limit: 2 }, { networkPolicy: "cache-only" })
+      .toPromise();
+    expect(alltasks.data).toEqual(cachedTask.data);
+    expect(alltasks.operation.meta.cacheHit).toEqual(false);
+    expect(cachedTask.operation.meta.cacheHit).toEqual(true);
+    const fewerTasks = await qore.views.allTasks
+      .readRows({ limit: 1 })
+      .toPromise();
     expect(alltasks).not.toEqual(fewerTasks);
   });
 
@@ -216,12 +225,11 @@ describe("Qore SDK", () => {
       projectId: "FAKE_PROJECT",
     });
     await qore.init();
-    const readStream = qore.views.allTasks.viewStream.row({
-      id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
-    });
+    const readStream = qore.views.allTasks.readRow(
+      "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+    );
 
     let resultsData: Array<{}> = [];
-
     const subscription = readStream.subscribe((result) => {
       if (result.error) done(result.error);
       if (result.data) {
@@ -241,10 +249,11 @@ describe("Qore SDK", () => {
         done();
       }
     });
+
     setTimeout(() => {
-      readStream.reExecute({});
+      readStream.revalidate();
       setTimeout(() => {
-        readStream.reExecute({ config: { mode: "network" } });
+        readStream.revalidate({ networkPolicy: "network-only" });
       }, 1000);
     }, 1000);
   });
@@ -274,8 +283,8 @@ describe("Qore SDK", () => {
       name: "New task",
     });
     expect(newTask).toHaveProperty("name", "New task");
-    const { data: cachedTask } = await qore.views.allTasks.viewStream
-      .row({ id: newTask.id })
+    const { data: cachedTask } = await qore.views.allTasks
+      .readRow(newTask.id)
       .toPromise();
     expect(newTask).toEqual(cachedTask);
   });
@@ -344,13 +353,6 @@ describe("Qore SDK", () => {
       projectId: "FAKE_PROJECT",
     });
     await qore.init();
-    qore.views.allTasks.cache = new Map([
-      [
-        `allTasks:id:beba4104-44ee-46b2-9ddc-e6bfd0a1570f`,
-        { id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f", name: "Some task" },
-      ],
-    ]);
     await qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f");
-    expect(qore.views.allTasks.cache.size).toEqual(0);
   });
 });
