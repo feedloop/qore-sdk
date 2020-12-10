@@ -129,7 +129,13 @@ describe("Qore SDK", () => {
     scope.done();
   });
   it("initialize sdk", async () => {
-    const qore = new QoreClient<{ allTasks: { id: string; name: string } }>({
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+      };
+    }>({
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
@@ -139,7 +145,7 @@ describe("Qore SDK", () => {
 
   it("fetch view rows, read and write to cache", async () => {
     scope
-      .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows?limit=1")
+      .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows?limit=1&slug=some-slug&order=asc")
       .reply(200, {
         nodes: [
           {
@@ -178,7 +184,13 @@ describe("Qore SDK", () => {
         ],
         totalCount: "2",
       });
-    const qore = new QoreClient<{ allTasks: { id: string; name: string } }>({
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+      };
+    }>({
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
@@ -193,7 +205,7 @@ describe("Qore SDK", () => {
     expect(alltasks.operation.meta.cacheHit).toEqual(false);
     expect(cachedTask.operation.meta.cacheHit).toEqual(true);
     const fewerTasks = await qore.views.allTasks
-      .readRows({ limit: 1 })
+      .readRows({ limit: 1, slug: 'some-slug', order: "asc" })
       .toPromise();
     expect(alltasks).not.toEqual(fewerTasks);
   });
@@ -220,7 +232,13 @@ describe("Qore SDK", () => {
         name: "Completely new task",
         user: null,
       });
-    const qore = new QoreClient<{ allTasks: { id: string; name: string } }>({
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+      };
+    }>({
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
@@ -253,7 +271,10 @@ describe("Qore SDK", () => {
     setTimeout(() => {
       readStream.revalidate();
       setTimeout(() => {
-        readStream.revalidate({ networkPolicy: "network-only" });
+        readStream.revalidate({
+          networkPolicy: "network-only",
+          pollInterval: 5000,
+        });
       }, 1000);
     }, 1000);
   });
@@ -274,7 +295,13 @@ describe("Qore SDK", () => {
         name: "New task",
         user: null,
       });
-    const qore = new QoreClient<{ allTasks: { id: string; name: string } }>({
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+      };
+    }>({
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
@@ -311,10 +338,19 @@ describe("Qore SDK", () => {
       .reply(200, { ok: true });
     const qore = new QoreClient<{
       allTasks: {
-        id: string;
-        name: string;
-        user?: { id: string };
-        subtasks: [{ id: string }];
+        read: {
+          id: string;
+          name: string;
+          user: { id: string; name: string };
+          subtasks: [{ id: string; name: string }];
+        };
+        write: {
+          id: string;
+          name: string;
+          user: string[];
+          subtasks: string[];
+        };
+        params: { slug?: string };
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -325,8 +361,8 @@ describe("Qore SDK", () => {
       "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
       {
         name: "Old task",
-        user: { id: "9275e876-fd95-45a0-ad67-b947a1296c32" },
-        subtasks: [{ id: "ssdsd" }],
+        user: ["9275e876-fd95-45a0-ad67-b947a1296c32"],
+        subtasks: ["another-task"],
       }
     );
     expect(updatedTask).toHaveProperty("name", "Old task");
@@ -344,9 +380,9 @@ describe("Qore SDK", () => {
       .reply(200, { ok: true });
     const qore = new QoreClient<{
       allTasks: {
-        id: string;
-        name: string;
-        user?: { id: string };
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
       };
     }>({
       organisationId: "FAKE_ORG",

@@ -1,0 +1,172 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`codegen should be able to generate codegen 1`] = `
+"type MemberTableRow = {
+  id: string;
+  email: string;
+  role: { id: string; displayField: string };
+  tasks: TasksTableRow[];
+  doneTasks: number;
+};
+
+type TasksTableRow = {
+  id: string;
+  name: string;
+  description: string;
+  user: UserTableRow;
+  done: boolean;
+  subtasks: SubtasksTableRow[];
+};
+
+type ProfileTableRow = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+type SubtasksTableRow = {
+  id: string;
+  name: string;
+  description: string;
+  tasks1: Tasks1TableRow[];
+};
+
+type AllTasksViewRow = {
+  read: {
+    id: string;
+    name: string;
+    user: UserTableRow;
+    done: boolean;
+    subtasks: SubtasksTableRow[];
+  };
+  write: {
+    name: string;
+    user: string[];
+    done: boolean;
+    subtasks: string[];
+  };
+  params: {};
+};
+
+type AllMembersViewRow = {
+  read: {
+    id: string;
+    email: string;
+    role: { id: string; displayField: string };
+  };
+  write: {
+    email: string;
+  };
+  params: {};
+};
+
+type MemberTasksViewRow = {
+  read: {
+    id: string;
+    email: string;
+    role: { id: string; displayField: string };
+    tasks: TasksTableRow[];
+    doneTasks: number;
+  };
+  write: {
+    email: string;
+    tasks: string[];
+  };
+  params: {};
+};
+
+type ProfileDefaultViewViewRow = {
+  read: {
+    id: string;
+    name: string;
+    description: string;
+  };
+  write: {
+    name: string;
+    description: string;
+  };
+  params: {};
+};
+
+type AllProfilesViewRow = {
+  read: {
+    id: string;
+    name: string;
+    description: string;
+  };
+  write: {
+    name: string;
+    description: string;
+  };
+  params: {};
+};
+
+type SubtasksDefaultViewViewRow = {
+  read: {
+    id: string;
+    name: string;
+    description: string;
+  };
+  write: {
+    name: string;
+    description: string;
+  };
+  params: {};
+};
+
+type TasksByNameViewRow = {
+  read: {
+    id: string;
+    name: string;
+    description: string;
+    user: UserTableRow;
+    done: boolean;
+    subtasks: SubtasksTableRow[];
+  };
+  write: {
+    name: string;
+    description: string;
+    user: string[];
+    done: boolean;
+    subtasks: string[];
+  };
+  params: {
+    name?: string;
+  };
+};
+
+type TasksByUserEmailViewRow = {
+  read: {
+    id: string;
+    name: string;
+    description: string;
+    user: UserTableRow;
+    done: boolean;
+    subtasks: SubtasksTableRow[];
+  };
+  write: {
+    name: string;
+    description: string;
+    user: string[];
+    done: boolean;
+    subtasks: string[];
+  };
+  params: {
+    email: string;
+    \\"$by.name\\"?: \\"asc\\" | \\"desc\\";
+    \\"$by.description\\"?: \\"asc\\";
+  };
+};
+
+export type QoreProjectSchema = {
+  allTasks: AllTasksViewRow;
+  allMembers: AllMembersViewRow;
+  memberTasks: MemberTasksViewRow;
+  profileDefaultView: ProfileDefaultViewViewRow;
+  allProfiles: AllProfilesViewRow;
+  subtasksDefaultView: SubtasksDefaultViewViewRow;
+  tasksByName: TasksByNameViewRow;
+  tasksByUserEmail: TasksByUserEmailViewRow;
+};
+"
+`;

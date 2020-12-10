@@ -2,6 +2,14 @@ import { AxiosRequestConfig } from "axios";
 import Wonka from "wonka";
 import QoreClient from "./client/Qore";
 
+export type QoreViewSchema = {
+  read: Record<string, any>;
+  write: Record<string, any>;
+  params: Record<string, any>;
+};
+
+export type QoreSchema = Record<string, QoreViewSchema>;
+
 export type NetworkPolicy = "network-only" | "network-and-cache" | "cache-only";
 
 export type QoreOperationConfig = {

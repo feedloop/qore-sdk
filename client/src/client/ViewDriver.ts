@@ -5,6 +5,7 @@ import {
   QoreOperation,
   QoreOperationConfig,
   QoreOperationResult,
+  QoreViewSchema,
 } from "../types";
 import QoreClient, {
   QoreRow,
@@ -14,12 +15,11 @@ import QoreClient, {
   defaultOperationConfig,
 } from "./Qore";
 
-export class ViewDriver<T extends QoreRow = QoreRow> {
+export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   id: string;
   tableId: string;
   fields: Record<string, Field> = {};
   project: QoreProject;
-  cache = new Map<string, T | T[]>();
   client: QoreClient;
   constructor(
     client: QoreClient,
@@ -38,13 +38,14 @@ export class ViewDriver<T extends QoreRow = QoreRow> {
     );
   }
   readRows(
-    opts: { offset?: number; limit?: number } = {},
+    opts: Partial<{ offset: number; limit: number; order: "asc" | "desc" }> &
+      T["params"] = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
-  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T[]>> {
+  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"][]>> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/views/${this.id}/v2rows`,
       params: opts,
-      method: 'GET'
+      method: "GET",
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -59,10 +60,10 @@ export class ViewDriver<T extends QoreRow = QoreRow> {
   readRow(
     id: string,
     config: Partial<QoreOperationConfig> = defaultOperationConfig
-  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T>> {
+  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"]>> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/views/${this.id}/v2rows/${id}`,
-      method: 'GET'
+      method: "GET",
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -73,7 +74,7 @@ export class ViewDriver<T extends QoreRow = QoreRow> {
     };
     return this.client.execute(operation);
   }
-  async updateRow(id: string, input: Partial<T>): Promise<T> {
+  async updateRow(id: string, input: Partial<T["write"]>): Promise<T["read"]> {
     const inputs = Object.entries(input);
     const nonRelational = inputs
       .filter(([key]) => {
@@ -128,7 +129,7 @@ export class ViewDriver<T extends QoreRow = QoreRow> {
     await this.client.execute(operation).toPromise();
     return true;
   }
-  async insertRow(input: Omit<Partial<T>, "id">): Promise<T> {
+  async insertRow(input: Partial<T["write"]>): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/tables/${this.tableId}/rows`,
       data: input,

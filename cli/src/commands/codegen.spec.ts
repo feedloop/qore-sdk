@@ -1,132 +1,28 @@
-import { expect, test } from "@oclif/test";
+import { setupRecorder } from "nock-record";
+import fs from "fs";
+import path from "path";
+import Codegen from "./codegen";
 
-const schema = {
-  tables: [
-    {
-      name: "member",
-      type: "auth",
-      id: "member",
-      fields: [
-        {
-          name: "email",
-          type: "text",
-          id: "email",
-        },
-        {
-          name: "role",
-          type: "role",
-          id: "role",
-        },
-        {
-          name: "action",
-          type: "action",
-          id: "action",
-          parameters: [
-            {
-              slug: "param1",
-              type: "text",
-            },
-          ],
-        },
-      ],
-    },
-  ],
-  roles: [
-    {
-      id: "tO3WLmWNGoIiILG",
-      name: "admin",
-      isAdmin: true,
-    },
-  ],
-  forms: [
-    {
-      name: "form1",
-      id: "form1",
-      tableId: "member",
-      fields: [
-        {
-          required: true,
-          id: "email",
-        },
-        {
-          hidden: true,
-          required: true,
-          id: "role",
-        },
-      ],
-    },
-  ],
-  views: [
-    {
-      id: "view1",
-      name: "view1",
-      tableId: "member",
-      parameters: [
-        {
-          slug: "param1",
-          type: "text",
-        },
-      ],
-      sorts: [
-        {
-          by: "email",
-          order: "desc",
-        },
-      ],
-      fields: [
-        {
-          name: "email",
-          type: "text",
-          id: "email",
-        },
-        {
-          name: "role",
-          type: "role",
-          id: "role",
-        },
-        {
-          name: "action",
-          type: "action",
-          id: "action",
-          parameters: [
-            {
-              slug: "param1",
-              type: "text",
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
+const record = setupRecorder();
 
-describe.only("codegen", () => {
-  test
-    .nock("https://qore-api.feedloop.io", (api) =>
-      api
-        .get("/orgs/some-organization/projects/some-project/schema")
-        .reply(200, schema)
-    )
-    .stdout()
-    .command(["codegen", "--project=some-project", "--org=some-organization"])
-    .it("notify successful login", (ctx) => {
-      expect(ctx.stdout).to.equal(`
-type MemberTable = {
-  fields: {
-    email: text;
-    role: role;
-    action: action;
-  }
-}
-
-type View1View = {
-  table: MemberTable;
-  fields: {
-    email: text;
-    role: role;
-    action: action;
-  }
-}
-`);
-    });
+describe("codegen", () => {
+  it("should be able to generate codegen", async () => {
+    const { completeRecording } = await record("codegen");
+    await Codegen.run([
+      "--project",
+      "MwSGN129jH8D1a0",
+      "--org",
+      "ntfvYtSmV8T3GMG",
+      "--token",
+      "3334164d-c7d0-4ca8-9b0c-913a9286f0b6",
+    ]);
+    completeRecording();
+    const filename = path.resolve(process.cwd() + "/qore-generated.ts");
+    expect(
+      fs.readFileSync(filename, {
+        encoding: "utf8",
+      })
+    ).toMatchSnapshot();
+    fs.unlinkSync(filename);
+  });
 });

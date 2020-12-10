@@ -9,6 +9,8 @@ import {
   QoreOperation,
   QoreOperationConfig,
   QoreOperationResult,
+  QoreSchema,
+  QoreViewSchema,
 } from "../types";
 import debugExchange from "../exchanges/debugExchange";
 import networkExchange from "../exchanges/networkExchange";
@@ -103,7 +105,7 @@ export function withHelpers<T>(
   return source$ as PromisifiedSource<T>;
 }
 
-export default class QoreClient<T extends Record<string, any> = {}> {
+export default class QoreClient<T extends QoreSchema = QoreSchema> {
   results: Wonka.Source<QoreOperationResult<AxiosRequestConfig>>;
   operations: Wonka.Source<QoreOperation<AxiosRequestConfig>>;
   nextOperation: (operation: QoreOperation<AxiosRequestConfig>) => void;
