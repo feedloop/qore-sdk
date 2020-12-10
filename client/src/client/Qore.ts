@@ -26,6 +26,8 @@ export type QoreRow = { id: string } & Record<
 type QoreConfig = {
   projectId: string;
   organisationId: string;
+  getToken?: () => string | undefined;
+  onError?: (error: Error) => void;
 };
 
 export const defaultOperationConfig: QoreOperationConfig = {
@@ -36,7 +38,6 @@ export const defaultOperationConfig: QoreOperationConfig = {
 export class QoreProject {
   config: QoreConfig;
   axios: AxiosInstance;
-  cache = new NormalizedCache();
   constructor(config: QoreConfig) {
     this.config = config;
     this.axios = Axios.create({
@@ -44,11 +45,17 @@ export class QoreProject {
         this.config.organisationId
       }/projects/${this.config.projectId}`,
     });
+    this.axios.interceptors.request.use((req) => {
+      const token = this.config.getToken && this.config.getToken();
+      if (token) req.headers["Authorization"] = `Bearer ${token}`;
+      return req;
+    });
     this.axios.interceptors.response.use(
       async function handleSuccess(resp) {
         return resp;
       },
-      async function handleError(error) {
+      async (error) => {
+        this.config.onError && this.config.onError(error);
         throw error;
       }
     );
@@ -154,6 +161,13 @@ export default class QoreClient<T extends Record<string, any> = {}> {
       }),
       {}
     );
+  }
+  async authenticate(email: string, password: string): Promise<string> {
+    const resp = await this.project.axios.post<{
+      email: string;
+      token: string;
+    }>("/login", { email, password });
+    return resp.data.token;
   }
   onOperationStart(operation: QoreOperation) {
     this.activeOperations[operation.key] =
