@@ -5,7 +5,12 @@ cli-test:
   image: node:latest
   stage: test
   script:
-    - cd cli
+    - cd sdk
+    - yarn
+    - yarn build
+    - yarn link
+    - cd ../cli
+    - yarn link @qore/sdk
     - yarn
     - yarn test
   only:
