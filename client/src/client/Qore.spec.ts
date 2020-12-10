@@ -391,4 +391,51 @@ describe("Qore SDK", () => {
     await qore.init();
     await qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f");
   });
+
+  it("authenticate a user", async () => {
+    scope
+      .get(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+      .reply(401)
+      .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/login")
+      .reply(200, { email: "rrmdn@pm.me", token: "some-token" })
+      .get(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+      .reply(200, { id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f" });
+    let token: string | undefined = undefined;
+    const mockGetToken = jest.fn(() => token);
+    const mockOnError = jest.fn((error) => {});
+    const qore = new QoreClient<{
+      allTasks: {
+        id: string;
+        name: string;
+        user?: { id: string };
+      };
+    }>({
+      organisationId: "FAKE_ORG",
+      projectId: "FAKE_PROJECT",
+      getToken: mockGetToken,
+      onError: mockOnError,
+    });
+    await qore.init();
+    const tasks = await qore.views.allTasks
+      .readRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
+      .toPromise();
+    expect(tasks.data).toEqual(undefined);
+    expect(tasks.error?.message).toEqual("Request failed with status code 401");
+    token = await qore.authenticate("rrmdn@pm.me", "some-password");
+    const row = await qore.views.allTasks
+      .readRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f", {
+        networkPolicy: "network-only",
+      })
+      .toPromise();
+    expect(row.error).toEqual(undefined);
+    expect(row.data).not.toEqual(undefined);
+    expect(mockOnError.mock.calls[0][0]).toEqual(
+      new Error("Request failed with status code 401")
+    );
+    expect(mockGetToken.mock.calls.length).toEqual(7);
+  });
 });
