@@ -1,17 +1,16 @@
 import { Command, flags } from "@oclif/command";
 import voca from "voca";
 import prettier from "prettier";
-import Wonka from "wonka";
 import { Field } from "@qore/sdk";
 import fs from "fs";
 import path from "path";
 import createProject, {
   FieldType,
-  Table,
   Vield,
-  ViewSummary,
 } from "@qore/sdk/lib/project/index";
 import config from "../config";
+import ExportSchema from "./export-schema";
+import { promptFlags } from "../flags";
 
 export default class Codegen extends Command {
   static description = "Generate typescript definition file";
@@ -70,37 +69,14 @@ export default class Codegen extends Command {
   async run() {
     try {
       const { args, flags } = this.parse(Codegen);
-      const token = flags.token || config.get("accessToken");
-      if (!flags.org || !flags.project || !token)
-        throw new Error("Unauthorized");
-      const project = createProject({
-        organizationId: flags.org,
-        projectId: flags.project,
-        token,
-      });
-
-      const tables = await project.tables();
-      const tablesWithFields = await Promise.all(
-        tables.map(async (table) => {
-          const fields = await table.fields();
-          return { table, fields };
-        })
-      );
-
-      const views = await project.views();
-      const viewsWithFields = await Promise.all(
-        views.map(async (view) => {
-          const detailView = await project.view(view.id);
-          const vields = await view.vields();
-          return { view, detailView, vields };
-        })
-      );
+      const configs = await promptFlags(flags);
+      const schema = await ExportSchema.getSchema(configs);
       const idField = { id: "id", type: "text", name: "id" } as Field<"text">;
       const typeDef = `
-      ${tablesWithFields
+      ${schema.tables
         .map(
-          ({ table, fields }) => `
-            type ${voca.capitalize(table.id)}TableRow = {${[idField, ...fields]
+          ({ id, fields }) => `
+            type ${voca.capitalize(id)}TableRow = {${[idField, ...fields]
             .map(
               (field) => `
             ${field.id}: ${this.readFieldType(field)};`
@@ -109,10 +85,10 @@ export default class Codegen extends Command {
         )
         .join("\n")}
 
-    ${viewsWithFields
+    ${schema.views
       .map(
-        ({ view, vields, detailView }) => `
-          type ${voca.capitalize(view.id)}ViewRow = {
+        ({ id, parameters, sorts, vields }) => `
+          type ${voca.capitalize(id)}ViewRow = {
             read: {${[idField, ...vields]
               .map(
                 (field) => `
@@ -127,7 +103,7 @@ export default class Codegen extends Command {
               )
               .join("")}
             }
-            params: {${detailView.parameters
+            params: {${parameters
               .map(
                 (param) => `
                 ${param.slug}${param.required ? "" : "?"}: ${
@@ -135,7 +111,7 @@ export default class Codegen extends Command {
                 };`
               )
               .join("")}
-              ${detailView.sorts
+              ${sorts
                 .filter((sort) => !!sort.order && !!sort.by)
                 // group order by "sort.by"
                 .reduce((group, sort) => {
@@ -165,8 +141,8 @@ export default class Codegen extends Command {
       .join("\n")}
 
       export type QoreProjectSchema = {
-        ${viewsWithFields
-          .map(({ view }) => `${view.id}: ${voca.capitalize(view.id)}ViewRow;`)
+        ${schema.views
+          .map((view) => `${view.id}: ${voca.capitalize(view.id)}ViewRow;`)
           .join("")}
       }
     `;

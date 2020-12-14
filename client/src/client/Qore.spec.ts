@@ -186,9 +186,13 @@ describe("Qore SDK", () => {
       });
     const qore = new QoreClient<{
       allTasks: {
-        read: { id: string; name: string };
+        read: { id: string; name: string, doneTasks: number };
         write: { id: string; name: string };
-        params: { slug?: string };
+        params: {
+          slug?: string;
+          "$by.name"?: "asc" | "desc";
+          "$by.description"?: "asc";
+        };
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -409,9 +413,9 @@ describe("Qore SDK", () => {
     const mockOnError = jest.fn((error) => {});
     const qore = new QoreClient<{
       allTasks: {
-        id: string;
-        name: string;
-        user?: { id: string };
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
       };
     }>({
       organisationId: "FAKE_ORG",
