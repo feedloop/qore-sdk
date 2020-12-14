@@ -25,7 +25,7 @@ export default class Codegen extends Command {
           password: values.password,
         }
       );
-      config.set("accessToken", resp.data.token);
+      config.set("token", resp.data.token);
       this.log(`Logged in as ${resp.data.email}`);
     } catch (error) {
       this.error("Invalid login credentials", { exit: 100 });

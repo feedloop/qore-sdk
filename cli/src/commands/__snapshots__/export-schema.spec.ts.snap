@@ -1,0 +1,446 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`export-schema should be able to export schema 1`] = `
+"{
+  \\"tables\\": [
+    {
+      \\"id\\": \\"member\\",
+      \\"name\\": \\"member\\",
+      \\"type\\": \\"auth\\",
+      \\"fields\\": [
+        {
+          \\"id\\": \\"email\\",
+          \\"name\\": \\"email\\",
+          \\"linked\\": false,
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": true,
+          \\"createdAt\\": \\"2020-11-25T02:59:59.292Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"role\\",
+          \\"name\\": \\"role\\",
+          \\"linked\\": false,
+          \\"type\\": \\"role\\",
+          \\"deletionProtection\\": true,
+          \\"createdAt\\": \\"2020-11-25T02:59:59.295Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"tasks\\",
+          \\"name\\": \\"Tasks\\",
+          \\"linked\\": false,
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:13.909Z\\",
+          \\"table\\": \\"tasks\\",
+          \\"multiple\\": true
+        },
+        {
+          \\"id\\": \\"doneTasks\\",
+          \\"name\\": \\"Done tasks\\",
+          \\"linked\\": false,
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:04:48.448Z\\",
+          \\"refRows\\": null
+        }
+      ],
+      \\"forms\\": []
+    },
+    {
+      \\"id\\": \\"tasks\\",
+      \\"name\\": \\"Tasks\\",
+      \\"type\\": null,
+      \\"fields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"linked\\": false,
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:00:10.809Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"linked\\": false,
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:00:11.815Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"user\\",
+          \\"name\\": \\"user\\",
+          \\"linked\\": false,
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:13.889Z\\",
+          \\"table\\": \\"member\\",
+          \\"multiple\\": false
+        },
+        {
+          \\"id\\": \\"done\\",
+          \\"name\\": \\"done\\",
+          \\"linked\\": false,
+          \\"type\\": \\"boolean\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:33.065Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"subtasks\\",
+          \\"name\\": \\"subtasks\\",
+          \\"linked\\": false,
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:29.610Z\\",
+          \\"table\\": \\"subtasks\\",
+          \\"multiple\\": true
+        }
+      ],
+      \\"forms\\": []
+    },
+    {
+      \\"id\\": \\"profile\\",
+      \\"name\\": \\"Profile\\",
+      \\"type\\": null,
+      \\"fields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"linked\\": false,
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T03:07:38.867Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"linked\\": false,
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T03:07:39.873Z\\",
+          \\"refRows\\": null
+        }
+      ],
+      \\"forms\\": []
+    },
+    {
+      \\"id\\": \\"subtasks\\",
+      \\"name\\": \\"Subtasks\\",
+      \\"type\\": null,
+      \\"fields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"linked\\": false,
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:13.725Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"linked\\": false,
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:14.734Z\\",
+          \\"refRows\\": null
+        },
+        {
+          \\"id\\": \\"tasks1\\",
+          \\"name\\": \\"Tasks 1\\",
+          \\"linked\\": false,
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:29.641Z\\",
+          \\"table\\": \\"tasks\\",
+          \\"multiple\\": true
+        }
+      ],
+      \\"forms\\": []
+    }
+  ],
+  \\"views\\": [
+    {
+      \\"id\\": \\"allTasks\\",
+      \\"name\\": \\"All tasks\\",
+      \\"sorts\\": [],
+      \\"parameters\\": [],
+      \\"tableId\\": \\"tasks\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:00:10.809Z\\"
+        },
+        {
+          \\"id\\": \\"user\\",
+          \\"name\\": \\"user\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:13.889Z\\",
+          \\"table\\": \\"member\\",
+          \\"multiple\\": false
+        },
+        {
+          \\"id\\": \\"done\\",
+          \\"name\\": \\"done\\",
+          \\"type\\": \\"boolean\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:33.065Z\\"
+        },
+        {
+          \\"id\\": \\"subtasks\\",
+          \\"name\\": \\"subtasks\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:29.610Z\\",
+          \\"table\\": \\"subtasks\\",
+          \\"multiple\\": true
+        }
+      ]
+    },
+    {
+      \\"id\\": \\"allMembers\\",
+      \\"name\\": \\"All members\\",
+      \\"sorts\\": [],
+      \\"parameters\\": [],
+      \\"tableId\\": \\"member\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"email\\",
+          \\"name\\": \\"email\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": true,
+          \\"createdAt\\": \\"2020-11-25T02:59:59.292Z\\"
+        },
+        {
+          \\"id\\": \\"role\\",
+          \\"name\\": \\"role\\",
+          \\"type\\": \\"role\\",
+          \\"deletionProtection\\": true,
+          \\"createdAt\\": \\"2020-11-25T02:59:59.295Z\\"
+        }
+      ]
+    },
+    {
+      \\"id\\": \\"memberTasks\\",
+      \\"name\\": \\"member tasks\\",
+      \\"sorts\\": [],
+      \\"parameters\\": [],
+      \\"tableId\\": \\"member\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"email\\",
+          \\"name\\": \\"email\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": true,
+          \\"createdAt\\": \\"2020-11-25T02:59:59.292Z\\"
+        },
+        {
+          \\"id\\": \\"role\\",
+          \\"name\\": \\"role\\",
+          \\"type\\": \\"role\\",
+          \\"deletionProtection\\": true,
+          \\"createdAt\\": \\"2020-11-25T02:59:59.295Z\\"
+        },
+        {
+          \\"id\\": \\"tasks\\",
+          \\"name\\": \\"Tasks\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:13.909Z\\",
+          \\"table\\": \\"tasks\\",
+          \\"multiple\\": true
+        },
+        {
+          \\"id\\": \\"doneTasks\\",
+          \\"name\\": \\"Done tasks\\",
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:04:48.448Z\\"
+        }
+      ]
+    },
+    {
+      \\"id\\": \\"profileDefaultView\\",
+      \\"name\\": \\"Profile Default View\\",
+      \\"sorts\\": [],
+      \\"parameters\\": [],
+      \\"tableId\\": \\"profile\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T03:07:38.867Z\\"
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T03:07:39.873Z\\"
+        }
+      ]
+    },
+    {
+      \\"id\\": \\"allProfiles\\",
+      \\"name\\": \\"AllProfiles\\",
+      \\"sorts\\": [],
+      \\"parameters\\": [],
+      \\"tableId\\": \\"profile\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T03:07:38.867Z\\"
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T03:07:39.873Z\\"
+        }
+      ]
+    },
+    {
+      \\"id\\": \\"subtasksDefaultView\\",
+      \\"name\\": \\"Subtasks Default View\\",
+      \\"sorts\\": [],
+      \\"parameters\\": [],
+      \\"tableId\\": \\"subtasks\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:13.725Z\\"
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:14.734Z\\"
+        }
+      ]
+    },
+    {
+      \\"id\\": \\"tasksByName\\",
+      \\"name\\": \\"tasks by name\\",
+      \\"sorts\\": [],
+      \\"parameters\\": [{ \\"slug\\": \\"name\\", \\"type\\": \\"text\\", \\"required\\": false }],
+      \\"tableId\\": \\"tasks\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:00:10.809Z\\"
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:00:11.815Z\\"
+        },
+        {
+          \\"id\\": \\"user\\",
+          \\"name\\": \\"user\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:13.889Z\\",
+          \\"table\\": \\"member\\",
+          \\"multiple\\": false
+        },
+        {
+          \\"id\\": \\"done\\",
+          \\"name\\": \\"done\\",
+          \\"type\\": \\"boolean\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:33.065Z\\"
+        },
+        {
+          \\"id\\": \\"subtasks\\",
+          \\"name\\": \\"subtasks\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:29.610Z\\",
+          \\"table\\": \\"subtasks\\",
+          \\"multiple\\": true
+        }
+      ]
+    },
+    {
+      \\"id\\": \\"tasksByUserEmail\\",
+      \\"filter\\": \\"tasks.user.email = $params.email\\",
+      \\"name\\": \\"tasks by user email\\",
+      \\"sorts\\": [
+        { \\"order\\": \\"asc\\", \\"by\\": \\"name\\" },
+        { \\"order\\": \\"desc\\", \\"by\\": \\"name\\" },
+        { \\"order\\": \\"asc\\", \\"by\\": \\"description\\" }
+      ],
+      \\"parameters\\": [{ \\"slug\\": \\"email\\", \\"type\\": \\"text\\", \\"required\\": true }],
+      \\"tableId\\": \\"tasks\\",
+      \\"vields\\": [
+        {
+          \\"id\\": \\"name\\",
+          \\"name\\": \\"name\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:00:10.809Z\\"
+        },
+        {
+          \\"id\\": \\"description\\",
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:00:11.815Z\\"
+        },
+        {
+          \\"id\\": \\"user\\",
+          \\"name\\": \\"user\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:13.889Z\\",
+          \\"table\\": \\"member\\",
+          \\"multiple\\": false
+        },
+        {
+          \\"id\\": \\"done\\",
+          \\"name\\": \\"done\\",
+          \\"type\\": \\"boolean\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-25T03:02:33.065Z\\"
+        },
+        {
+          \\"id\\": \\"subtasks\\",
+          \\"name\\": \\"subtasks\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"createdAt\\": \\"2020-11-27T07:15:29.610Z\\",
+          \\"table\\": \\"subtasks\\",
+          \\"multiple\\": true
+        }
+      ]
+    }
+  ]
+}
+"
+`;
