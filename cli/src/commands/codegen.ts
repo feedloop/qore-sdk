@@ -10,7 +10,7 @@ import createProject, {
 } from "@qore/sdk/lib/project/index";
 import config from "../config";
 import ExportSchema from "./export-schema";
-import { promptFlags } from "../flags";
+import { configFlags, promptFlags } from "../flags";
 
 export default class Codegen extends Command {
   static description = "Generate typescript definition file";
@@ -18,9 +18,7 @@ export default class Codegen extends Command {
   static examples = [`$ qore codegen --project projectId --org orgId`];
 
   static flags = {
-    project: flags.string({ description: "project id", required: true }),
-    org: flags.string({ description: "oranization id", required: true }),
-    token: flags.string({ description: "token" }),
+    ...configFlags
   };
 
   private writeFieldTypes = new Set<FieldType>([
@@ -69,7 +67,7 @@ export default class Codegen extends Command {
   async run() {
     try {
       const { args, flags } = this.parse(Codegen);
-      const configs = await promptFlags(flags);
+      const configs = await promptFlags(flags, Codegen.flags);
       const schema = await ExportSchema.getSchema(configs);
       const idField = { id: "id", type: "text", name: "id" } as Field<"text">;
       const typeDef = `
