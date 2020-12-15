@@ -1,6 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import Wonka from "wonka";
-import { Field } from "../sdk/project/field";
+import { APIField } from "../sdk/project/field";
 import {
   QoreOperation,
   QoreOperationConfig,
@@ -18,7 +17,7 @@ import QoreClient, {
 export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   id: string;
   tableId: string;
-  fields: Record<string, Field> = {};
+  fields: Record<string, APIField> = {};
   project: QoreProject;
   client: QoreClient;
   constructor(
@@ -26,7 +25,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     project: QoreProject,
     id: string,
     tableId: string,
-    fields: Field[]
+    fields: APIField[]
   ) {
     this.client = client;
     this.id = id;

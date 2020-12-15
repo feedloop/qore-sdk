@@ -1,5 +1,10 @@
-import { Parameter } from '../view';
 import { BaseField } from './baseField';
+
+export type Parameter = {
+  slug: string;
+  type: string;
+  required: boolean;
+};
 
 export type InsertTask = {
   type: 'insert';
