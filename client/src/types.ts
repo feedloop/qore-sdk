@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from "axios";
 import Wonka from "wonka";
 import QoreClient from "./client/Qore";
+import { APIField } from "./sdk/project/field";
 
 export type QoreViewSchema = {
   read: Record<string, any>;
@@ -16,6 +17,18 @@ export type QoreOperationConfig = {
   networkPolicy: NetworkPolicy;
   pollInterval: number;
 };
+
+export type QoreProjectSchemaV1 = {
+  version: "v1",
+  views: Array<{
+    id: string;
+    name: string;
+    tableId: string;
+    fields: APIField[];
+  }>;
+}
+
+export type QoreProjectSchema = QoreProjectSchemaV1;
 
 export type QoreOperation<
   Params extends AxiosRequestConfig = AxiosRequestConfig

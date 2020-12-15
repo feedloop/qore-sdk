@@ -1,132 +1,47 @@
 import nock from "nock";
 import Wonka from "wonka";
+import { QoreProjectSchema } from "../types";
 import QoreClient from "./Qore";
 
-const createMockServer = () =>
-  nock("http://localhost:8080")
-    .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views")
-    .reply(200, {
-      nodes: [
-        {
-          id: "allTasks",
-          name: "All tasks",
-          tableId: "tasks",
-        },
-        {
-          id: "allMembers",
-          name: "All members",
-          tableId: "member",
-        },
-        {
-          id: "memberTasks",
-          name: "member tasks",
-          tableId: "member",
-        },
-      ],
-      totalCount: 3,
-    })
-    .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/fields")
-    .reply(200, {
-      nodes: [
-        {
-          id: "name",
-          name: "name",
-          type: "text",
-          deletionProtection: false,
-          createdAt: "2020-11-25T03:00:10.809Z",
-        },
+const fakeProjectSchema = (): QoreProjectSchema => ({
+  version: "v1",
+  views: [
+    {
+      id: "allTasks",
+      name: "All tasks",
+      tableId: "tasks",
+      fields: [
         {
           id: "user",
           name: "user",
           type: "relation",
-          deletionProtection: false,
-          createdAt: "2020-11-25T03:02:13.889Z",
           table: "member",
           multiple: false,
-        },
-        {
-          id: "done",
-          name: "done",
-          type: "boolean",
           deletionProtection: false,
-          createdAt: "2020-11-25T03:02:33.065Z",
         },
         {
           id: "subtasks",
           name: "subtasks",
           type: "relation",
           deletionProtection: false,
-          createdAt: "2020-11-27T07:15:29.610Z",
           table: "subtasks",
           multiple: true,
         },
+        { id: "done", name: "done", type: "boolean", deletionProtection: true },
+        { type: "text", name: "id", id: "id", deletionProtection: false },
+        { type: "text", name: "name", id: "name", deletionProtection: false },
       ],
-      totalCount: 3,
-    })
-    .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allMembers/fields")
-    .reply(200, {
-      nodes: [
-        {
-          id: "email",
-          name: "email",
-          type: "text",
-          deletionProtection: true,
-          createdAt: "2020-11-25T02:59:59.292Z",
-        },
-        {
-          id: "role",
-          name: "role",
-          type: "role",
-          deletionProtection: true,
-          createdAt: "2020-11-25T02:59:59.295Z",
-        },
-      ],
-      totalCount: 2,
-    })
-    .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/memberTasks/fields")
-    .reply(200, {
-      nodes: [
-        {
-          id: "email",
-          name: "email",
-          type: "text",
-          deletionProtection: true,
-          createdAt: "2020-11-25T02:59:59.292Z",
-        },
-        {
-          id: "role",
-          name: "role",
-          type: "role",
-          deletionProtection: true,
-          createdAt: "2020-11-25T02:59:59.295Z",
-        },
-        {
-          id: "tasks",
-          name: "Tasks",
-          type: "relation",
-          deletionProtection: false,
-          createdAt: "2020-11-25T03:02:13.909Z",
-          table: "tasks",
-          multiple: true,
-        },
-        {
-          id: "doneTasks",
-          name: "Done tasks",
-          type: "rollup",
-          deletionProtection: false,
-          createdAt: "2020-11-25T03:04:48.448Z",
-        },
-      ],
-      totalCount: 4,
-    });
+    },
+  ],
+});
 
 describe("Qore SDK", () => {
   let scope: nock.Scope;
   beforeEach(() => {
-    scope = createMockServer();
+    scope = scope = nock("http://localhost:8080");
   });
   afterEach(() => {
-    scope.done();
+    // scope.done();
   });
   it("initialize sdk", async () => {
     const qore = new QoreClient<{
@@ -139,13 +54,15 @@ describe("Qore SDK", () => {
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
-    await qore.init();
+    qore.init(fakeProjectSchema());
     expect(qore.views.allTasks).toHaveProperty("readRows");
   });
 
   it("fetch view rows, read and write to cache", async () => {
-    scope
-      .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows?limit=1&slug=some-slug&order=asc")
+    scope = scope
+      .get(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows?limit=1&slug=some-slug&order=asc"
+      )
       .reply(200, {
         nodes: [
           {
@@ -186,7 +103,7 @@ describe("Qore SDK", () => {
       });
     const qore = new QoreClient<{
       allTasks: {
-        read: { id: string; name: string, doneTasks: number };
+        read: { id: string; name: string; doneTasks: number };
         write: { id: string; name: string };
         params: {
           slug?: string;
@@ -198,7 +115,7 @@ describe("Qore SDK", () => {
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
-    await qore.init();
+    qore.init(fakeProjectSchema());
     const alltasks = await qore.views.allTasks
       .readRows({ limit: 2 })
       .toPromise();
@@ -209,13 +126,13 @@ describe("Qore SDK", () => {
     expect(alltasks.operation.meta.cacheHit).toEqual(false);
     expect(cachedTask.operation.meta.cacheHit).toEqual(true);
     const fewerTasks = await qore.views.allTasks
-      .readRows({ limit: 1, slug: 'some-slug', order: "asc" })
+      .readRows({ limit: 1, slug: "some-slug", order: "asc" })
       .toPromise();
     expect(alltasks).not.toEqual(fewerTasks);
   });
 
   it("read from subscription", async (done) => {
-    scope
+    scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -246,7 +163,7 @@ describe("Qore SDK", () => {
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
-    await qore.init();
+    qore.init(fakeProjectSchema());
     const readStream = qore.views.allTasks.readRow(
       "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
     );
@@ -284,7 +201,7 @@ describe("Qore SDK", () => {
   });
 
   it("insert a new row, write and read from cache", async () => {
-    scope
+    scope = scope
       .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
@@ -309,7 +226,7 @@ describe("Qore SDK", () => {
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
-    await qore.init();
+    qore.init(fakeProjectSchema());
     const newTask = await qore.views.allTasks.insertRow({
       name: "New task",
     });
@@ -321,7 +238,7 @@ describe("Qore SDK", () => {
   });
 
   it("update a row", async () => {
-    scope
+    scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -360,7 +277,7 @@ describe("Qore SDK", () => {
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
-    await qore.init();
+    qore.init(fakeProjectSchema());
     const updatedTask = await qore.views.allTasks.updateRow(
       "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
       {
@@ -377,7 +294,7 @@ describe("Qore SDK", () => {
   });
 
   it("delete a row", async () => {
-    scope
+    scope = scope
       .delete(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -392,12 +309,12 @@ describe("Qore SDK", () => {
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
     });
-    await qore.init();
+    qore.init(fakeProjectSchema());
     await qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f");
   });
 
   it("authenticate a user", async () => {
-    scope
+    scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -423,7 +340,7 @@ describe("Qore SDK", () => {
       getToken: mockGetToken,
       onError: mockOnError,
     });
-    await qore.init();
+    qore.init(fakeProjectSchema());
     const tasks = await qore.views.allTasks
       .readRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .toPromise();
@@ -440,6 +357,6 @@ describe("Qore SDK", () => {
     expect(mockOnError.mock.calls[0][0]).toEqual(
       new Error("Request failed with status code 401")
     );
-    expect(mockGetToken.mock.calls.length).toEqual(7);
+    expect(mockGetToken.mock.calls.length).toEqual(3);
   });
 });

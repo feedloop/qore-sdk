@@ -1,21 +1,17 @@
 import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import Wonka, { merge } from "wonka";
-import { schema, Schema, SchemaObject } from "normalizr";
-import { Field } from "../sdk/project/field";
 import {
   Exchange,
   ExchangeInput,
-  ExchangeIO,
   QoreOperation,
   QoreOperationConfig,
   QoreOperationResult,
+  QoreProjectSchema,
   QoreSchema,
-  QoreViewSchema,
 } from "../types";
 import debugExchange from "../exchanges/debugExchange";
 import networkExchange from "../exchanges/networkExchange";
 import { ViewDriver } from "./ViewDriver";
-import { NormalizedCache } from "./NormalizedCache";
 import cacheExchange from "../exchanges/cacheExchange";
 
 export type RelationValue = { id: string } | Array<{ id: string }>;
@@ -137,24 +133,16 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     // Keep the stream open
     Wonka.publish(this.results);
   }
-  async init() {
-    const resp = await this.project.axios.get<{
-      nodes: Array<{ id: string; name: string; tableId: string }>;
-    }>("/views");
-    const views = await Promise.all(
-      resp.data.nodes.map(async (view) => {
-        const resp = await this.project.axios.get<{ nodes: Field[] }>(
-          `/views/${view.id}/fields`
-        );
-        return new ViewDriver(
-          this,
-          this.project,
-          view.id,
-          view.tableId,
-          resp.data.nodes
-        );
-      })
-    );
+  init(schema: QoreProjectSchema) {
+    const views = schema.views.map((view) => {
+      return new ViewDriver(
+        this,
+        this.project,
+        view.id,
+        view.tableId,
+        view.fields
+      );
+    });
     // @ts-ignore
     this.views = views.reduce(
       (map, driver) => ({
