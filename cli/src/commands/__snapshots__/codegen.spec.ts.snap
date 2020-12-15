@@ -3,56 +3,35 @@
 exports[`codegen should be able to generate codegen 1`] = `
 "type MemberTableRow = {
   id: string;
-  email: string;
   role: { id: string; displayField: string };
-  tasks: TasksTableRow[];
-  doneTasks: number;
+  email: string;
+  toDo: ToDoTableRow[];
+  totalTask: number;
+  totalPoint: number;
+  totalHardTask: number;
+  createTask: action;
 };
 
-type TasksTableRow = {
+type ToDoTableRow = {
   id: string;
-  name: string;
+  task: string;
   description: string;
-  user: UserTableRow;
   done: boolean;
-  subtasks: SubtasksTableRow[];
+  points: number;
+  deadline: date;
+  difficulty: select;
+  person: PersonTableRow[];
+  role: lookup;
+  attachment: file;
+  timeAllocation: formula;
 };
 
-type ProfileTableRow = {
-  id: string;
-  name: string;
-  description: string;
-};
-
-type SubtasksTableRow = {
-  id: string;
-  name: string;
-  description: string;
-  tasks1: Tasks1TableRow[];
-};
-
-type AllTasksViewRow = {
-  read: {
-    id: string;
-    name: string;
-    user: UserTableRow;
-    done: boolean;
-    subtasks: SubtasksTableRow[];
-  };
-  write: {
-    name: string;
-    user: string[];
-    done: boolean;
-    subtasks: string[];
-  };
-  params: {};
-};
-
-type AllMembersViewRow = {
+type MemberDefaultViewViewRow = {
   read: {
     id: string;
     email: string;
     role: { id: string; displayField: string };
+    createTask: action;
   };
   write: {
     email: string;
@@ -60,113 +39,138 @@ type AllMembersViewRow = {
   params: {};
 };
 
-type MemberTasksViewRow = {
+type ToDoDefaultViewViewRow = {
+  read: {
+    id: string;
+    task: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+    difficulty: select;
+    person: PersonTableRow[];
+    role: lookup;
+    attachment: file;
+    timeAllocation: formula;
+  };
+  write: {
+    task: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+    difficulty: select;
+    person: string[];
+    attachment: file;
+  };
+  params: {
+    \\"$by.points\\"?: \\"desc\\";
+  };
+};
+
+type TestViewRow = {
+  read: {
+    id: string;
+    task: string;
+    description: string;
+  };
+  write: {
+    task: string;
+    description: string;
+  };
+  params: {};
+};
+
+type ToDoViewRow = {
+  read: {
+    id: string;
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+  };
+  write: {
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+  };
+  params: {};
+};
+
+type DoneViewRow = {
+  read: {
+    id: string;
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+  };
+  write: {
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+  };
+  params: {};
+};
+
+type ReisTaskViewRow = {
+  read: {
+    id: string;
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+    difficulty: select;
+    person: PersonTableRow[];
+    role: lookup;
+    attachment: file;
+    timeAllocation: formula;
+  };
+  write: {
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+    difficulty: select;
+    person: string[];
+    attachment: file;
+  };
+  params: {
+    timeAllocation?: string;
+  };
+};
+
+type MemberMetricViewRow = {
   read: {
     id: string;
     email: string;
     role: { id: string; displayField: string };
-    tasks: TasksTableRow[];
-    doneTasks: number;
+    totalTask: number;
+    totalPoint: number;
+    totalHardTask: number;
   };
   write: {
     email: string;
-    tasks: string[];
-  };
-  params: {};
-};
-
-type ProfileDefaultViewViewRow = {
-  read: {
-    id: string;
-    name: string;
-    description: string;
-  };
-  write: {
-    name: string;
-    description: string;
-  };
-  params: {};
-};
-
-type AllProfilesViewRow = {
-  read: {
-    id: string;
-    name: string;
-    description: string;
-  };
-  write: {
-    name: string;
-    description: string;
-  };
-  params: {};
-};
-
-type SubtasksDefaultViewViewRow = {
-  read: {
-    id: string;
-    name: string;
-    description: string;
-  };
-  write: {
-    name: string;
-    description: string;
-  };
-  params: {};
-};
-
-type TasksByNameViewRow = {
-  read: {
-    id: string;
-    name: string;
-    description: string;
-    user: UserTableRow;
-    done: boolean;
-    subtasks: SubtasksTableRow[];
-  };
-  write: {
-    name: string;
-    description: string;
-    user: string[];
-    done: boolean;
-    subtasks: string[];
-  };
-  params: {
-    name?: string;
-  };
-};
-
-type TasksByUserEmailViewRow = {
-  read: {
-    id: string;
-    name: string;
-    description: string;
-    user: UserTableRow;
-    done: boolean;
-    subtasks: SubtasksTableRow[];
-  };
-  write: {
-    name: string;
-    description: string;
-    user: string[];
-    done: boolean;
-    subtasks: string[];
   };
   params: {
     email: string;
-    \\"$by.name\\"?: \\"asc\\" | \\"desc\\";
-    \\"$by.description\\"?: \\"asc\\";
   };
 };
 
 export type QoreProjectSchema = {
-  allTasks: AllTasksViewRow;
-  allMembers: AllMembersViewRow;
-  memberTasks: MemberTasksViewRow;
-  profileDefaultView: ProfileDefaultViewViewRow;
-  allProfiles: AllProfilesViewRow;
-  subtasksDefaultView: SubtasksDefaultViewViewRow;
-  tasksByName: TasksByNameViewRow;
-  tasksByUserEmail: TasksByUserEmailViewRow;
+  memberDefaultView: MemberDefaultViewViewRow;
+  toDoDefaultView: ToDoDefaultViewViewRow;
+  test: TestViewRow;
+  toDo: ToDoViewRow;
+  done: DoneViewRow;
+  reisTask: ReisTaskViewRow;
+  memberMetric: MemberMetricViewRow;
 };
 "
 `;

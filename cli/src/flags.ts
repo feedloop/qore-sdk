@@ -26,20 +26,22 @@ export const configFlags: flags.Input<CLIConfig> = {
   token: tokenFlag,
 };
 
-export const promptFlags = async (
-  configFromStorage: Partial<CLIConfig>
-): Promise<CLIConfig> => {
-  const remainingConfig = Object.keys(schema).filter(
-    (key) => !(key in configFromStorage)
-  ) as Array<keyof CLIConfig>;
-  const data = await prompts<keyof CLIConfig>(
+export const promptFlags = async <T = {}>(
+  partialValues: Partial<T>,
+  flags: {[K in keyof T]: flags.IFlag<T[K]>}
+): Promise<T> => {
+  const remainingConfig = Object.keys(flags).filter(
+    (key) => !(key in partialValues)
+  ) as Array<keyof T>;
+  // @ts-ignore
+  const data = await prompts<keyof T>(
     remainingConfig
-      .map((key) => ({ key, field: schema[key] }))
+      .map((key) => ({ key, field: flags[key] }))
       .map(({ key, field }) => ({
         message: `Enter your ${field?.description}`,
         name: key,
         type: "text",
       }))
   );
-  return { ...data, ...configFromStorage };
+  return { ...data, ...partialValues };
 };

@@ -44,7 +44,12 @@ export default class ExportSchema extends Command {
       tables.map(
         async (table): Promise<TableSchema> => {
           const fields = await table.fields();
-          const forms = await table.forms();
+          const tableForms = await table.forms();
+          const forms = await Promise.all(
+            tableForms.map(async (form) => {
+              return table.form(form.id);
+            })
+          );
           return {
             id: table.id,
             name: table.name,
@@ -61,9 +66,14 @@ export default class ExportSchema extends Command {
       views.map(
         async (view): Promise<ViewSchema> => {
           const vields = await view.vields();
-          const { filter, id, name, parameters, sorts, tableId } = await project.view(
-            view.id
-          );
+          const {
+            filter,
+            id,
+            name,
+            parameters,
+            sorts,
+            tableId,
+          } = await project.view(view.id);
           return {
             id,
             filter,
@@ -77,6 +87,7 @@ export default class ExportSchema extends Command {
       )
     );
     const schema: QoreSchema = {
+      version: "v1",
       tables: tablesSchema,
       views: viewsSchema,
     };
@@ -85,7 +96,7 @@ export default class ExportSchema extends Command {
 
   async run() {
     const { args, flags } = this.parse(ExportSchema);
-    const configs = await promptFlags(flags);
+    const configs = await promptFlags(flags, ExportSchema.flags);
     const schema = await ExportSchema.getSchema(configs);
     fs.writeFileSync(
       path.resolve(process.cwd() + "/qore-schema.json"),

@@ -104,7 +104,7 @@ export default () => {
       // );
       return new OrganizationImpl({
         ...{ id, category: '', size: '', name: '', subdomain: '' },
-        userToken: user.token,
+        userToken: 'Bearer ' + user.token,
         url,
       });
     },

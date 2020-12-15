@@ -7,14 +7,16 @@ const record = setupRecorder();
 
 describe("codegen", () => {
   it("should be able to generate codegen", async () => {
+    process.env.REACT_APP_API_URL =
+      "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const { completeRecording } = await record("codegen");
     await Codegen.run([
       "--project",
-      "MwSGN129jH8D1a0",
+      "I0D3NimZQ9GKEDP",
       "--org",
-      "ntfvYtSmV8T3GMG",
+      "lIdfC42DJCN2XzQ",
       "--token",
-      "3334164d-c7d0-4ca8-9b0c-913a9286f0b6",
+      "77f2ff71-8864-404d-8596-127d78a4c1bd",
     ]);
     completeRecording();
     const filename = path.resolve(process.cwd() + "/qore-generated.ts");
