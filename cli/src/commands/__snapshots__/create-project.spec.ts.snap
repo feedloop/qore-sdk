@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`create-project should be able to export schema 1`] = `
+"{
+  \\"version\\": \\"v1\\",
+  \\"endpoint\\": \\"https://qore-api.feedloop.io\\",
+  \\"project\\": \\"some-project-id\\",
+  \\"org\\": \\"some-org-id\\"
+}
+"
+`;

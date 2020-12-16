@@ -9,126 +9,71 @@ import makeProject, {
 } from "@qore/sdk/lib/project/index";
 import makeUser from "@qore/sdk/lib/user";
 import fs from "fs";
+import fse from "fs-extra";
 import path from "path";
 import config, { CLIConfig } from "../config";
 import { configFlags, orgFlag, promptFlags, tokenFlag } from "../flags";
 import { QoreSchema, TableSchema, ViewSchema } from "../types";
 import { AxiosError } from "axios";
-
-const advancedFieldsOrder: FieldType[] = [
-  "relation",
-  "lookup",
-  "rollup",
-  "formula",
-];
-
+import dir from "node-dir";
 export default class CreateProject extends Command {
   static description = "create a project from scratch or qore-schema.json";
 
   static examples = [`$ qore `];
 
+  static templatesLocation = path.resolve(__dirname, "../../templates/");
+
   static flags = {
     token: tokenFlag,
     org: orgFlag,
-    file: flags.string({
-      char: "f",
-      name: "file",
-      description: "relative location of your qore-schema.json",
+    template: flags.string({
+      char: "t",
+      name: "template",
+      description: "qore project template",
+      default: "todo-list-typescript",
     }),
   };
 
   static args = [{ name: "name" }];
 
-  async applyV1Schema(
-    project: ReturnType<typeof makeProject>,
-    schema: QoreSchema
-  ) {
-    const tableCreation = await Promise.all(
-      schema.tables.map(async (table) => {
-        try {
-          const tableID = await project.createTable({
-            name: table.name,
-            master: table.master,
-          });
-          const createdTable = await project.table(tableID);
-          await Promise.all(
-            asSequence(table.fields)
-              .sortedBy((field) => advancedFieldsOrder.indexOf(field.type))
-              .map(async (field) => {
-                await createdTable.addField(field);
-              })
-              .toArray()
-          );
-          await Promise.all(
-            table.forms.map(async ({ id, ...form }) => {
-              await createdTable.createForm(form);
-            })
-          );
-          return { table };
-        } catch (error) {
-          let err = error as AxiosError;
-          return {
-            table,
-            error: err.message,
-            data: JSON.stringify(err.response?.data, null, 2),
-            config: JSON.stringify(err.response?.config, null, 2),
-          };
-        }
-      })
-    );
-    console.log({ tableCreation });
-    const viewsCreation = await Promise.all(
-      schema.views.map(async (view) => {
-        try {
-          const viewId = await project.createView({
-            name: view.name,
-            parameters: view.parameters,
-            filter: view.filter,
-            sorts: view.sorts,
-            tableId: view.tableId,
-            vields: view.vields.map((v) => v.id),
-          });
-          return { view };
-        } catch (error) {
-          console.log(error.response.config);
-          return {
-            view,
-            error: error.message,
-            data: error.response.data.message,
-          };
-        }
-      })
-    );
-    console.log({ viewsCreation });
+  static getTemplates() {
+    const templates = fs
+      .readdirSync(CreateProject.templatesLocation)
+      .filter((file) =>
+        fs
+          .lstatSync(path.resolve(CreateProject.templatesLocation, file))
+          .isDirectory()
+      );
+    return templates;
   }
 
   async run() {
     const { args, flags } = this.parse(CreateProject);
     const configs = await promptFlags(flags, CreateProject.flags);
-    const user = makeUser();
-    user.setToken(configs.token);
-    const org = await user.organization(configs.org);
-    const newProjectID = await org.createProject({
-      name: args["name"] || "New project",
-    });
-    config.set("project", newProjectID);
-    const project = makeProject({
-      organizationId: configs.org,
-      projectId: newProjectID,
-    });
-    await project.auth.signInWithUserToken(configs.token);
-    if (configs.file) {
-      try {
-        const schema: QoreSchema = JSON.parse(
-          fs.readFileSync(path.resolve(process.cwd() + "/" + configs.file), {
-            encoding: "utf8",
-          })
-        );
-        await this.applyV1Schema(project, schema);
-      } catch (error) {
-        throw error;
-      }
+    const templates = CreateProject.getTemplates();
+    if (templates.indexOf(configs.template) === -1) {
+      this.error(
+        `Cant find "${configs.template}" from project templates, may want to choose from the following available templates: ${templates}`
+      );
     }
-    this.log(`Created project: ${newProjectID}`);
+    const destination: string = path.resolve(
+      process.cwd(),
+      args.name || "qore-project"
+    );
+    fse.copySync(
+      path.resolve(CreateProject.templatesLocation, configs.template),
+      destination
+    );
+
+    fse.writeJSONSync(
+      path.resolve(destination, "qore.config.json"),
+      {
+        version: "v1",
+        endpoint: "https://qore-api.feedloop.io",
+        project: "some-project-id",
+        org: "some-org-id",
+      },
+      { spaces: 2 }
+    );
   }
 }
