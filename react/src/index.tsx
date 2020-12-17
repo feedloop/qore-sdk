@@ -38,16 +38,19 @@ type QoreHooks<T extends QoreSchema[string]> = {
   useInsertRow: () => {
     insertRow: (data: T["write"]) => void;
     status: QoreRequestStatus;
+    error: Error | null;
   };
 
   useUpdateRow: () => {
     updateRow: (rowId: string, data: T["write"]) => void;
     status: QoreRequestStatus;
+    error: Error | null;
   };
 
   useDeleteRow: () => {
     deleteRow: (rowId: string) => void;
     status: QoreRequestStatus;
+    error: Error | null;
   };
 };
 
@@ -157,27 +160,72 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         },
 
         useInsertRow: () => {
-          const insertRow = (data: ProjectSchema[string]["write"]) => {};
-          const status = "idle";
-          return { insertRow, status };
+          const { qoreRef } = useQoreContext();
+          const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
+          const [error, setError] = React.useState<Error | null>(null);
+
+          const insertRow = async (data: ProjectSchema[string]["write"]) => {
+            try {
+              setStatus("loading");
+              const result = await qoreRef.current?.views[
+                currentViewId
+              ].insertRow(data);
+              setStatus("success");
+              return result;
+            } catch (error) {
+              setStatus("error");
+              setError(error);
+            }
+          };
+
+          return { insertRow, status, error };
         },
 
         useUpdateRow: () => {
-          const updateRow = (
+          const { qoreRef } = useQoreContext();
+          const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
+          const [error, setError] = React.useState<Error | null>(null);
+
+          const updateRow = async (
             rowId: string,
             data: ProjectSchema[string]["write"]
-          ) => {};
-          const status = "idle";
-          return { updateRow, status };
+          ) => {
+            try {
+              setStatus("loading");
+              const result = await qoreRef.current?.views[
+                currentViewId
+              ].updateRow(rowId, data);
+              setStatus("success");
+              return result;
+            } catch (error) {
+              setStatus("error");
+              setError(error);
+            }
+          };
+
+          return { updateRow, status, error };
         },
 
-        useDeleteRow: (): {
-          deleteRow: (rowId: string) => void;
-          status: QoreRequestStatus;
-        } => {
-          const deleteRow = (rowId: string) => {};
-          const status = "idle";
-          return { deleteRow, status };
+        useDeleteRow: () => {
+          const { qoreRef } = useQoreContext();
+          const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
+          const [error, setError] = React.useState<Error | null>(null);
+
+          const deleteRow = async (rowId: string) => {
+            try {
+              setStatus("loading");
+              const result = await qoreRef.current?.views[
+                currentViewId
+              ].deleteRow(rowId);
+              setStatus("success");
+              return result;
+            } catch (error) {
+              setStatus("error");
+              setError(error);
+            }
+          };
+
+          return { deleteRow, status, error };
         }
       }
     }),
