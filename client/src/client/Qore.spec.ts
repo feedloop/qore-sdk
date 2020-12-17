@@ -17,7 +17,7 @@ const fakeProjectSchema = (): QoreProjectSchema => ({
           type: "relation",
           table: "member",
           multiple: false,
-          deletionProtection: false,
+          deletionProtection: false
         },
         {
           id: "subtasks",
@@ -25,14 +25,14 @@ const fakeProjectSchema = (): QoreProjectSchema => ({
           type: "relation",
           deletionProtection: false,
           table: "subtasks",
-          multiple: true,
+          multiple: true
         },
         { id: "done", name: "done", type: "boolean", deletionProtection: true },
         { type: "text", name: "id", id: "id", deletionProtection: false },
-        { type: "text", name: "name", id: "name", deletionProtection: false },
-      ],
-    },
-  ],
+        { type: "text", name: "name", id: "name", deletionProtection: false }
+      ]
+    }
+  ]
 });
 
 describe("Qore SDK", () => {
@@ -52,7 +52,7 @@ describe("Qore SDK", () => {
       };
     }>({
       organisationId: "FAKE_ORG",
-      projectId: "FAKE_PROJECT",
+      projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
     expect(qore.views.allTasks).toHaveProperty("readRows");
@@ -69,13 +69,13 @@ describe("Qore SDK", () => {
             id: "25b0cccf-4851-43e2-80c7-f68e7883dbd6",
             user: {
               id: "9275e876-fd95-45a0-ad67-b947a1296c32",
-              displayField: "rrmdn@pm.me",
+              displayField: "rrmdn@pm.me"
             },
             name: "Meeting 1",
-            done: true,
-          },
+            done: true
+          }
         ],
-        totalCount: "1",
+        totalCount: "1"
       })
       .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows?limit=2")
       .reply(200, {
@@ -84,22 +84,22 @@ describe("Qore SDK", () => {
             id: "25b0cccf-4851-43e2-80c7-f68e7883dbd6",
             user: {
               id: "9275e876-fd95-45a0-ad67-b947a1296c32",
-              displayField: "rrmdn@pm.me",
+              displayField: "rrmdn@pm.me"
             },
             name: "Meeting 1",
-            done: true,
+            done: true
           },
           {
             id: "dd7813b3-98b3-4baa-9fff-e754afba9af8",
             user: {
               id: "9275e876-fd95-45a0-ad67-b947a1296c32",
-              displayField: "rrmdn@pm.me",
+              displayField: "rrmdn@pm.me"
             },
             name: "Meeting 3",
-            done: false,
-          },
+            done: false
+          }
         ],
-        totalCount: "2",
+        totalCount: "2"
       });
     const qore = new QoreClient<{
       allTasks: {
@@ -113,7 +113,7 @@ describe("Qore SDK", () => {
       };
     }>({
       organisationId: "FAKE_ORG",
-      projectId: "FAKE_PROJECT",
+      projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
     const alltasks = await qore.views.allTasks
@@ -131,7 +131,7 @@ describe("Qore SDK", () => {
     expect(alltasks).not.toEqual(fewerTasks);
   });
 
-  it("read from subscription", async (done) => {
+  it("read from subscription", async done => {
     scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
@@ -141,7 +141,7 @@ describe("Qore SDK", () => {
         description: null,
         done: false,
         name: "New task",
-        user: null,
+        user: null
       })
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
@@ -151,7 +151,7 @@ describe("Qore SDK", () => {
         description: null,
         done: false,
         name: "Completely new task",
-        user: null,
+        user: null
       });
     const qore = new QoreClient<{
       allTasks: {
@@ -161,7 +161,7 @@ describe("Qore SDK", () => {
       };
     }>({
       organisationId: "FAKE_ORG",
-      projectId: "FAKE_PROJECT",
+      projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
     const readStream = qore.views.allTasks.readRow(
@@ -169,7 +169,7 @@ describe("Qore SDK", () => {
     );
 
     let resultsData: Array<{}> = [];
-    const subscription = readStream.subscribe((result) => {
+    const subscription = readStream.subscribe(result => {
       if (result.error) done(result.error);
       if (result.data) {
         resultsData.push(result.data);
@@ -180,7 +180,7 @@ describe("Qore SDK", () => {
           description: null,
           done: false,
           name: "New task",
-          user: null,
+          user: null
         });
         expect(resultsData[0]).toEqual(resultsData[1]);
         expect(resultsData[0]).not.toEqual(resultsData[2]);
@@ -194,7 +194,7 @@ describe("Qore SDK", () => {
       setTimeout(() => {
         readStream.revalidate({
           networkPolicy: "network-only",
-          pollInterval: 5000,
+          pollInterval: 5000
         });
       }, 1000);
     }, 1000);
@@ -204,7 +204,7 @@ describe("Qore SDK", () => {
     scope = scope
       .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows")
       .reply(200, {
-        id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
+        id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       })
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
@@ -214,7 +214,7 @@ describe("Qore SDK", () => {
         description: null,
         done: false,
         name: "New task",
-        user: null,
+        user: null
       });
     const qore = new QoreClient<{
       allTasks: {
@@ -224,11 +224,11 @@ describe("Qore SDK", () => {
       };
     }>({
       organisationId: "FAKE_ORG",
-      projectId: "FAKE_PROJECT",
+      projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
     const newTask = await qore.views.allTasks.insertRow({
-      name: "New task",
+      name: "New task"
     });
     expect(newTask).toHaveProperty("name", "New task");
     const { data: cachedTask } = await qore.views.allTasks
@@ -249,9 +249,9 @@ describe("Qore SDK", () => {
         name: "Old task",
         user: {
           id: "9275e876-fd95-45a0-ad67-b947a1296c32",
-          displayField: "rrmdn@pm.me",
+          displayField: "rrmdn@pm.me"
         },
-        subTasks: [{ id: "sdsd", displayField: "some sub task" }],
+        subTasks: [{ id: "sdsd", displayField: "some sub task" }]
       })
       .patch(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
@@ -275,7 +275,7 @@ describe("Qore SDK", () => {
       };
     }>({
       organisationId: "FAKE_ORG",
-      projectId: "FAKE_PROJECT",
+      projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
     const updatedTask = await qore.views.allTasks.updateRow(
@@ -283,13 +283,13 @@ describe("Qore SDK", () => {
       {
         name: "Old task",
         user: ["9275e876-fd95-45a0-ad67-b947a1296c32"],
-        subtasks: ["another-task"],
+        subtasks: ["another-task"]
       }
     );
     expect(updatedTask).toHaveProperty("name", "Old task");
     expect(updatedTask.user).toEqual({
       id: "9275e876-fd95-45a0-ad67-b947a1296c32",
-      displayField: "rrmdn@pm.me",
+      displayField: "rrmdn@pm.me"
     });
   });
 
@@ -307,7 +307,7 @@ describe("Qore SDK", () => {
       };
     }>({
       organisationId: "FAKE_ORG",
-      projectId: "FAKE_PROJECT",
+      projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
     await qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f");
@@ -327,7 +327,7 @@ describe("Qore SDK", () => {
       .reply(200, { id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f" });
     let token: string | undefined = undefined;
     const mockGetToken = jest.fn(() => token);
-    const mockOnError = jest.fn((error) => {});
+    const mockOnError = jest.fn(error => {});
     const qore = new QoreClient<{
       allTasks: {
         read: { id: string; name: string };
@@ -338,7 +338,7 @@ describe("Qore SDK", () => {
       organisationId: "FAKE_ORG",
       projectId: "FAKE_PROJECT",
       getToken: mockGetToken,
-      onError: mockOnError,
+      onError: mockOnError
     });
     qore.init(fakeProjectSchema());
     const tasks = await qore.views.allTasks
@@ -349,7 +349,7 @@ describe("Qore SDK", () => {
     token = await qore.authenticate("rrmdn@pm.me", "some-password");
     const row = await qore.views.allTasks
       .readRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f", {
-        networkPolicy: "network-only",
+        networkPolicy: "network-only"
       })
       .toPromise();
     expect(row.error).toEqual(undefined);
