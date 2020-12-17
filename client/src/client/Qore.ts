@@ -7,7 +7,7 @@ import {
   QoreOperationConfig,
   QoreOperationResult,
   QoreProjectSchema,
-  QoreSchema,
+  QoreSchema
 } from "../types";
 import debugExchange from "../exchanges/debugExchange";
 import networkExchange from "../exchanges/networkExchange";
@@ -21,7 +21,7 @@ export type QoreRow = { id: string } & Record<
   string | number | boolean | RelationValue
 >;
 
-type QoreConfig = {
+export type QoreConfig = {
   projectId: string;
   organisationId: string;
   getToken?: () => string | undefined;
@@ -30,7 +30,7 @@ type QoreConfig = {
 
 export const defaultOperationConfig: QoreOperationConfig = {
   networkPolicy: "network-and-cache",
-  pollInterval: 0,
+  pollInterval: 0
 };
 
 export class QoreProject {
@@ -41,9 +41,9 @@ export class QoreProject {
     this.axios = Axios.create({
       baseURL: `${process.env.QORE_API || "http://localhost:8080"}/orgs/${
         this.config.organisationId
-      }/projects/${this.config.projectId}`,
+      }/projects/${this.config.projectId}`
     });
-    this.axios.interceptors.request.use((req) => {
+    this.axios.interceptors.request.use(req => {
       const token = this.config.getToken && this.config.getToken();
       if (token) req.headers["Authorization"] = `Bearer ${token}`;
       return req;
@@ -52,7 +52,7 @@ export class QoreProject {
       async function handleSuccess(resp) {
         return resp;
       },
-      async (error) => {
+      async error => {
         this.config.onError && this.config.onError(error);
         throw error;
       }
@@ -71,13 +71,13 @@ export type CacheRef = { __ref: string };
 
 export const composeExchanges = (exchanges: Exchange[]) => ({
   client,
-  forward,
+  forward
 }: ExchangeInput) =>
   exchanges.reduceRight(
     (forward, exchange) =>
       exchange({
         client,
-        forward,
+        forward
       }),
     forward
   );
@@ -95,10 +95,8 @@ export function withHelpers<T>(
 ): PromisifiedSource<T> {
   (source$ as PromisifiedSource<T>).toPromise = () =>
     Wonka.pipe(source$, Wonka.take(1), Wonka.toPromise);
-
-  (source$ as PromisifiedSource<T>).subscribe = (callback) =>
+  (source$ as PromisifiedSource<T>).subscribe = callback =>
     Wonka.subscribe(callback)(source$);
-
   (source$ as PromisifiedSource<T>).revalidate = (
     config = defaultOperationConfig
   ) => {
@@ -134,7 +132,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     Wonka.publish(this.results);
   }
   init(schema: QoreProjectSchema) {
-    const views = schema.views.map((view) => {
+    const views = schema.views.map(view => {
       return new ViewDriver(
         this,
         this.project,
@@ -147,7 +145,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     this.views = views.reduce(
       (map, driver) => ({
         ...map,
-        [driver.id]: driver,
+        [driver.id]: driver
       }),
       {}
     );
@@ -180,7 +178,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   executeOperation(operation: QoreOperation) {
     let resultStream = Wonka.pipe(
       this.results,
-      Wonka.filter((result) => result.operation.key === operation.key)
+      Wonka.filter(result => result.operation.key === operation.key)
     );
     // non GET operations should receive only one result
     if (operation.type?.toLowerCase() !== "get") {
@@ -193,7 +191,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
 
     const teardownStream = Wonka.pipe(
       this.operations,
-      Wonka.filter((op) => op.key === operation.key && op.type === "teardown")
+      Wonka.filter(op => op.key === operation.key && op.type === "teardown")
     );
 
     resultStream = Wonka.pipe(
