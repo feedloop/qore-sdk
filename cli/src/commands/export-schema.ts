@@ -4,7 +4,7 @@ import createProject, {
   FieldType,
   Table,
   Vield,
-  ViewSummary,
+  ViewSummary
 } from "@qore/sdk/lib/project/index";
 import fs from "fs";
 import path from "path";
@@ -28,7 +28,7 @@ export default class ExportSchema extends Command {
   static examples = [`$ qore `];
 
   static flags = {
-    ...configFlags,
+    ...configFlags
   };
 
   static args = [{ name: "file" }];
@@ -37,7 +37,7 @@ export default class ExportSchema extends Command {
     const project = createProject({
       organizationId: configs.org,
       projectId: configs.project,
-      token: configs.token,
+      token: configs.token
     });
     const tables = await project.tables();
     const tablesSchema: TableSchema[] = await Promise.all(
@@ -46,7 +46,7 @@ export default class ExportSchema extends Command {
           const fields = await table.fields();
           const tableForms = await table.forms();
           const forms = await Promise.all(
-            tableForms.map(async (form) => {
+            tableForms.map(async form => {
               return table.form(form.id);
             })
           );
@@ -56,7 +56,7 @@ export default class ExportSchema extends Command {
             type: table.type,
             master: table.master,
             fields,
-            forms,
+            forms
           };
         }
       )
@@ -72,7 +72,7 @@ export default class ExportSchema extends Command {
             name,
             parameters,
             sorts,
-            tableId,
+            tableId
           } = await project.view(view.id);
           return {
             id,
@@ -81,7 +81,7 @@ export default class ExportSchema extends Command {
             sorts,
             parameters,
             tableId,
-            vields,
+            vields
           };
         }
       )
@@ -89,7 +89,7 @@ export default class ExportSchema extends Command {
     const schema: QoreSchema = {
       version: "v1",
       tables: tablesSchema,
-      views: viewsSchema,
+      views: viewsSchema
     };
     return schema;
   }
@@ -102,7 +102,7 @@ export default class ExportSchema extends Command {
       path.resolve(process.cwd() + "/qore-schema.json"),
       prettier.format(JSON.stringify(schema), { parser: "json" }),
       {
-        encoding: "utf8",
+        encoding: "utf8"
       }
     );
   }

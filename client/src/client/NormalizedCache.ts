@@ -1,6 +1,6 @@
 import produce from "immer";
-import { ViewDriver } from './ViewDriver';
-import { CacheRef, ViewDriverObject, QoreRow } from './Qore';
+import { ViewDriver } from "./ViewDriver";
+import { CacheRef, ViewDriverObject, QoreRow } from "./Qore";
 
 // for future reference if normalized cache is necessary
 export class NormalizedCache {
@@ -24,8 +24,8 @@ export class NormalizedCache {
         typeof value !== "object"
           ? value
           : depth > 0
-            ? this.lookup(value, depth - 1)
-            : undefined;
+          ? this.lookup(value, depth - 1)
+          : undefined;
     }
     return record;
   }
@@ -39,9 +39,8 @@ export class NormalizedCache {
     for (const row of rows) {
       const id = this.identify(view.tableId, row.id);
       for (const field of Object.values(view.fields)) {
-        if (typeof row === "object")
-          return;
-        this.modify((draft) => {
+        if (typeof row === "object") return;
+        this.modify(draft => {
           draft[id][field.id] = row[field.id];
         });
       }

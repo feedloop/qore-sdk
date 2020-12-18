@@ -1,3 +1,3 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
-export type FileField = BaseField & { type: 'file'; fileType: string };
+export type FileField = BaseField & { type: "file"; fileType: string };

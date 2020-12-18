@@ -1,3 +1,3 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
-export type SelectField = BaseField & { type: 'select'; select: string[] };
+export type SelectField = BaseField & { type: "select"; select: string[] };

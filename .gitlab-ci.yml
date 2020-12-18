@@ -47,7 +47,7 @@ release-doc:
     - cd doc
     - yarn global add vercel
     - vercel --token $VERCEL_TOKEN --confirm --prod
-  dependencies: 
+  dependencies:
     - build-doc
   only:
     refs:

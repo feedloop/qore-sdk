@@ -1,6 +1,6 @@
-import { ProjectConfig } from '../project';
-import { FormMethod } from './formMethod';
-import { APIFormSummary, FormSummaryImpl } from './formSummary';
+import { ProjectConfig } from "../project";
+import { FormMethod } from "./formMethod";
+import { APIFormSummary, FormSummaryImpl } from "./formSummary";
 
 export type FormFieldSetting = {
   id: string;
@@ -16,7 +16,7 @@ export type APIForm = APIFormSummary & {
 export type Form = APIForm & FormMethod;
 
 export class FormImpl extends FormSummaryImpl implements Form {
-  fields: APIForm['fields'];
+  fields: APIForm["fields"];
   constructor(params: APIForm & { config: ProjectConfig }) {
     super(params);
     this.fields = params.fields;

@@ -1,4 +1,4 @@
-import { FieldType } from './field';
+import { FieldType } from "./field";
 
 type RelationValue = { id: string; displayField: string };
 

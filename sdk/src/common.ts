@@ -1,13 +1,13 @@
 import Axios from "axios";
 
 Axios.interceptors.response.use(
-  (data) => data,
-  (error) => {
+  data => data,
+  error => {
     throw error;
   }
 );
 
-Axios.interceptors.request.use((config) => {
+Axios.interceptors.request.use(config => {
   config.baseURL =
     process.env.REACT_APP_API_URL ||
     "https://s-qore-dot-pti-feedloop.et.r.appspot.com";

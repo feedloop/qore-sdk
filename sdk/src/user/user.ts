@@ -1,7 +1,11 @@
-import { callApi } from '../common';
-import { Project, ProjectImpl } from './project';
-import { APIOrganization, Organization, OrganizationImpl } from './organization';
-import { generateUrlUserPath } from './url';
+import { callApi } from "../common";
+import { Project, ProjectImpl } from "./project";
+import {
+  APIOrganization,
+  Organization,
+  OrganizationImpl
+} from "./organization";
+import { generateUrlUserPath } from "./url";
 
 export type APIUser = {
   email: string;
@@ -13,10 +17,17 @@ export type QoreUser = {
   logout(): void;
   login(email: string, password: string): Promise<void>;
   verify(email: string, activationCode: string): Promise<void>;
-  createOrganization(params: { name: string; category: string; size: string }): Promise<string>;
+  createOrganization(params: {
+    name: string;
+    category: string;
+    size: string;
+  }): Promise<string>;
   organizations(limit?: number, offset?: number): Promise<Organization[]>;
   organization(id: string): Promise<Organization | undefined>;
-  projects(orgId: string, props?: { limit?: number; offset?: number }): Promise<Project[]>;
+  projects(
+    orgId: string,
+    props?: { limit?: number; offset?: number }
+  ): Promise<Project[]>;
   user(): APIUser | undefined;
 };
 
@@ -25,30 +36,30 @@ export default () => {
   const url = generateUrlUserPath();
   return {
     setToken(token: string) {
-      user = { email: '', token };
+      user = { email: "", token };
     },
     async register(params: { email: string; password: string }): Promise<void> {
       await callApi({
-        method: 'post',
+        method: "post",
         url: url.register(),
-        data: params,
+        data: params
       });
     },
     async login(email: string, password: string): Promise<void> {
       const { token } = await callApi({
-        method: 'post',
+        method: "post",
         url: url.login(),
-        data: { email, password },
+        data: { email, password }
       });
-      user = { email, token: 'Bearer ' + token };
+      user = { email, token: "Bearer " + token };
     },
     async verify(email: string, activationCode: string): Promise<void> {
       const { token } = await callApi({
-        method: 'post',
+        method: "post",
         url: url.verify(),
-        data: { email, activationCode },
+        data: { email, activationCode }
       });
-      user = { email, token: 'Bearer ' + token };
+      user = { email, token: "Bearer " + token };
     },
     async createOrganization(params: {
       name: string;
@@ -58,39 +69,47 @@ export default () => {
     }): Promise<string> {
       const { id } = await callApi(
         {
-          method: 'post',
+          method: "post",
           url: url.organization(),
-          data: params,
+          data: params
         },
         user.token
       );
       return id;
     },
-    async projects(orgId: string, props: { limit?: number; offset?: number }): Promise<Project[]> {
+    async projects(
+      orgId: string,
+      props: { limit?: number; offset?: number }
+    ): Promise<Project[]> {
       const { limit, offset } = props || {};
       const { nodes } = await callApi(
         {
-          method: 'get',
+          method: "get",
           url: url.project(orgId),
-          params: { limit, offset },
+          params: { limit, offset }
         },
         user.token
       );
       return nodes.map(
-        (row: APIOrganization) => new ProjectImpl({ ...row, userToken: user.token, url, orgId })
+        (row: APIOrganization) =>
+          new ProjectImpl({ ...row, userToken: user.token, url, orgId })
       );
     },
-    async organizations(limit?: number, offset?: number): Promise<Organization[]> {
+    async organizations(
+      limit?: number,
+      offset?: number
+    ): Promise<Organization[]> {
       const { nodes } = await callApi(
         {
-          method: 'get',
+          method: "get",
           url: url.organization(),
-          params: { limit, offset },
+          params: { limit, offset }
         },
         user.token
       );
       return nodes.map(
-        (row: APIOrganization) => new OrganizationImpl({ ...row, userToken: user.token, url })
+        (row: APIOrganization) =>
+          new OrganizationImpl({ ...row, userToken: user.token, url })
       );
     },
     async organization(id: string): Promise<Organization> {
@@ -103,14 +122,14 @@ export default () => {
       //   user.token
       // );
       return new OrganizationImpl({
-        ...{ id, category: '', size: '', name: '', subdomain: '' },
-        userToken: 'Bearer ' + user.token,
-        url,
+        ...{ id, category: "", size: "", name: "", subdomain: "" },
+        userToken: "Bearer " + user.token,
+        url
       });
     },
     user: () => user,
     logout: () => {
-      user = { token: '', email: '' };
-    },
+      user = { token: "", email: "" };
+    }
   };
 };

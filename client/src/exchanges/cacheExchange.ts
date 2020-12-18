@@ -14,7 +14,7 @@ const shouldCacheOperation = (operation: QoreOperation) => {
   return false;
 };
 
-const cacheExchange: Exchange = ({ forward, client }) => (operationStream) => {
+const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
   const resultCache = new Map<string, QoreOperationResult["data"]>();
   const sharedOpsStream = Wonka.share(operationStream);
   const hasCache = (operation: QoreOperation) => {
@@ -22,14 +22,14 @@ const cacheExchange: Exchange = ({ forward, client }) => (operationStream) => {
   };
   const cachedStream = Wonka.pipe(
     sharedOpsStream,
-    Wonka.filter((operation) => hasCache(operation)),
+    Wonka.filter(operation => hasCache(operation)),
     Wonka.map(
       (operation): QoreOperationResult => {
         const cached = resultCache.get(operation.key);
         const result: QoreOperationResult = {
           operation,
           stale: false,
-          data: cached,
+          data: cached
         };
         // send revalidation command
         if (operation.networkPolicy === "network-and-cache") {
@@ -44,9 +44,9 @@ const cacheExchange: Exchange = ({ forward, client }) => (operationStream) => {
 
   const forwardStream = Wonka.pipe(
     sharedOpsStream,
-    Wonka.filter((operation) => !hasCache(operation)),
+    Wonka.filter(operation => !hasCache(operation)),
     forward,
-    Wonka.tap((result) => {
+    Wonka.tap(result => {
       if (result.data) {
         result.operation.meta["cacheHit"] = false;
         resultCache.set(result.operation.key, result.data);

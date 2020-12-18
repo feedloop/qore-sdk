@@ -1,7 +1,7 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
 export type FormulaField = BaseField & {
-  type: 'formula';
-  returnType: 'number';
+  type: "formula";
+  returnType: "number";
   formula: string;
 };

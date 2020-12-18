@@ -1,8 +1,8 @@
-import { callApi } from '../common';
-import { AccountImpl, APIAccount, Account } from './account';
-import { APIProject, Project, ProjectImpl } from './project';
-import { Rows } from './row';
-import { UrlUserPath } from './url';
+import { callApi } from "../common";
+import { AccountImpl, APIAccount, Account } from "./account";
+import { APIProject, Project, ProjectImpl } from "./project";
+import { Rows } from "./row";
+import { UrlUserPath } from "./url";
 
 export type APIOrganization = {
   id: string;
@@ -16,7 +16,10 @@ export type Organization = APIOrganization & {
   accounts(limit?: number, offset?: number): Promise<Account[]>;
   inviteAccount(params: { email: string; type: string }): Promise<void>;
   createProject(params: { name: string }): Promise<string>;
-  projects(limit?: number, offset?: number): Promise<{ projects: Project[]; totalCount: number }>;
+  projects(
+    limit?: number,
+    offset?: number
+  ): Promise<{ projects: Project[]; totalCount: number }>;
   project(id: string): Promise<Project>;
   delete(): Promise<void>;
   update(org: Partial<APIOrganization>): Promise<void>;
@@ -30,7 +33,9 @@ export class OrganizationImpl implements Organization {
   size: string;
   _url: UrlUserPath;
   _token: string;
-  constructor(params: APIOrganization & { url: UrlUserPath; userToken: string }) {
+  constructor(
+    params: APIOrganization & { url: UrlUserPath; userToken: string }
+  ) {
     this.id = params.id;
     this.name = params.name;
     this.subdomain = params.subdomain;
@@ -42,28 +47,28 @@ export class OrganizationImpl implements Organization {
   async accounts(limit?: number, offset?: number): Promise<Account[]> {
     const { nodes } = await callApi<Rows<APIAccount>>(
       {
-        method: 'get',
+        method: "get",
         url: this._url.account(this.id),
-        params: { limit, offset },
+        params: { limit, offset }
       },
       this._token
     );
     return nodes.map(
-      (account) =>
+      account =>
         new AccountImpl({
           ...account,
           userToken: this._token,
           url: this._url,
-          orgId: this.id,
+          orgId: this.id
         })
     );
   }
   async inviteAccount(params: { email: string; type: string }): Promise<void> {
     await callApi(
       {
-        method: 'post',
+        method: "post",
         url: this._url.account(this.id),
-        data: params,
+        data: params
       },
       this._token
     );
@@ -71,20 +76,23 @@ export class OrganizationImpl implements Organization {
   async createProject(params: { name: string }): Promise<string> {
     const { id } = await callApi(
       {
-        method: 'post',
+        method: "post",
         url: this._url.project(this.id),
-        data: params,
+        data: params
       },
       this._token
     );
     return id;
   }
-  async projects(limit = 10, offset = 0): Promise<{ projects: Project[]; totalCount: number }> {
+  async projects(
+    limit = 10,
+    offset = 0
+  ): Promise<{ projects: Project[]; totalCount: number }> {
     const { nodes, totalCount } = await callApi(
       {
-        method: 'get',
+        method: "get",
         url: this._url.project(this.id),
-        params: { limit, offset },
+        params: { limit, offset }
       },
       this._token
     );
@@ -95,17 +103,17 @@ export class OrganizationImpl implements Organization {
             ...row,
             userToken: this._token,
             url: this._url,
-            orgId: this.id,
+            orgId: this.id
           })
       ),
-      totalCount,
+      totalCount
     };
   }
   async project(id: string): Promise<Project> {
     const project = await callApi<APIProject>(
       {
-        method: 'get',
-        url: this._url.project(this.id, id),
+        method: "get",
+        url: this._url.project(this.id, id)
       },
       this._token
     );
@@ -113,14 +121,14 @@ export class OrganizationImpl implements Organization {
       ...project,
       userToken: this._token,
       url: this._url,
-      orgId: this.id,
+      orgId: this.id
     });
   }
   async delete(): Promise<void> {
     await callApi(
       {
-        method: 'delete',
-        url: this._url.organization(this.id),
+        method: "delete",
+        url: this._url.organization(this.id)
       },
       this._token
     );
@@ -128,9 +136,9 @@ export class OrganizationImpl implements Organization {
   async update(org: Partial<APIOrganization>): Promise<void> {
     await callApi(
       {
-        method: 'patch',
+        method: "patch",
         url: this._url.organization(this.id),
-        data: org,
+        data: org
       },
       this._token
     );
