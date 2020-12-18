@@ -57,8 +57,8 @@ export class AuthConfigImpl implements AuthConfig {
           identifierField: values.identifierField,
           roleField: values.roleField,
           // @ts-ignore
-          passwordField: values.passwordField,
-        },
+          passwordField: values.passwordField
+        }
       },
       this._config.token
     );

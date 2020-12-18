@@ -1,21 +1,21 @@
-import { callApi } from '../../common';
-import { ProjectConfig } from '../project';
-import { APIRow, RowImpl, Rows } from '../row';
-import { url } from '../url';
-import { ActionField } from './actionField';
-import { BooleanField } from './booleanField';
-import { DateField } from './dateField';
-import { FormulaField } from './formulaField';
-import { LookupField } from './lookupField';
-import { NumberField } from './numberField';
-import { PasswordField } from './passwordField';
-import { RelationField } from './relationField';
-import { RoleField } from './roleField';
-import { RollupField } from './rollupField';
-import { SelectField } from './selectField';
-import { TextField } from './textField';
-import { FileField } from './fileField';
-import { JsonField } from './jsonField';
+import { callApi } from "../../common";
+import { ProjectConfig } from "../project";
+import { APIRow, RowImpl, Rows } from "../row";
+import { url } from "../url";
+import { ActionField } from "./actionField";
+import { BooleanField } from "./booleanField";
+import { DateField } from "./dateField";
+import { FormulaField } from "./formulaField";
+import { LookupField } from "./lookupField";
+import { NumberField } from "./numberField";
+import { PasswordField } from "./passwordField";
+import { RelationField } from "./relationField";
+import { RoleField } from "./roleField";
+import { RollupField } from "./rollupField";
+import { SelectField } from "./selectField";
+import { TextField } from "./textField";
+import { FileField } from "./fileField";
+import { JsonField } from "./jsonField";
 
 export type Fields = {
   text: TextField;
@@ -40,13 +40,17 @@ export type APIField<T extends FieldType = FieldType> = Fields[T];
 
 export type Field<T extends FieldType = FieldType> = APIField<T> & {
   delete(): Promise<void>;
-  update(field: Omit<APIField<T>, 'id'>): Promise<void>;
-} & (T extends 'relation'
+  update(field: Omit<APIField<T>, "id">): Promise<void>;
+} & (T extends "relation"
     ? {
-        refRows(qs: { limit?: number; offset?: number; q?: string }): Promise<Rows>;
+        refRows(qs: {
+          limit?: number;
+          offset?: number;
+          q?: string;
+        }): Promise<Rows>;
       }
     : {}) &
-  (T extends 'file'
+  (T extends "file"
     ? {
         getUploadFile(fileName: string): Promise<string>;
       }
@@ -62,34 +66,40 @@ export function buildRowField(params: {
   const { field, config, rowId, tableId, row } = params;
   const fieldId = field.id;
   switch (field.type) {
-    case 'role':
-    case 'select':
-    case 'boolean':
-    case 'date':
-    case 'number':
-    case 'password':
-    case 'json':
-    case 'text':
+    case "role":
+    case "select":
+    case "boolean":
+    case "date":
+    case "number":
+    case "password":
+    case "json":
+    case "text":
       return {
         value() {
           return row[fieldId];
         },
         async update(
-          value?: string | boolean | number | Date | Array<any> | { [key: string]: any }
+          value?:
+            | string
+            | boolean
+            | number
+            | Date
+            | Array<any>
+            | { [key: string]: any }
         ) {
           await callApi(
             {
-              method: 'patch',
+              method: "patch",
               url: url.row({ ...config, tableId, rowId }),
               data: {
-                [fieldId]: value,
-              },
+                [fieldId]: value
+              }
             },
             config.token
           );
-        },
+        }
       };
-    case 'relation':
+    case "relation":
       return {
         value() {
           return row[fieldId];
@@ -97,9 +107,9 @@ export function buildRowField(params: {
         async add(value: string) {
           await callApi(
             {
-              method: 'post',
+              method: "post",
               url: url.addRowRelation({ ...config, tableId, rowId, fieldId }),
-              data: { value },
+              data: { value }
             },
             config.token
           );
@@ -107,41 +117,41 @@ export function buildRowField(params: {
         async remove(refRowId: string) {
           await callApi(
             {
-              method: 'delete',
+              method: "delete",
               url: url.removeRowRelation({
                 ...config,
                 tableId,
                 rowId,
                 fieldId,
-                refRowId,
-              }),
+                refRowId
+              })
             },
             config.token
           );
-        },
+        }
       };
-    case 'action':
+    case "action":
       return {
         async execute(parameters: { [key: string]: any }) {
           await callApi(
             {
-              method: 'post',
+              method: "post",
               url: url.executeRow({ ...config, tableId, rowId, fieldId }),
-              data: parameters,
+              data: parameters
             },
             config.token
           );
-        },
+        }
       };
-    case 'lookup':
-    case 'rollup':
-    case 'formula':
+    case "lookup":
+    case "rollup":
+    case "formula":
       return {
         value() {
           return row[fieldId];
-        },
+        }
       };
-    case 'file':
+    case "file":
       return {
         value() {
           return row[fieldId];
@@ -149,9 +159,9 @@ export function buildRowField(params: {
         async getUploadUrl(fileName: string) {
           const { url: uploadUrl } = await callApi(
             {
-              method: 'get',
-              url: url.table({ ...config, tableId }) + '/upload-url',
-              params: { fileName },
+              method: "get",
+              url: url.table({ ...config, tableId }) + "/upload-url",
+              params: { fileName }
             },
             config.token
           );
@@ -160,15 +170,15 @@ export function buildRowField(params: {
         async update(value?: string | boolean | number | Date) {
           await callApi(
             {
-              method: 'patch',
+              method: "patch",
               url: url.row({ ...config, tableId, rowId }),
               data: {
-                [fieldId]: value,
-              },
+                [fieldId]: value
+              }
             },
             config.token
           );
-        },
+        }
       };
   }
 }
@@ -182,28 +192,30 @@ export function buildField<T extends FieldType = FieldType>(params: {
   return {
     ...field,
     refRows:
-      field.type !== 'relation'
+      field.type !== "relation"
         ? null
-        : async (qs: { limit?: number; offset?: number; q?: string } = {}): Promise<Rows> => {
+        : async (
+            qs: { limit?: number; offset?: number; q?: string } = {}
+          ): Promise<Rows> => {
             const { nodes, totalCount } = await callApi(
               {
-                method: 'get',
+                method: "get",
                 url: url.row({ ...config, tableId: field.table }),
-                params: { ...qs, isDisplayField: true },
+                params: { ...qs, isDisplayField: true }
               },
               config.token
             );
             const rowParam = { parentId: tableId, config };
             return {
               nodes: nodes.map((row: APIRow) => new RowImpl(rowParam, row)),
-              totalCount,
+              totalCount
             };
           },
     delete: async (): Promise<void> => {
       await callApi(
         {
-          method: 'delete',
-          url: url.field({ ...config, tableId, fieldId: field.id }),
+          method: "delete",
+          url: url.field({ ...config, tableId, fieldId: field.id })
         },
         config.token
       );
@@ -211,12 +223,12 @@ export function buildField<T extends FieldType = FieldType>(params: {
     update: async (data: Partial<APIField<T>>): Promise<void> => {
       await callApi(
         {
-          method: 'patch',
+          method: "patch",
           url: url.field({ ...config, tableId, fieldId: field.id }),
-          data,
+          data
         },
         config.token
       );
-    },
+    }
   };
 }

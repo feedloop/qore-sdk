@@ -1,3 +1,3 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
-export type JsonField = BaseField & { type: 'json' };
+export type JsonField = BaseField & { type: "json" };

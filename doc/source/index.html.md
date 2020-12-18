@@ -160,11 +160,11 @@ const Component = () => {
   const [{ data: allTasks, stale, error }] = qoreContext.allTasks.useListRows({
     offset: 10,
     limit: 10,
-    order: "asc",
+    order: "asc"
   });
   return (
     <ul>
-      {allTasks.map((task) => (
+      {allTasks.map(task => (
         <li>{task.name}</li>
       ))}
     </ul>
@@ -193,7 +193,7 @@ const Component = () => {
   );
   return (
     <ul>
-      {allTasks.map((task) => (
+      {allTasks.map(task => (
         <li>{task.name}</li>
       ))}
     </ul>
@@ -224,13 +224,13 @@ const Component = () => {
     {
       offset: 10,
       limit: 10,
-      order: "asc",
+      order: "asc"
     },
     { networkPolicy: "cache-only" }
   );
   return (
     <ul>
-      {allTasks.map((task) => (
+      {allTasks.map(task => (
         <li>{task.name}</li>
       ))}
     </ul>
@@ -393,7 +393,7 @@ Insert a data to `allTasks` view.
 
 ```javascript
 await client.views.allTasks.updateRow("some-task-id", {
-  ...data,
+  ...data
 });
 ```
 

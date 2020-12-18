@@ -1,26 +1,26 @@
-import { callApi } from '../common';
-import { ProjectConfig } from './project';
-import { url } from './url';
+import { callApi } from "../common";
+import { ProjectConfig } from "./project";
+import { url } from "./url";
 
 export type WebhookAction = {
-  type: 'webhook';
+  type: "webhook";
   url: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: "GET" | "POST" | "PUT" | "DELETE";
   headers?: Record<string, string>;
   transformUrl?: Record<string, string>;
 };
 
 export type DatabaseOperationAction = {
-  type: 'database-operation';
+  type: "database-operation";
   projectId: string;
   tableId: string;
   schema: string;
-  operation: 'select';
+  operation: "select";
   fields: string[];
 };
 
 export type SequenceAction = {
-  type: 'sequence';
+  type: "sequence";
   steps: (WebhookAction | DatabaseOperationAction)[];
 };
 
@@ -31,15 +31,15 @@ export type WorkflowAction = {
 export type WorkflowCondition = {
   field: string;
   values: string[];
-  operator: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'between';
+  operator: "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "between";
 };
 
 export type APIWorkflow = {
   id: string;
   tableId: string;
   name: string;
-  event: 'onRowCreate' | 'onRowUpdate' | 'onRowDelete';
-  type: 'trigger';
+  event: "onRowCreate" | "onRowUpdate" | "onRowDelete";
+  type: "trigger";
   active: boolean;
   actions: WorkflowAction[];
   preCondition?: {
@@ -51,18 +51,18 @@ export type APIWorkflow = {
 export interface Workflow extends APIWorkflow {
   _config: ProjectConfig;
   delete(): Promise<void>;
-  update(workflow: Partial<Omit<APIWorkflow, 'id'>>): Promise<void>;
+  update(workflow: Partial<Omit<APIWorkflow, "id">>): Promise<void>;
 }
 
 export class WorkflowImpl implements Workflow {
-  id: Workflow['id'];
-  tableId: Workflow['tableId'];
-  name: Workflow['name'];
-  event: Workflow['event'];
-  type: Workflow['type'];
-  active: Workflow['active'];
-  actions: Workflow['actions'];
-  preCondition: Workflow['preCondition'];
+  id: Workflow["id"];
+  tableId: Workflow["tableId"];
+  name: Workflow["name"];
+  event: Workflow["event"];
+  type: Workflow["type"];
+  active: Workflow["active"];
+  actions: Workflow["actions"];
+  preCondition: Workflow["preCondition"];
   _config: ProjectConfig;
   constructor(params: APIWorkflow & { config: ProjectConfig }) {
     this.id = params.id;
@@ -79,19 +79,19 @@ export class WorkflowImpl implements Workflow {
   delete(): Promise<void> {
     return callApi(
       {
-        method: 'delete',
-        url: url.workflow({ ...this._config, workflowId: this.id }),
+        method: "delete",
+        url: url.workflow({ ...this._config, workflowId: this.id })
       },
       this._config.token
     );
   }
 
-  update(workflow: Partial<Omit<APIWorkflow, 'id' | 'type'>>): Promise<void> {
+  update(workflow: Partial<Omit<APIWorkflow, "id" | "type">>): Promise<void> {
     return callApi(
       {
-        method: 'patch',
+        method: "patch",
         url: url.workflow({ ...this._config, workflowId: this.id }),
-        data: workflow,
+        data: workflow
       },
       this._config.token
     );

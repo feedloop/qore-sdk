@@ -1,3 +1,3 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
-export type DateField = BaseField & { type: 'date' };
+export type DateField = BaseField & { type: "date" };

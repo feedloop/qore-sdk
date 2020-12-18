@@ -1,4 +1,20 @@
 {
-  "private": true,
-  "workspaces": ["sdk"]
+  "name": "qore-sdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@gitlab.com:feedloop_io/qore-sdk.git",
+  "author": "Rizki Romadhoni <rrmdn@pm.me>",
+  "license": "MIT",
+  "scripts": {
+    "format": "prettier --only-changed --write \"./**/*.{ts,tsx,css,yml}\" \".gitlab-ci.yml\" \"./doc/**/*.md\""
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn format; git add ."
+    }
+  },
+  "dependencies": {
+    "husky": "^4.3.6",
+    "prettier": "^2.2.1"
+  }
 }

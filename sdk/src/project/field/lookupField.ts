@@ -1,7 +1,7 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
 export type LookupField = BaseField & {
-  type: 'lookup';
+  type: "lookup";
   source: string;
   destinations: string[];
   returnType?: string;

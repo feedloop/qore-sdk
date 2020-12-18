@@ -1,4 +1,4 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
 export type Parameter = {
   slug: string;
@@ -7,18 +7,18 @@ export type Parameter = {
 };
 
 export type InsertTask = {
-  type: 'insert';
+  type: "insert";
   table: string;
   insert: { [key: string]: string };
 };
 export type UpdateTask = {
-  type: 'update';
+  type: "update";
   update: { [key: string]: string };
 };
 export type Task = InsertTask | UpdateTask;
 
 export type ActionField = BaseField & {
-  type: 'action';
+  type: "action";
   parameters: Parameter[];
   condition?: string;
   tasks: Task[];

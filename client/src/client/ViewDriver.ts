@@ -4,14 +4,14 @@ import {
   QoreOperation,
   QoreOperationConfig,
   QoreOperationResult,
-  QoreViewSchema,
+  QoreViewSchema
 } from "../types";
 import QoreClient, {
   QoreRow,
   QoreProject,
   RelationValue,
   PromisifiedSource,
-  defaultOperationConfig,
+  defaultOperationConfig
 } from "./Qore";
 
 export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
@@ -44,14 +44,14 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/views/${this.id}/v2rows`,
       params: opts,
-      method: "GET",
+      method: "GET"
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
       request: axiosConfig,
       type: axiosConfig.method,
       meta: {},
-      ...{ ...defaultOperationConfig, ...config },
+      ...{ ...defaultOperationConfig, ...config }
     };
     return this.client.execute(operation);
   }
@@ -62,14 +62,14 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"]>> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/views/${this.id}/v2rows/${id}`,
-      method: "GET",
+      method: "GET"
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
       request: axiosConfig,
       type: axiosConfig.method,
       meta: {},
-      ...{ ...defaultOperationConfig, ...config },
+      ...{ ...defaultOperationConfig, ...config }
     };
     return this.client.execute(operation);
   }
@@ -91,13 +91,13 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       .reduce((acc, [key, value]: [string, RelationValue]) => {
         return {
           ...acc,
-          [key]: Array.isArray(value) ? value.map((val) => val.id) : value.id,
+          [key]: Array.isArray(value) ? value.map(val => val.id) : value.id
         };
       });
     const axiosConfig: AxiosRequestConfig = {
       url: `/tables/${this.tableId}/rows/${id}`,
       data: { ...nonRelational, ...relational },
-      method: "PATCH",
+      method: "PATCH"
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -105,7 +105,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       type: axiosConfig.method,
       meta: {},
       pollInterval: 0,
-      networkPolicy: "network-only",
+      networkPolicy: "network-only"
     };
     await this.client.execute(operation).toPromise();
     const row = await this.readRow(id).toPromise();
@@ -115,7 +115,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   async deleteRow(id: string): Promise<boolean> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/tables/${this.tableId}/rows/${id}`,
-      method: "DELETE",
+      method: "DELETE"
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -123,7 +123,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       type: axiosConfig.method,
       meta: {},
       pollInterval: 0,
-      networkPolicy: "network-only",
+      networkPolicy: "network-only"
     };
     await this.client.execute(operation).toPromise();
     return true;
@@ -132,7 +132,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/tables/${this.tableId}/rows`,
       data: input,
-      method: "POST",
+      method: "POST"
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -140,7 +140,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       type: axiosConfig.method,
       meta: {},
       pollInterval: 0,
-      networkPolicy: "network-only",
+      networkPolicy: "network-only"
     };
     const result = await this.client
       .execute<{ id: string }>(operation)

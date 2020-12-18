@@ -1,5 +1,5 @@
-import { callApi } from '../common';
-import { UrlUserPath } from './url';
+import { callApi } from "../common";
+import { UrlUserPath } from "./url";
 
 export type APIProject = {
   id: string;
@@ -22,7 +22,9 @@ export class ProjectImpl implements Project {
   _orgId: string;
   _url: UrlUserPath;
   _token: string;
-  constructor(params: APIProject & { url: UrlUserPath; userToken: string; orgId: string }) {
+  constructor(
+    params: APIProject & { url: UrlUserPath; userToken: string; orgId: string }
+  ) {
     this.id = params.id;
     this.name = params.name;
     this._orgId = params.orgId;
@@ -32,17 +34,19 @@ export class ProjectImpl implements Project {
   async get() {
     await callApi(
       {
-        method: 'get',
-        url: this._url.project(this._orgId),
+        method: "get",
+        url: this._url.project(this._orgId)
       },
       this._token
     );
   }
-  async tables(props: { limit?: number; offset?: number } = {}): Promise<Table[]> {
+  async tables(
+    props: { limit?: number; offset?: number } = {}
+  ): Promise<Table[]> {
     const { nodes } = await callApi(
       {
-        method: 'get',
-        url: this._url.project(this._orgId, this.id) + '/tables',
+        method: "get",
+        url: this._url.project(this._orgId, this.id) + "/tables"
       },
       this._token
     );
@@ -51,8 +55,8 @@ export class ProjectImpl implements Project {
   async delete() {
     await callApi(
       {
-        method: 'delete',
-        url: this._url.project(this._orgId, this.id),
+        method: "delete",
+        url: this._url.project(this._orgId, this.id)
       },
       this._token
     );
@@ -60,9 +64,9 @@ export class ProjectImpl implements Project {
   async update(project: Partial<APIProject>) {
     await callApi(
       {
-        method: 'patch',
+        method: "patch",
         url: this._url.project(this._orgId, this.id),
-        data: project,
+        data: project
       },
       this._token
     );

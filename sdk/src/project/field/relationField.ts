@@ -1,7 +1,7 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
 export type RelationField = BaseField & {
-  type: 'relation';
+  type: "relation";
   table: string;
   multiple: boolean;
 };

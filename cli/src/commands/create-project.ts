@@ -5,7 +5,7 @@ import makeProject, {
   FieldType,
   Table,
   Vield,
-  ViewSummary,
+  ViewSummary
 } from "@qore/sdk/lib/project/index";
 import makeUser from "@qore/sdk/lib/user";
 import fs from "fs";
@@ -30,8 +30,8 @@ export default class CreateProject extends Command {
       char: "t",
       name: "template",
       description: "qore project template",
-      default: "todo-list-typescript",
-    }),
+      default: "todo-list-typescript"
+    })
   };
 
   static args = [{ name: "name" }];
@@ -39,7 +39,7 @@ export default class CreateProject extends Command {
   static getTemplates() {
     const templates = fs
       .readdirSync(CreateProject.templatesLocation)
-      .filter((file) =>
+      .filter(file =>
         fs
           .lstatSync(path.resolve(CreateProject.templatesLocation, file))
           .isDirectory()
@@ -71,7 +71,7 @@ export default class CreateProject extends Command {
         version: "v1",
         endpoint: "https://qore-api.feedloop.io",
         project: "some-project-id",
-        org: "some-org-id",
+        org: "some-org-id"
       },
       { spaces: 2 }
     );

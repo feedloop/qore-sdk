@@ -1,3 +1,3 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
-export type PasswordField = BaseField & { type: 'password' };
+export type PasswordField = BaseField & { type: "password" };

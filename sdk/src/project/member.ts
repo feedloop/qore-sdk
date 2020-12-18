@@ -1,6 +1,6 @@
-import { callApi } from '../common';
-import { ProjectConfig } from './project';
-import { url } from './url';
+import { callApi } from "../common";
+import { ProjectConfig } from "./project";
+import { url } from "./url";
 
 export type APIMember = {
   id: string;
@@ -24,8 +24,8 @@ export class MemberImpl implements Member {
   delete = async () => {
     await callApi(
       {
-        method: 'delete',
-        url: url.member({ ...this._config, memberId: this.id }),
+        method: "delete",
+        url: url.member({ ...this._config, memberId: this.id })
       },
       this._config.token
     );

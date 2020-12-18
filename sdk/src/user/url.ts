@@ -9,23 +9,23 @@ export type UrlUserPath = {
 export function generateUrlUserPath() {
   const url = {
     register(): string {
-      return '/register';
+      return "/register";
     },
     verify(): string {
-      return '/verify';
+      return "/verify";
     },
     login(): string {
-      return '/login';
+      return "/login";
     },
     organization(id?: string): string {
-      return id ? '/orgs/' + id : '/orgs';
+      return id ? "/orgs/" + id : "/orgs";
     },
     account(orgId: string, id?: string): string {
-      return url.organization(orgId) + (id ? '/accounts/' + id : '/accounts');
+      return url.organization(orgId) + (id ? "/accounts/" + id : "/accounts");
     },
     project(orgId: string, id?: string): string {
-      return url.organization(orgId) + (id ? '/projects/' + id : '/projects');
-    },
+      return url.organization(orgId) + (id ? "/projects/" + id : "/projects");
+    }
   };
   return url;
 }

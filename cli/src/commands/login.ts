@@ -9,20 +9,20 @@ export default class Codegen extends Command {
   static examples = [`$ qore codegen`];
 
   static flags = {
-    email: flags.string({ char: "p", description: "project id" }),
+    email: flags.string({ char: "p", description: "project id" })
   };
 
   async run() {
     const values = await prompts([
       { name: "email", type: "text", message: "Enter your email" },
-      { name: "password", type: "password", message: "Enter your password" },
+      { name: "password", type: "password", message: "Enter your password" }
     ]);
     try {
       const resp = await axios.post<{ email: string; token: string }>(
         "/login",
         {
           email: values.email,
-          password: values.password,
+          password: values.password
         }
       );
       config.set("token", resp.data.token);

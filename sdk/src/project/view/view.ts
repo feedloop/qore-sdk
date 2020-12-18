@@ -1,6 +1,6 @@
-import { ProjectConfig } from '../project';
-import { ViewMethod } from './viewMethod';
-import { APIViewSummary, ViewSummaryImpl } from './viewSummary';
+import { ProjectConfig } from "../project";
+import { ViewMethod } from "./viewMethod";
+import { APIViewSummary, ViewSummaryImpl } from "./viewSummary";
 
 export type Sort = {
   order: string;
@@ -22,9 +22,9 @@ export type APIView = APIViewSummary & {
 export type View = APIView & ViewMethod;
 
 export class ViewImpl extends ViewSummaryImpl implements View {
-  filter: APIView['filter'];
-  parameters: APIView['parameters'];
-  sorts: APIView['sorts'];
+  filter: APIView["filter"];
+  parameters: APIView["parameters"];
+  sorts: APIView["sorts"];
   constructor(params: APIView & { config: ProjectConfig }) {
     super(params);
     this.filter = params.filter;

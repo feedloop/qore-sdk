@@ -4,10 +4,7 @@ import prettier from "prettier";
 import { Field } from "@qore/sdk";
 import fs from "fs";
 import path from "path";
-import createProject, {
-  FieldType,
-  Vield,
-} from "@qore/sdk/lib/project/index";
+import createProject, { FieldType, Vield } from "@qore/sdk/lib/project/index";
 import config from "../config";
 import ExportSchema from "./export-schema";
 import { configFlags, promptFlags } from "../flags";
@@ -30,7 +27,7 @@ export default class Codegen extends Command {
     "select",
     "boolean",
     "select",
-    "relation",
+    "relation"
   ]);
 
   readFieldType(field: Field | Vield) {
@@ -76,7 +73,7 @@ export default class Codegen extends Command {
           ({ id, fields }) => `
             type ${voca.capitalize(id)}TableRow = {${[idField, ...fields]
             .map(
-              (field) => `
+              field => `
             ${field.id}: ${this.readFieldType(field)};`
             )
             .join("")}}`
@@ -89,47 +86,47 @@ export default class Codegen extends Command {
           type ${voca.capitalize(id)}ViewRow = {
             read: {${[idField, ...vields]
               .map(
-                (field) => `
+                field => `
             ${field.id}: ${this.readFieldType(field)};`
               )
               .join("")}}
             write: {${vields
-              .filter((vield) => this.isWriteField(vield))
+              .filter(vield => this.isWriteField(vield))
               .map(
-                (field) => `
+                field => `
                 ${field.id}: ${this.writeFieldType(field)};`
               )
               .join("")}
             }
             params: {${parameters
               .map(
-                (param) => `
+                param => `
                 ${param.slug}${param.required ? "" : "?"}: ${
                   param.type === "text" ? "string" : "number"
                 };`
               )
               .join("")}
               ${sorts
-                .filter((sort) => !!sort.order && !!sort.by)
+                .filter(sort => !!sort.order && !!sort.by)
                 // group order by "sort.by"
                 .reduce((group, sort) => {
                   const targetIdx = group.findIndex(
-                    (sortGroup) => sortGroup.by === sort.by
+                    sortGroup => sortGroup.by === sort.by
                   );
                   if (group[targetIdx]) {
                     group[targetIdx].order.push(sort.order);
                   } else {
                     group.push({
                       by: sort.by,
-                      order: [sort.order],
+                      order: [sort.order]
                     });
                   }
                   return group;
                 }, [] as Array<{ by: string; order: string[] }>)
                 .map(
-                  (sortGroup) =>
+                  sortGroup =>
                     `"$by.${sortGroup.by}"?: ${sortGroup.order
-                      .map((order) => `"${order}"`)
+                      .map(order => `"${order}"`)
                       .join("|")};`
                 )
                 .join("")}
@@ -140,7 +137,7 @@ export default class Codegen extends Command {
 
       export type QoreProjectSchema = {
         ${schema.views
-          .map((view) => `${view.id}: ${voca.capitalize(view.id)}ViewRow;`)
+          .map(view => `${view.id}: ${voca.capitalize(view.id)}ViewRow;`)
           .join("")}
       }
     `;
@@ -148,7 +145,7 @@ export default class Codegen extends Command {
         path.resolve(process.cwd() + "/qore-generated.ts"),
         prettier.format(typeDef, { parser: "babel-ts" }),
         {
-          encoding: "utf8",
+          encoding: "utf8"
         }
       );
     } catch (error) {

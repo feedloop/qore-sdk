@@ -1,3 +1,3 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
-export type TextField = BaseField & { type: 'text' };
+export type TextField = BaseField & { type: "text" };

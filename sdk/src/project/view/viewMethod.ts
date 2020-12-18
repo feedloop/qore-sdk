@@ -1,6 +1,6 @@
-import { Row, Rows } from '../row';
-import { APIView } from './view';
-import { Vield } from './viewSummary';
+import { Row, Rows } from "../row";
+import { APIView } from "./view";
+import { Vield } from "./viewSummary";
 
 export type ViewMethod = {
   addVield(id: string): Promise<void>;
@@ -20,6 +20,8 @@ export type ViewMethod = {
   }): Promise<Rows>;
   row(rowId: string): Promise<Row>;
   addRow(params?: { [key: string]: any }): Promise<string>;
-  update(view: Omit<APIView, 'id' | 'vields'> & { vields: string[] }): Promise<void>;
+  update(
+    view: Omit<APIView, "id" | "vields"> & { vields: string[] }
+  ): Promise<void>;
   delete(): Promise<void>;
 };

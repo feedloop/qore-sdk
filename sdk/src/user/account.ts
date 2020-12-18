@@ -1,6 +1,6 @@
-import { callApi } from '../common';
-import { UrlUserPath } from './url';
-import { APIUser } from './user';
+import { callApi } from "../common";
+import { UrlUserPath } from "./url";
+import { APIUser } from "./user";
 
 export type APIAccount = {
   id: string;
@@ -20,7 +20,9 @@ export class AccountImpl implements Account {
   _orgId: string;
   _url: UrlUserPath;
   _token: string;
-  constructor(params: APIAccount & { url: UrlUserPath; userToken: string; orgId: string }) {
+  constructor(
+    params: APIAccount & { url: UrlUserPath; userToken: string; orgId: string }
+  ) {
     this.id = params.id;
     this.user = params.user;
     this.type = params.type;
@@ -31,9 +33,9 @@ export class AccountImpl implements Account {
   async updateType(type: string) {
     await callApi(
       {
-        method: 'patch',
+        method: "patch",
         url: this._url.account(this._orgId, this.id),
-        data: { type },
+        data: { type }
       },
       this._token
     );
@@ -41,8 +43,8 @@ export class AccountImpl implements Account {
   async delete() {
     await callApi(
       {
-        method: 'delete',
-        url: this._url.account(this._orgId, this.id),
+        method: "delete",
+        url: this._url.account(this._orgId, this.id)
       },
       this._token
     );

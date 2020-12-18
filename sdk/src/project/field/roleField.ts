@@ -1,3 +1,3 @@
-import { BaseField } from './baseField';
+import { BaseField } from "./baseField";
 
-export type RoleField = BaseField & { type: 'role' };
+export type RoleField = BaseField & { type: "role" };

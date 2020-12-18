@@ -6,7 +6,7 @@ import {
   ExchangeIO,
   QoreOperation,
   QoreOperationResult,
-  QoreOperationResultData,
+  QoreOperationResultData
 } from "../types";
 
 const makeNetworkSource = (
@@ -22,13 +22,13 @@ const makeNetworkSource = (
         ...operation.request,
         cancelToken: cancelToken.token,
         url:
-          (client.project.axios.defaults.baseURL || "") + operation.request.url,
+          (client.project.axios.defaults.baseURL || "") + operation.request.url
       });
       request
-        .then((resp) => {
+        .then(resp => {
           next({ data: resp.data, operation, stale: false });
         })
-        .catch((error) => {
+        .catch(error => {
           next({ error: error, operation, stale: false });
         })
         .finally(() => {
@@ -43,18 +43,16 @@ const makeNetworkSource = (
 
 const isTeardown = (operation: QoreOperation) => operation.type === "teardown";
 
-const networkExchange: Exchange = ({ forward, client }) => (
-  operationStream
-) => {
+const networkExchange: Exchange = ({ forward, client }) => operationStream => {
   const sharedOpsStream = Wonka.share(operationStream);
   const resultsStream = Wonka.pipe(
     sharedOpsStream,
-    Wonka.filter((operation) => !isTeardown(operation)),
-    Wonka.mergeMap((operation) => {
+    Wonka.filter(operation => !isTeardown(operation)),
+    Wonka.mergeMap(operation => {
       const { key } = operation;
       const teardownStream = Wonka.pipe(
         sharedOpsStream,
-        Wonka.filter((op) => op.type === "teardown" && op.key === key)
+        Wonka.filter(op => op.type === "teardown" && op.key === key)
       );
 
       return Wonka.pipe(
@@ -66,7 +64,7 @@ const networkExchange: Exchange = ({ forward, client }) => (
 
   const forwardStream = Wonka.pipe(
     sharedOpsStream,
-    Wonka.filter((operation) => isTeardown(operation)),
+    Wonka.filter(operation => isTeardown(operation)),
     forward
   );
 

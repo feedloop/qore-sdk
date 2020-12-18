@@ -19,14 +19,14 @@ export type QoreOperationConfig = {
 };
 
 export type QoreProjectSchemaV1 = {
-  version: "v1",
+  version: "v1";
   views: Array<{
     id: string;
     name: string;
     tableId: string;
     fields: APIField[];
   }>;
-}
+};
 
 export type QoreProjectSchema = QoreProjectSchemaV1;
 

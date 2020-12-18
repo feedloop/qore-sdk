@@ -16,7 +16,7 @@ describe("create-project", () => {
       "lIdfC42DJCN2XzQ",
       "--token",
       "77f2ff71-8864-404d-8596-127d78a4c1bd",
-      projectName,
+      projectName
     ]);
     const qoreConfig = fse.readFileSync(
       path.resolve(process.cwd(), projectName, "qore.config.json"),
@@ -31,7 +31,7 @@ describe("create-project", () => {
         "77f2ff71-8864-404d-8596-127d78a4c1bd",
         "--template",
         "some-unknown-template",
-        projectName,
+        projectName
       ])
     ).rejects.toThrowError(
       'Cant find "some-unknown-template" from project templates, may want to choose from the following available templates: todo-list-typescript'

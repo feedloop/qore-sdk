@@ -1,6 +1,6 @@
-import { callApi } from '../common';
-import { ProjectConfig } from './project';
-import { url } from './url';
+import { callApi } from "../common";
+import { ProjectConfig } from "./project";
+import { url } from "./url";
 
 export type Permission = {
   viewId: string;
@@ -20,7 +20,7 @@ export type APIRole = {
 export type Role = APIRole & {
   _config: ProjectConfig;
   delete(): Promise<void>;
-  update(role: Partial<Omit<APIRole, 'id' | 'isAdmin'>>): Promise<void>;
+  update(role: Partial<Omit<APIRole, "id" | "isAdmin">>): Promise<void>;
 };
 
 export class RoleImpl implements Role {
@@ -39,18 +39,18 @@ export class RoleImpl implements Role {
   async delete(): Promise<void> {
     await callApi(
       {
-        method: 'delete',
-        url: url.role({ ...this._config, roleId: this.id }),
+        method: "delete",
+        url: url.role({ ...this._config, roleId: this.id })
       },
       this._config.token
     );
   }
-  async update(role: Partial<Omit<APIRole, 'id'>>): Promise<void> {
+  async update(role: Partial<Omit<APIRole, "id">>): Promise<void> {
     await callApi(
       {
-        method: 'patch',
+        method: "patch",
         url: url.role({ ...this._config, roleId: this.id }),
-        data: role,
+        data: role
       },
       this._config.token
     );
