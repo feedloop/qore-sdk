@@ -49,11 +49,6 @@ release-doc:
     - vercel --token $VERCEL_TOKEN --confirm --prod
   dependencies:
     - build-doc
-  only:
-    refs:
-      - master
-    changes:
-      - doc/**/*
 
 build-doc:
   image: docker:19.03.12
