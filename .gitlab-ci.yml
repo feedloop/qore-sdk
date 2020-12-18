@@ -51,7 +51,7 @@ release-doc:
     - build-doc
   only:
     refs:
-      - merge_requests
+      - master
     changes:
       - doc/**/*
 
@@ -65,6 +65,6 @@ build-doc:
     untracked: true
   only:
     refs:
-      - merge_requests
+      - master
     changes:
       - doc/**/*
