@@ -418,6 +418,31 @@ Update a data of `allTasks` view with an id of _some-task-id_.
 
 `data` must be compliant to the schema of the view, excluding the `id` field.
 
+## Upload a file
+
+```javascript
+const files = await client.upload(event.target.files);
+await client.views.allTasks.updateRow("some-task-id", {
+  ...data
+  avatar: files
+});
+```
+
+```jsx
+import qoreContext from "./qoreContext";
+
+const Component = () => {
+  const [updateRow, status] = qoreContext.allTasks.useUpdateRow();
+  const handleUpload = async event => {
+    const files = await client.upload(event.target.files);
+    await updateRow("some-task-id", { ...data, avatar: files });
+  };
+  return <input type="file" onChange={handleUpload} />;
+};
+```
+
+Adding files to a row requires you to upload the file first. The file type of the uploaded files must match with the field target, unwanted file types will be ignored.
+
 ## Delete a row
 
 ```javascript
@@ -443,6 +468,66 @@ const Component = () => {
 
 Remove a data of `allTasks` view with an id of _some-task-id_.
 
+## Trigger actions
+
+```javascript
+const rowActions = client.views.allTasks.rowActions("some-task-id");
+
+await rowActions.archiveTask.trigger({
+  someParams: "someValue"
+});
+```
+
+```jsx
+import qoreContext from "./qoreContext";
+
+const Component = () => {
+  const [rowActions, status] = qoreContext.allTasks.useActions("some-task-id");
+  return (
+    <button
+      onClick={async () => {
+        await rowActions.archiveTask.trigger({
+          someParams: "someValue"
+        });
+      }}
+    >
+      archive task
+    </button>
+  );
+};
+```
+
+Each qore row can have one or more action triggers, an action trigger may require parameters.
+
+## Send form inputs
+
+```javascript
+await client.views.allTasks.forms.newTaskForm.send({
+  someParams: "someValue"
+});
+```
+
+```jsx
+import qoreContext from "./qoreContext";
+
+const Component = () => {
+  const [forms, status] = qoreContext.allTasks.useForms();
+  return (
+    <button
+      onClick={async () => {
+        await forms.newTaskForm.send({
+          someParams: "someValue"
+        });
+      }}
+    >
+      Add new task
+    </button>
+  );
+};
+```
+
+Each qore view has one or more forms, sending forms may require parameters.
+
 # Authenticating your user
 
 ```typescript
@@ -457,6 +542,27 @@ const token = await client.authenticate(
 
 // save token to somewhere safe
 cookies.set("token", token);
+
+// log a user out by removing the token from your storage
+cookies.remove("token");
 ```
 
 As you can register new users to qore, you might need to log them in to your application.
+
+# Error handling
+
+```typescript
+const client = new QoreClient({..config, onError: (error) => {
+  switch(error.code) {
+    case 500:
+      modal.message("An error has occured");
+      break;
+    case 401:
+      router.push("/login");
+      break;
+  }
+})})
+
+```
+
+Any error that occurs along the lifetime of a qore client will be emitted via the `onError` callback supplied during initialization.
