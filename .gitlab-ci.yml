@@ -41,23 +41,14 @@ client-test:
       - client/**/*
 
 release-doc:
-  image: node:latest
+  image: docker:19.03.12
   stage: release
   script:
-    - cd doc
-    - yarn global add vercel
-    - vercel --token $VERCEL_TOKEN --confirm --prod
-  dependencies:
-    - build-doc
-
-build-doc:
-  image: docker:19.03.12
-  stage: build
-  script:
+    - apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/main/ nodejs=12.18.4-r0
+    - npm install --global vercel
     - cd doc
     - sh ./build.sh
-  artifacts:
-    untracked: true
+    - vercel --token $VERCEL_TOKEN --confirm --prod
   only:
     refs:
       - master
