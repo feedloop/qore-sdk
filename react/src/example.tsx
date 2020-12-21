@@ -58,11 +58,14 @@ qoreClient.init({
 const qoreContext = createQoreContext(qoreClient);
 
 const View = () => {
-  const { data, status } = qoreContext.views.allTasks.useListRow({
-    limit: 10,
-    offset: 0,
-    slug: "slug"
-  });
+  const { data, status } = qoreContext.views.allTasks.useListRow(
+    {
+      limit: 10,
+      offset: 0,
+      slug: "slug"
+    },
+    { networkPolicy: "network-and-cache", pollInterval: 1000 }
+  );
 
   qoreContext.views.allTasks.useGetRow("123456");
 
@@ -78,9 +81,5 @@ const View = () => {
 };
 
 const App = () => {
-  return (
-    <qoreContext.Provider>
-      <View />
-    </qoreContext.Provider>
-  );
+  return <View />;
 };
