@@ -82,15 +82,15 @@ export default class Codegen extends Command {
 
     ${schema.views
       .map(
-        ({ id, parameters, sorts, vields }) => `
+        ({ id, parameters, sorts, fields }) => `
           type ${voca.capitalize(id)}ViewRow = {
-            read: {${[idField, ...vields]
+            read: {${[idField, ...fields]
               .map(
                 field => `
             ${field.id}: ${this.readFieldType(field)};`
               )
               .join("")}}
-            write: {${vields
+            write: {${fields
               .filter(vield => this.isWriteField(vield))
               .map(
                 field => `

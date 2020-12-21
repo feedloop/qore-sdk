@@ -1,4 +1,5 @@
 import { callApi } from "../common";
+import { QoreProjectSchema } from "../project";
 import { AccountImpl, APIAccount, Account } from "./account";
 import { APIProject, Project, ProjectImpl } from "./project";
 import { Rows } from "./row";
@@ -15,7 +16,10 @@ export type APIOrganization = {
 export type Organization = APIOrganization & {
   accounts(limit?: number, offset?: number): Promise<Account[]>;
   inviteAccount(params: { email: string; type: string }): Promise<void>;
-  createProject(params: { name: string }): Promise<string>;
+  createProject(params: {
+    name: string;
+    schema?: QoreProjectSchema;
+  }): Promise<string>;
   projects(
     limit?: number,
     offset?: number
@@ -73,7 +77,10 @@ export class OrganizationImpl implements Organization {
       this._token
     );
   }
-  async createProject(params: { name: string }): Promise<string> {
+  async createProject(params: {
+    name: string;
+    schema?: QoreProjectSchema;
+  }): Promise<string> {
     const { id } = await callApi(
       {
         method: "post",

@@ -3,6 +3,7 @@ import { APITable, Table, TableImpl } from "./table";
 import {
   APIView,
   APIViewSummary,
+  Vield,
   View,
   ViewImpl,
   ViewSummary,
@@ -27,11 +28,32 @@ import {
   FormSummaryImpl
 } from "./form";
 import { APIWorkflow, Workflow, WorkflowImpl } from "./workflow";
+import { Field } from "./field";
 
 export type ProjectConfig = {
   organizationId: string;
   projectId: string;
   token?: string;
+};
+
+export type TableSchema = APITable & {
+  fields: Field[];
+  forms: Form[];
+};
+
+export type ViewSchema = APIView & {
+  fields: Field[];
+};
+
+export type FormSchema = APIForm;
+
+export type RoleSchema = APIRole;
+
+export type QoreProjectSchema = {
+  tables: TableSchema[];
+  views: ViewSchema[];
+  forms: FormSchema[];
+  roles: RoleSchema[];
 };
 
 export default (config: ProjectConfig) => {
@@ -52,6 +74,16 @@ export default (config: ProjectConfig) => {
         config.token
       );
       return id;
+    },
+    exportSchema: async () => {
+      const schema = await callApi<QoreProjectSchema>(
+        {
+          method: "get",
+          url: url.schema(config)
+        },
+        config.token
+      );
+      return schema;
     },
     tables: async (limit?: number, offset?: number): Promise<Table[]> => {
       const { nodes } = await callApi<Rows<APITable>>(
