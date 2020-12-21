@@ -293,7 +293,7 @@ describe("Qore SDK", () => {
     });
   });
 
-  it("delete a row", async () => {
+  it.only("delete a row", async () => {
     scope = scope
       .delete(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
@@ -310,7 +310,31 @@ describe("Qore SDK", () => {
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
-    await qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f");
+    await expect(
+      qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
+    ).resolves.toEqual(true);
+  });
+
+  it("reject promise when delete a row failed", async () => {
+    scope = scope
+      .delete(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+      .reply(500, { ok: false });
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+      };
+    }>({
+      organisationId: "FAKE_ORG",
+      projectId: "FAKE_PROJECT"
+    });
+    qore.init(fakeProjectSchema());
+    await expect(
+      qore.views.allTasks.deleteRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
+    ).rejects.toThrow("Request failed with status code 500");
   });
 
   it("authenticate a user", async () => {

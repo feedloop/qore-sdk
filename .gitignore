@@ -1,4 +1,6 @@
 node_modules
 dist
+lib
+coverage
 sdk/lib
 qore/lib

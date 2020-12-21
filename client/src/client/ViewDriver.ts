@@ -40,7 +40,9 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     opts: Partial<{ offset: number; limit: number; order: "asc" | "desc" }> &
       T["params"] = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
-  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"][]>> {
+  ): PromisifiedSource<
+    QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
+  > {
     const axiosConfig: AxiosRequestConfig = {
       url: `/views/${this.id}/v2rows`,
       params: opts,
@@ -93,7 +95,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           ...acc,
           [key]: Array.isArray(value) ? value.map(val => val.id) : value.id
         };
-      });
+      }, {});
     const axiosConfig: AxiosRequestConfig = {
       url: `/tables/${this.tableId}/rows/${id}`,
       data: { ...nonRelational, ...relational },
@@ -109,7 +111,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     };
     await this.client.execute(operation).toPromise();
     const row = await this.readRow(id).toPromise();
-    if (!row.data) throw new Error("Request failed");
+    if (!row.data) throw row.error;
     return row.data;
   }
   async deleteRow(id: string): Promise<boolean> {
@@ -125,7 +127,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       pollInterval: 0,
       networkPolicy: "network-only"
     };
-    await this.client.execute(operation).toPromise();
+    const res = await this.client.execute(operation).toPromise();
+    if (res.error) throw res.error;
     return true;
   }
   async insertRow(input: Partial<T["write"]>): Promise<T["read"]> {
@@ -145,9 +148,9 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const result = await this.client
       .execute<{ id: string }>(operation)
       .toPromise();
-    if (!result.data?.id) throw new Error("Request failed");
+    if (!result.data?.id) throw result.error;
     const row = await this.readRow(result.data.id).toPromise();
-    if (!row.data) throw new Error("Request failed");
+    if (!row.data) throw row.error;
     return row.data;
   }
 }
