@@ -2,559 +2,951 @@
 
 exports[`export-schema should be able to export schema 1`] = `
 "{
-  \\"version\\": \\"v1\\",
   \\"tables\\": [
     {
-      \\"id\\": \\"member\\",
       \\"name\\": \\"member\\",
       \\"type\\": \\"auth\\",
+      \\"id\\": \\"member\\",
       \\"fields\\": [
         {
-          \\"id\\": \\"role\\",
           \\"name\\": \\"role\\",
-          \\"linked\\": false,
           \\"type\\": \\"role\\",
           \\"deletionProtection\\": true,
-          \\"createdAt\\": \\"2020-12-08T07:31:04.801Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"role\\",
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"email\\",
           \\"name\\": \\"email\\",
-          \\"linked\\": false,
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": true,
-          \\"createdAt\\": \\"2020-12-08T07:31:04.801Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"email\\",
+          \\"displayField\\": true
         },
         {
-          \\"id\\": \\"toDo\\",
           \\"name\\": \\"To Do\\",
-          \\"linked\\": false,
           \\"type\\": \\"relation\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:02:47.440Z\\",
+          \\"id\\": \\"toDo\\",
           \\"table\\": \\"toDo\\",
-          \\"multiple\\": true
+          \\"column\\": \\"person\\",
+          \\"multiple\\": true,
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"totalTask\\",
           \\"name\\": \\"Total task\\",
-          \\"linked\\": false,
           \\"type\\": \\"rollup\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:37:51.822Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"totalTask\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"id\\"],
+          \\"aggregate\\": \\"count\\",
+          \\"condition\\": null,
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"totalPoint\\",
           \\"name\\": \\"Total point\\",
-          \\"linked\\": false,
           \\"type\\": \\"rollup\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:38:17.873Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"totalPoint\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"points\\"],
+          \\"aggregate\\": \\"sum\\",
+          \\"condition\\": null,
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"totalHardTask\\",
           \\"name\\": \\"Total hard task\\",
-          \\"linked\\": false,
           \\"type\\": \\"rollup\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:42:13.651Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"totalHardTask\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"id\\"],
+          \\"aggregate\\": \\"count\\",
+          \\"condition\\": \\"difficulty = 'Hard'\\",
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"createTask\\",
           \\"name\\": \\"Create task\\",
-          \\"linked\\": false,
           \\"type\\": \\"action\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:49:35.850Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"createTask\\",
+          \\"parameters\\": [
+            { \\"slug\\": \\"task\\", \\"type\\": \\"text\\" },
+            { \\"slug\\": \\"description\\", \\"type\\": \\"text\\" }
+          ],
+          \\"tasks\\": [
+            {
+              \\"type\\": \\"insert\\",
+              \\"insert\\": {
+                \\"description\\": \\"$param.description\\",
+                \\"person\\": \\"id\\",
+                \\"task\\": \\"$param.task\\"
+              },
+              \\"table\\": \\"toDo\\"
+            }
+          ],
+          \\"condition\\": null,
+          \\"displayField\\": false
+        },
+        {
+          \\"name\\": \\"Add Task\\",
+          \\"type\\": \\"action\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"addTask\\",
+          \\"parameters\\": [
+            { \\"slug\\": \\"task\\", \\"type\\": \\"text\\" },
+            { \\"slug\\": \\"description\\", \\"type\\": \\"text\\" }
+          ],
+          \\"tasks\\": [{ \\"type\\": \\"insert\\", \\"insert\\": {}, \\"table\\": \\"toDo\\" }],
+          \\"condition\\": null,
+          \\"displayField\\": false
+        },
+        {
+          \\"name\\": \\"Task Done\\",
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"taskDone\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"id\\"],
+          \\"aggregate\\": \\"count\\",
+          \\"condition\\": \\"done = 'TRUE'\\",
+          \\"displayField\\": false
+        },
+        {
+          \\"name\\": \\"Insert Task\\",
+          \\"type\\": \\"action\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"insertTask\\",
+          \\"parameters\\": [],
+          \\"tasks\\": [
+            {
+              \\"type\\": \\"insert\\",
+              \\"insert\\": {
+                \\"done\\": \\"'TRUE'\\",
+                \\"description\\": \\"$param.description\\",
+                \\"person\\": \\"email\\",
+                \\"task\\": \\"$param.task\\"
+              },
+              \\"table\\": \\"toDo\\"
+            }
+          ],
+          \\"condition\\": null,
+          \\"displayField\\": false
+        },
+        {
+          \\"name\\": \\"Password\\",
+          \\"type\\": \\"password\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"password\\"
         }
-      ],
-      \\"forms\\": []
+      ]
     },
     {
-      \\"id\\": \\"toDo\\",
       \\"name\\": \\"To Do\\",
       \\"type\\": null,
+      \\"id\\": \\"toDo\\",
       \\"fields\\": [
         {
-          \\"id\\": \\"task\\",
           \\"name\\": \\"Task\\",
-          \\"linked\\": false,
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:46.250Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"task\\",
+          \\"displayField\\": true
         },
         {
-          \\"id\\": \\"description\\",
           \\"name\\": \\"description\\",
-          \\"linked\\": false,
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:47.255Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"done\\",
           \\"name\\": \\"Done\\",
-          \\"linked\\": false,
           \\"type\\": \\"boolean\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:50:42.534Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"done\\",
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"points\\",
           \\"name\\": \\"Points\\",
-          \\"linked\\": false,
           \\"type\\": \\"number\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:51:15.322Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"points\\",
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"deadline\\",
           \\"name\\": \\"Deadline\\",
-          \\"linked\\": false,
           \\"type\\": \\"date\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:52:25.580Z\\",
-          \\"refRows\\": null
+          \\"id\\": \\"deadline\\",
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"difficulty\\",
           \\"name\\": \\"Difficulty\\",
-          \\"linked\\": false,
           \\"type\\": \\"select\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:00:20.824Z\\",
+          \\"id\\": \\"difficulty\\",
           \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"],
-          \\"refRows\\": null
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"person\\",
           \\"name\\": \\"Person\\",
-          \\"linked\\": false,
           \\"type\\": \\"relation\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:02:47.423Z\\",
+          \\"id\\": \\"person\\",
           \\"table\\": \\"member\\",
-          \\"multiple\\": true
+          \\"column\\": \\"toDo\\",
+          \\"multiple\\": true,
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"role\\",
           \\"name\\": \\"Role\\",
-          \\"linked\\": false,
           \\"type\\": \\"lookup\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:06:05.437Z\\",
+          \\"id\\": \\"role\\",
+          \\"source\\": \\"person\\",
+          \\"destinations\\": [\\"role\\"],
           \\"returnType\\": \\"table\\",
           \\"multiple\\": false,
-          \\"refRows\\": null
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"attachment\\",
           \\"name\\": \\"Attachment\\",
-          \\"linked\\": false,
           \\"type\\": \\"file\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:06:33.320Z\\",
           \\"fileType\\": \\"image\\",
-          \\"refRows\\": null
+          \\"id\\": \\"attachment\\",
+          \\"displayField\\": false
         },
         {
-          \\"id\\": \\"timeAllocation\\",
           \\"name\\": \\"Time Allocation\\",
-          \\"linked\\": false,
           \\"type\\": \\"formula\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:18:42.734Z\\",
+          \\"id\\": \\"timeAllocation\\",
+          \\"formula\\": \\"(points < 50) ? 'SHORT' : 'LONG'\\",
           \\"returnType\\": \\"text\\",
-          \\"refRows\\": null
+          \\"displayField\\": false
         }
-      ],
-      \\"forms\\": [
-        {
-          \\"id\\": \\"newForm3MuYd8OVj6FdlgEnmUv\\",
-          \\"name\\": \\"new form 3muYd8OVj-6fdlg-EnmUv\\",
-          \\"tableId\\": \\"toDo\\",
-          \\"_config\\": {
-            \\"organizationId\\": \\"lIdfC42DJCN2XzQ\\",
-            \\"projectId\\": \\"I0D3NimZQ9GKEDP\\",
-            \\"token\\": \\"Bearer 77f2ff71-8864-404d-8596-127d78a4c1bd\\"
-          },
-          \\"fields\\": [
-            { \\"id\\": \\"task\\", \\"defaultValue\\": null },
-            { \\"id\\": \\"description\\", \\"defaultValue\\": null },
-            { \\"id\\": \\"done\\", \\"defaultValue\\": null },
-            { \\"id\\": \\"points\\", \\"defaultValue\\": null },
-            { \\"id\\": \\"deadline\\", \\"defaultValue\\": null }
-          ]
-        }
+      ]
+    }
+  ],
+  \\"roles\\": [
+    { \\"id\\": \\"6Hc0YGiQGoc3Huf\\", \\"name\\": \\"admin\\", \\"isAdmin\\": true },
+    { \\"id\\": \\"1gjCDJq3oX0I6RZ\\", \\"name\\": \\"Fullstack\\", \\"isAdmin\\": false }
+  ],
+  \\"forms\\": [
+    {
+      \\"name\\": \\"new form 3muYd8OVj-6fdlg-EnmUv\\",
+      \\"id\\": \\"newForm3MuYd8OVj6FdlgEnmUv\\",
+      \\"tableId\\": \\"toDo\\",
+      \\"fields\\": [
+        { \\"id\\": \\"task\\" },
+        { \\"id\\": \\"description\\" },
+        { \\"id\\": \\"done\\" },
+        { \\"id\\": \\"points\\" },
+        { \\"id\\": \\"deadline\\" }
       ]
     }
   ],
   \\"views\\": [
     {
-      \\"id\\": \\"memberDefaultView\\",
-      \\"name\\": \\"member Default View\\",
-      \\"sorts\\": [],
-      \\"parameters\\": [],
-      \\"tableId\\": \\"member\\",
-      \\"vields\\": [
-        {
-          \\"id\\": \\"email\\",
-          \\"name\\": \\"email\\",
-          \\"type\\": \\"text\\",
-          \\"deletionProtection\\": true,
-          \\"createdAt\\": \\"2020-12-08T07:31:04.801Z\\"
-        },
-        {
-          \\"id\\": \\"role\\",
-          \\"name\\": \\"role\\",
-          \\"type\\": \\"role\\",
-          \\"deletionProtection\\": true,
-          \\"createdAt\\": \\"2020-12-08T07:31:04.801Z\\"
-        },
-        {
-          \\"id\\": \\"createTask\\",
-          \\"name\\": \\"Create task\\",
-          \\"type\\": \\"action\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:49:35.850Z\\"
-        }
-      ]
-    },
-    {
-      \\"id\\": \\"toDoDefaultView\\",
-      \\"name\\": \\"Tasks\\",
-      \\"sorts\\": [{ \\"order\\": \\"desc\\", \\"by\\": \\"points\\" }],
-      \\"parameters\\": [],
+      \\"id\\": \\"done\\",
+      \\"name\\": \\"Done\\",
       \\"tableId\\": \\"toDo\\",
-      \\"vields\\": [
+      \\"parameters\\": [],
+      \\"sorts\\": [],
+      \\"fields\\": [
         {
-          \\"id\\": \\"task\\",
           \\"name\\": \\"Task\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:46.250Z\\"
+          \\"id\\": \\"task\\",
+          \\"displayField\\": true,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"done\\",
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
           \\"name\\": \\"Done\\",
           \\"type\\": \\"boolean\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:50:42.534Z\\"
+          \\"id\\": \\"done\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"points\\",
           \\"name\\": \\"Points\\",
           \\"type\\": \\"number\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:51:15.322Z\\"
+          \\"id\\": \\"points\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"deadline\\",
           \\"name\\": \\"Deadline\\",
           \\"type\\": \\"date\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:52:25.580Z\\"
+          \\"id\\": \\"deadline\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        }
+      ],
+      \\"design\\": null
+    },
+    {
+      \\"id\\": \\"memberDefaultView\\",
+      \\"name\\": \\"member Default View\\",
+      \\"tableId\\": \\"member\\",
+      \\"parameters\\": [],
+      \\"sorts\\": [],
+      \\"fields\\": [
+        {
+          \\"name\\": \\"email\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": true,
+          \\"id\\": \\"email\\",
+          \\"displayField\\": true,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"difficulty\\",
+          \\"name\\": \\"role\\",
+          \\"type\\": \\"role\\",
+          \\"deletionProtection\\": true,
+          \\"id\\": \\"role\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Create task\\",
+          \\"type\\": \\"action\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"createTask\\",
+          \\"parameters\\": [
+            { \\"slug\\": \\"task\\", \\"type\\": \\"text\\" },
+            { \\"slug\\": \\"description\\", \\"type\\": \\"text\\" }
+          ],
+          \\"tasks\\": [
+            {
+              \\"type\\": \\"insert\\",
+              \\"insert\\": {
+                \\"description\\": \\"$param.description\\",
+                \\"person\\": \\"id\\",
+                \\"task\\": \\"$param.task\\"
+              },
+              \\"table\\": \\"toDo\\"
+            }
+          ],
+          \\"condition\\": null,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Add Task\\",
+          \\"type\\": \\"action\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"addTask\\",
+          \\"parameters\\": [
+            { \\"slug\\": \\"task\\", \\"type\\": \\"text\\" },
+            { \\"slug\\": \\"description\\", \\"type\\": \\"text\\" }
+          ],
+          \\"tasks\\": [{ \\"type\\": \\"insert\\", \\"insert\\": {}, \\"table\\": \\"toDo\\" }],
+          \\"condition\\": null,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Insert Task\\",
+          \\"type\\": \\"action\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"insertTask\\",
+          \\"parameters\\": [],
+          \\"tasks\\": [
+            {
+              \\"type\\": \\"insert\\",
+              \\"insert\\": {
+                \\"done\\": \\"'TRUE'\\",
+                \\"description\\": \\"$param.description\\",
+                \\"person\\": \\"email\\",
+                \\"task\\": \\"$param.task\\"
+              },
+              \\"table\\": \\"toDo\\"
+            }
+          ],
+          \\"condition\\": null,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Password\\",
+          \\"type\\": \\"password\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"password\\",
+          \\"design\\": null
+        }
+      ],
+      \\"design\\": null
+    },
+    {
+      \\"id\\": \\"memberMetric\\",
+      \\"name\\": \\"Member Metric\\",
+      \\"tableId\\": \\"member\\",
+      \\"parameters\\": [{ \\"slug\\": \\"email\\", \\"type\\": \\"text\\", \\"required\\": true }],
+      \\"sorts\\": [],
+      \\"fields\\": [
+        {
+          \\"name\\": \\"email\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": true,
+          \\"id\\": \\"email\\",
+          \\"displayField\\": true,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"role\\",
+          \\"type\\": \\"role\\",
+          \\"deletionProtection\\": true,
+          \\"id\\": \\"role\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Total task\\",
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"totalTask\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"id\\"],
+          \\"aggregate\\": \\"count\\",
+          \\"condition\\": null,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Total point\\",
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"totalPoint\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"points\\"],
+          \\"aggregate\\": \\"sum\\",
+          \\"condition\\": null,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Total hard task\\",
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"totalHardTask\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"id\\"],
+          \\"aggregate\\": \\"count\\",
+          \\"condition\\": \\"difficulty = 'Hard'\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Task Done\\",
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"taskDone\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"id\\"],
+          \\"aggregate\\": \\"count\\",
+          \\"condition\\": \\"done = 'TRUE'\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        }
+      ],
+      \\"design\\": null
+    },
+    {
+      \\"id\\": \\"ramasTask\\",
+      \\"name\\": \\"Rama's Task\\",
+      \\"tableId\\": \\"toDo\\",
+      \\"parameters\\": [],
+      \\"sorts\\": [],
+      \\"fields\\": [
+        {
+          \\"name\\": \\"Task\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"task\\",
+          \\"displayField\\": true,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Done\\",
+          \\"type\\": \\"boolean\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"done\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Points\\",
+          \\"type\\": \\"number\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"points\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Deadline\\",
+          \\"type\\": \\"date\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"deadline\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
           \\"name\\": \\"Difficulty\\",
           \\"type\\": \\"select\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:00:20.824Z\\",
-          \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"]
+          \\"id\\": \\"difficulty\\",
+          \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"],
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"person\\",
           \\"name\\": \\"Person\\",
           \\"type\\": \\"relation\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:02:47.423Z\\",
+          \\"id\\": \\"person\\",
           \\"table\\": \\"member\\",
-          \\"multiple\\": true
+          \\"column\\": \\"toDo\\",
+          \\"multiple\\": true,
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"role\\",
           \\"name\\": \\"Role\\",
           \\"type\\": \\"lookup\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:06:05.437Z\\",
+          \\"id\\": \\"role\\",
+          \\"source\\": \\"person\\",
+          \\"destinations\\": [\\"role\\"],
           \\"returnType\\": \\"table\\",
-          \\"multiple\\": false
+          \\"multiple\\": false,
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"attachment\\",
           \\"name\\": \\"Attachment\\",
           \\"type\\": \\"file\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:06:33.320Z\\",
-          \\"fileType\\": \\"image\\"
+          \\"fileType\\": \\"image\\",
+          \\"id\\": \\"attachment\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"timeAllocation\\",
           \\"name\\": \\"Time Allocation\\",
           \\"type\\": \\"formula\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:18:42.734Z\\",
-          \\"returnType\\": \\"text\\"
+          \\"id\\": \\"timeAllocation\\",
+          \\"formula\\": \\"(points < 50) ? 'SHORT' : 'LONG'\\",
+          \\"returnType\\": \\"text\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         }
-      ]
+      ],
+      \\"design\\": null
+    },
+    {
+      \\"id\\": \\"reisTask\\",
+      \\"name\\": \\"Task by timeAllocation\\",
+      \\"tableId\\": \\"toDo\\",
+      \\"parameters\\": [
+        { \\"slug\\": \\"timeAllocation\\", \\"type\\": \\"text\\", \\"required\\": false }
+      ],
+      \\"sorts\\": [],
+      \\"fields\\": [
+        {
+          \\"name\\": \\"Task\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"task\\",
+          \\"displayField\\": true,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Done\\",
+          \\"type\\": \\"boolean\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"done\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Points\\",
+          \\"type\\": \\"number\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"points\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Deadline\\",
+          \\"type\\": \\"date\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"deadline\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Difficulty\\",
+          \\"type\\": \\"select\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"difficulty\\",
+          \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"],
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Person\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"person\\",
+          \\"table\\": \\"member\\",
+          \\"column\\": \\"toDo\\",
+          \\"multiple\\": true,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Role\\",
+          \\"type\\": \\"lookup\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"role\\",
+          \\"source\\": \\"person\\",
+          \\"destinations\\": [\\"role\\"],
+          \\"returnType\\": \\"table\\",
+          \\"multiple\\": false,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Attachment\\",
+          \\"type\\": \\"file\\",
+          \\"deletionProtection\\": false,
+          \\"fileType\\": \\"image\\",
+          \\"id\\": \\"attachment\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Time Allocation\\",
+          \\"type\\": \\"formula\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"timeAllocation\\",
+          \\"formula\\": \\"(points < 50) ? 'SHORT' : 'LONG'\\",
+          \\"returnType\\": \\"text\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        }
+      ],
+      \\"design\\": null
     },
     {
       \\"id\\": \\"test\\",
       \\"name\\": \\"Priorities\\",
-      \\"sorts\\": [],
-      \\"parameters\\": [],
       \\"tableId\\": \\"toDo\\",
-      \\"vields\\": [
+      \\"parameters\\": [],
+      \\"sorts\\": [],
+      \\"fields\\": [
         {
-          \\"id\\": \\"task\\",
           \\"name\\": \\"Task\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:46.250Z\\"
+          \\"id\\": \\"task\\",
+          \\"displayField\\": true,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"description\\",
           \\"name\\": \\"description\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:47.255Z\\"
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         }
-      ]
+      ],
+      \\"design\\": null
     },
     {
       \\"id\\": \\"toDo\\",
-      \\"filter\\": \\"done = 'FALSE'\\",
       \\"name\\": \\"To Do\\",
-      \\"sorts\\": [],
-      \\"parameters\\": [],
       \\"tableId\\": \\"toDo\\",
-      \\"vields\\": [
+      \\"parameters\\": [],
+      \\"sorts\\": [],
+      \\"fields\\": [
         {
-          \\"id\\": \\"task\\",
           \\"name\\": \\"Task\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:46.250Z\\"
-        },
-        {
-          \\"id\\": \\"description\\",
-          \\"name\\": \\"description\\",
-          \\"type\\": \\"text\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:47.255Z\\"
-        },
-        {
-          \\"id\\": \\"done\\",
-          \\"name\\": \\"Done\\",
-          \\"type\\": \\"boolean\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:50:42.534Z\\"
-        },
-        {
-          \\"id\\": \\"points\\",
-          \\"name\\": \\"Points\\",
-          \\"type\\": \\"number\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:51:15.322Z\\"
-        },
-        {
-          \\"id\\": \\"deadline\\",
-          \\"name\\": \\"Deadline\\",
-          \\"type\\": \\"date\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:52:25.580Z\\"
-        }
-      ]
-    },
-    {
-      \\"id\\": \\"done\\",
-      \\"filter\\": \\"done = 'TRUE'\\",
-      \\"name\\": \\"Done\\",
-      \\"sorts\\": [],
-      \\"parameters\\": [],
-      \\"tableId\\": \\"toDo\\",
-      \\"vields\\": [
-        {
           \\"id\\": \\"task\\",
-          \\"name\\": \\"Task\\",
-          \\"type\\": \\"text\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:46.250Z\\"
+          \\"displayField\\": true,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"description\\",
           \\"name\\": \\"description\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:47.255Z\\"
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"done\\",
           \\"name\\": \\"Done\\",
           \\"type\\": \\"boolean\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:50:42.534Z\\"
+          \\"id\\": \\"done\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"points\\",
           \\"name\\": \\"Points\\",
           \\"type\\": \\"number\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:51:15.322Z\\"
+          \\"id\\": \\"points\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"deadline\\",
           \\"name\\": \\"Deadline\\",
           \\"type\\": \\"date\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:52:25.580Z\\"
+          \\"id\\": \\"deadline\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         }
-      ]
-    },
-    {
-      \\"id\\": \\"reisTask\\",
-      \\"filter\\": \\"timeAllocation = $param.timeAllocation\\",
-      \\"name\\": \\"Task by timeAllocation\\",
-      \\"sorts\\": [],
-      \\"parameters\\": [
-        { \\"slug\\": \\"timeAllocation\\", \\"type\\": \\"text\\", \\"required\\": false }
       ],
+      \\"design\\": null
+    },
+    {
+      \\"id\\": \\"toDoDefaultView\\",
+      \\"name\\": \\"Tasks\\",
       \\"tableId\\": \\"toDo\\",
-      \\"vields\\": [
+      \\"parameters\\": [],
+      \\"sorts\\": [{ \\"by\\": \\"points\\", \\"order\\": \\"desc\\" }],
+      \\"fields\\": [
         {
-          \\"id\\": \\"task\\",
           \\"name\\": \\"Task\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:46.250Z\\"
+          \\"id\\": \\"task\\",
+          \\"displayField\\": true,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"description\\",
           \\"name\\": \\"description\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:44:47.255Z\\"
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"done\\",
           \\"name\\": \\"Done\\",
           \\"type\\": \\"boolean\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:50:42.534Z\\"
+          \\"id\\": \\"done\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"points\\",
           \\"name\\": \\"Points\\",
           \\"type\\": \\"number\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:51:15.322Z\\"
+          \\"id\\": \\"points\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"deadline\\",
           \\"name\\": \\"Deadline\\",
           \\"type\\": \\"date\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T07:52:25.580Z\\"
+          \\"id\\": \\"deadline\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"difficulty\\",
           \\"name\\": \\"Difficulty\\",
           \\"type\\": \\"select\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:00:20.824Z\\",
-          \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"]
+          \\"id\\": \\"difficulty\\",
+          \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"],
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"person\\",
           \\"name\\": \\"Person\\",
           \\"type\\": \\"relation\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:02:47.423Z\\",
+          \\"id\\": \\"person\\",
           \\"table\\": \\"member\\",
-          \\"multiple\\": true
+          \\"column\\": \\"toDo\\",
+          \\"multiple\\": true,
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"role\\",
           \\"name\\": \\"Role\\",
           \\"type\\": \\"lookup\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:06:05.437Z\\",
+          \\"id\\": \\"role\\",
+          \\"source\\": \\"person\\",
+          \\"destinations\\": [\\"role\\"],
           \\"returnType\\": \\"table\\",
-          \\"multiple\\": false
+          \\"multiple\\": false,
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"attachment\\",
-          \\"name\\": \\"Attachment\\",
-          \\"type\\": \\"file\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:06:33.320Z\\",
-          \\"fileType\\": \\"image\\"
-        },
-        {
-          \\"id\\": \\"timeAllocation\\",
           \\"name\\": \\"Time Allocation\\",
           \\"type\\": \\"formula\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-08T08:18:42.734Z\\",
-          \\"returnType\\": \\"text\\"
+          \\"id\\": \\"timeAllocation\\",
+          \\"formula\\": \\"(points < 50) ? 'SHORT' : 'LONG'\\",
+          \\"returnType\\": \\"text\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Attachment\\",
+          \\"type\\": \\"file\\",
+          \\"deletionProtection\\": false,
+          \\"fileType\\": \\"image\\",
+          \\"id\\": \\"attachment\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         }
-      ]
+      ],
+      \\"design\\": null
     },
     {
-      \\"id\\": \\"memberMetric\\",
-      \\"filter\\": \\"email = $param.email\\",
-      \\"name\\": \\"Member Metric\\",
+      \\"id\\": \\"undone\\",
+      \\"name\\": \\"Undone\\",
+      \\"tableId\\": \\"toDo\\",
+      \\"parameters\\": [{ \\"slug\\": \\"undone\\", \\"type\\": \\"text\\", \\"required\\": false }],
       \\"sorts\\": [],
-      \\"parameters\\": [{ \\"slug\\": \\"email\\", \\"type\\": \\"text\\", \\"required\\": true }],
-      \\"tableId\\": \\"member\\",
-      \\"vields\\": [
+      \\"fields\\": [
         {
-          \\"id\\": \\"email\\",
-          \\"name\\": \\"email\\",
+          \\"name\\": \\"Task\\",
           \\"type\\": \\"text\\",
-          \\"deletionProtection\\": true,
-          \\"createdAt\\": \\"2020-12-08T07:31:04.801Z\\"
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"task\\",
+          \\"displayField\\": true,
+          \\"design\\": null
         },
         {
+          \\"name\\": \\"description\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"description\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Done\\",
+          \\"type\\": \\"boolean\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"done\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Points\\",
+          \\"type\\": \\"number\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"points\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Deadline\\",
+          \\"type\\": \\"date\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"deadline\\",
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Difficulty\\",
+          \\"type\\": \\"select\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"difficulty\\",
+          \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"],
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Person\\",
+          \\"type\\": \\"relation\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"person\\",
+          \\"table\\": \\"member\\",
+          \\"column\\": \\"toDo\\",
+          \\"multiple\\": true,
+          \\"displayField\\": false,
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"Role\\",
+          \\"type\\": \\"lookup\\",
+          \\"deletionProtection\\": false,
           \\"id\\": \\"role\\",
-          \\"name\\": \\"role\\",
-          \\"type\\": \\"role\\",
-          \\"deletionProtection\\": true,
-          \\"createdAt\\": \\"2020-12-08T07:31:04.801Z\\"
+          \\"source\\": \\"person\\",
+          \\"destinations\\": [\\"role\\"],
+          \\"returnType\\": \\"table\\",
+          \\"multiple\\": false,
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"totalTask\\",
-          \\"name\\": \\"Total task\\",
-          \\"type\\": \\"rollup\\",
+          \\"name\\": \\"Attachment\\",
+          \\"type\\": \\"file\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:37:51.822Z\\"
+          \\"fileType\\": \\"image\\",
+          \\"id\\": \\"attachment\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         },
         {
-          \\"id\\": \\"totalPoint\\",
-          \\"name\\": \\"Total point\\",
-          \\"type\\": \\"rollup\\",
+          \\"name\\": \\"Time Allocation\\",
+          \\"type\\": \\"formula\\",
           \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:38:17.873Z\\"
-        },
-        {
-          \\"id\\": \\"totalHardTask\\",
-          \\"name\\": \\"Total hard task\\",
-          \\"type\\": \\"rollup\\",
-          \\"deletionProtection\\": false,
-          \\"createdAt\\": \\"2020-12-10T03:42:13.651Z\\"
+          \\"id\\": \\"timeAllocation\\",
+          \\"formula\\": \\"(points < 50) ? 'SHORT' : 'LONG'\\",
+          \\"returnType\\": \\"text\\",
+          \\"displayField\\": false,
+          \\"design\\": null
         }
-      ]
+      ],
+      \\"design\\": null
     }
   ]
 }

@@ -1,21 +1,11 @@
 import { Command, flags } from "@oclif/command";
-import prettier from "prettier";
-import { asSequence } from "sequency";
-import makeProject, {
-  FieldType,
-  Table,
-  Vield,
-  ViewSummary
-} from "@qore/sdk/lib/project/index";
+import makeProject, { QoreProjectSchema } from "@qore/sdk/lib/project/index";
 import makeUser from "@qore/sdk/lib/user";
 import fs from "fs";
 import fse from "fs-extra";
 import path from "path";
-import config, { CLIConfig } from "../config";
-import { configFlags, orgFlag, promptFlags, tokenFlag } from "../flags";
-import { QoreSchema, TableSchema, ViewSchema } from "../types";
-import { AxiosError } from "axios";
-import dir from "node-dir";
+import { orgFlag, promptFlags, tokenFlag } from "../flags";
+
 export default class CreateProject extends Command {
   static description = "create a project from scratch or qore-schema.json";
 
@@ -60,18 +50,31 @@ export default class CreateProject extends Command {
       process.cwd(),
       args.name || "qore-project"
     );
+
     fse.copySync(
       path.resolve(CreateProject.templatesLocation, configs.template),
       destination
     );
+
+    const user = makeUser();
+    user.setToken(configs.token);
+
+    const org = await user.organization(configs.org);
+    const schemaFile = fse.readJSONSync(
+      path.resolve(destination, "qore.schema.json")
+    ) as QoreProjectSchema;
+    const projectId = await org.createProject({ name: args.name });
+
+    const project = makeProject({ organizationId: configs.org, projectId });
+    await project.auth.signInWithUserToken(configs.token);
 
     fse.writeJSONSync(
       path.resolve(destination, "qore.config.json"),
       {
         version: "v1",
         endpoint: "https://qore-api.feedloop.io",
-        project: "some-project-id",
-        org: "some-org-id"
+        projectId: projectId,
+        organizationId: org.id
       },
       { spaces: 2 }
     );

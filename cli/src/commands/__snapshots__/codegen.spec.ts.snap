@@ -10,6 +10,10 @@ exports[`codegen should be able to generate codegen 1`] = `
   totalPoint: number;
   totalHardTask: number;
   createTask: action;
+  addTask: action;
+  taskDone: number;
+  insertTask: action;
+  password: password;
 };
 
 type ToDoTableRow = {
@@ -26,23 +30,65 @@ type ToDoTableRow = {
   timeAllocation: formula;
 };
 
+type DoneViewRow = {
+  read: {
+    id: string;
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+  };
+  write: {
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+  };
+  params: {};
+};
+
 type MemberDefaultViewViewRow = {
   read: {
     id: string;
     email: string;
     role: { id: string; displayField: string };
     createTask: action;
+    addTask: action;
+    insertTask: action;
+    password: password;
   };
   write: {
     email: string;
+    password: password;
   };
   params: {};
 };
 
-type ToDoDefaultViewViewRow = {
+type MemberMetricViewRow = {
+  read: {
+    id: string;
+    email: string;
+    role: { id: string; displayField: string };
+    totalTask: number;
+    totalPoint: number;
+    totalHardTask: number;
+    taskDone: number;
+  };
+  write: {
+    email: string;
+  };
+  params: {
+    email: string;
+  };
+};
+
+type RamasTaskViewRow = {
   read: {
     id: string;
     task: string;
+    description: string;
     done: boolean;
     points: number;
     deadline: date;
@@ -54,6 +100,34 @@ type ToDoDefaultViewViewRow = {
   };
   write: {
     task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+    difficulty: select;
+    person: string[];
+    attachment: file;
+  };
+  params: {};
+};
+
+type ReisTaskViewRow = {
+  read: {
+    id: string;
+    task: string;
+    description: string;
+    done: boolean;
+    points: number;
+    deadline: date;
+    difficulty: select;
+    person: PersonTableRow[];
+    role: lookup;
+    attachment: file;
+    timeAllocation: formula;
+  };
+  write: {
+    task: string;
+    description: string;
     done: boolean;
     points: number;
     deadline: date;
@@ -62,7 +136,7 @@ type ToDoDefaultViewViewRow = {
     attachment: file;
   };
   params: {
-    \\"$by.points\\"?: \\"desc\\";
+    timeAllocation?: string;
   };
 };
 
@@ -98,7 +172,7 @@ type ToDoViewRow = {
   params: {};
 };
 
-type DoneViewRow = {
+type ToDoDefaultViewViewRow = {
   read: {
     id: string;
     task: string;
@@ -106,6 +180,11 @@ type DoneViewRow = {
     done: boolean;
     points: number;
     deadline: date;
+    difficulty: select;
+    person: PersonTableRow[];
+    role: lookup;
+    timeAllocation: formula;
+    attachment: file;
   };
   write: {
     task: string;
@@ -113,11 +192,16 @@ type DoneViewRow = {
     done: boolean;
     points: number;
     deadline: date;
+    difficulty: select;
+    person: string[];
+    attachment: file;
   };
-  params: {};
+  params: {
+    \\"$by.points\\"?: \\"desc\\";
+  };
 };
 
-type ReisTaskViewRow = {
+type UndoneViewRow = {
   read: {
     id: string;
     task: string;
@@ -142,35 +226,20 @@ type ReisTaskViewRow = {
     attachment: file;
   };
   params: {
-    timeAllocation?: string;
-  };
-};
-
-type MemberMetricViewRow = {
-  read: {
-    id: string;
-    email: string;
-    role: { id: string; displayField: string };
-    totalTask: number;
-    totalPoint: number;
-    totalHardTask: number;
-  };
-  write: {
-    email: string;
-  };
-  params: {
-    email: string;
+    undone?: string;
   };
 };
 
 export type QoreProjectSchema = {
+  done: DoneViewRow;
   memberDefaultView: MemberDefaultViewViewRow;
-  toDoDefaultView: ToDoDefaultViewViewRow;
+  memberMetric: MemberMetricViewRow;
+  ramasTask: RamasTaskViewRow;
+  reisTask: ReisTaskViewRow;
   test: TestViewRow;
   toDo: ToDoViewRow;
-  done: DoneViewRow;
-  reisTask: ReisTaskViewRow;
-  memberMetric: MemberMetricViewRow;
+  toDoDefaultView: ToDoDefaultViewViewRow;
+  undone: UndoneViewRow;
 };
 "
 `;

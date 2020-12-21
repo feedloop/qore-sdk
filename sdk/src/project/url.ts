@@ -52,6 +52,9 @@ export const url = {
     if (!params.tableId) return url.project(params) + "/tables";
     return url.project(params) + "/tables/" + params.tableId;
   },
+  schema(params: Pick<UrlParam, "organizationId" | "projectId">) {
+    return this.project(params) + "/schema";
+  },
   field(
     params: Partial<Pick<UrlParam, "fieldId">> &
       Pick<UrlParam, "organizationId" | "projectId" | "tableId">
