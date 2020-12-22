@@ -3,8 +3,8 @@
 exports[`create-project should be able to export schema 1`] = `
 "{
   \\"version\\": \\"v1\\",
-  \\"endpoint\\": \\"https://qore-api.feedloop.io\\",
-  \\"projectId\\": \\"j6RVjLItoqgSL9v\\",
+  \\"endpoint\\": \\"https://p-qore-dot-pti-feedloop.et.r.appspot.com\\",
+  \\"projectId\\": \\"Gdpqj6tL4AyTQ7o\\",
   \\"organizationId\\": \\"lIdfC42DJCN2XzQ\\"
 }
 "

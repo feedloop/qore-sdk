@@ -12,8 +12,6 @@ describe("create-project", () => {
     fse.removeSync(path.resolve(process.cwd(), projectName));
   });
   it("should be able to export schema", async () => {
-    process.env.REACT_APP_API_URL =
-      "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const { completeRecording } = await record("create-project");
     try {
       await CreateProject.run([

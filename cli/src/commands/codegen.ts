@@ -10,7 +10,7 @@ import ExportSchema from "./export-schema";
 import { configFlags, promptFlags } from "../flags";
 
 export default class Codegen extends Command {
-  static description = "Generate typescript definition file";
+  static description = "Generate qore project files";
 
   static examples = [`$ qore codegen --project projectId --org orgId`];
 

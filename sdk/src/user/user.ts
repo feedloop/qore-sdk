@@ -36,7 +36,7 @@ export default () => {
   const url = generateUrlUserPath();
   return {
     setToken(token: string) {
-      user = { email: "", token };
+      user = { email: "", token: "Bearer " + token };
     },
     async register(params: { email: string; password: string }): Promise<void> {
       await callApi({
@@ -52,6 +52,7 @@ export default () => {
         data: { email, password }
       });
       user = { email, token: "Bearer " + token };
+      return token;
     },
     async verify(email: string, activationCode: string): Promise<void> {
       const { token } = await callApi({
@@ -123,7 +124,7 @@ export default () => {
       // );
       return new OrganizationImpl({
         ...{ id, category: "", size: "", name: "", subdomain: "" },
-        userToken: "Bearer " + user.token,
+        userToken: user.token,
         url
       });
     },
