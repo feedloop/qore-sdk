@@ -1,15 +1,15 @@
 import { Command } from "@oclif/command";
 import prettier from "prettier";
-import createProject, { QoreProjectSchema } from "@qore/sdk/lib/project/index";
+import makeProject, { QoreProjectSchema } from "@qore/sdk/lib/project/index";
 import fs from "fs";
 import path from "path";
-import { CLIConfig } from "../config";
+import config, { CLIConfig } from "../config";
 import { configFlags, promptFlags } from "../flags";
 
 export default class ExportSchema extends Command {
   static description = "export the schema of a given project";
 
-  static examples = [`$ qore `];
+  static examples = [`$ qore export-schema`];
 
   static flags = {
     ...configFlags
@@ -18,11 +18,11 @@ export default class ExportSchema extends Command {
   static args = [{ name: "file" }];
 
   static async getSchema(configs: CLIConfig): Promise<QoreProjectSchema> {
-    const project = createProject({
+    const project = makeProject({
       organizationId: configs.org,
-      projectId: configs.project,
-      token: configs.token
+      projectId: configs.project
     });
+    await project.auth.signInWithUserToken(configs.token);
     const schema = await project.exportSchema();
     return schema;
   }

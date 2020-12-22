@@ -3,8 +3,8 @@
 exports[`codegen should be able to generate codegen 1`] = `
 "type MemberTableRow = {
   id: string;
-  role: { id: string; displayField: string };
   email: string;
+  role: { id: string; displayField: string };
   toDo: ToDoTableRow[];
   totalTask: number;
   totalPoint: number;
@@ -14,6 +14,7 @@ exports[`codegen should be able to generate codegen 1`] = `
   taskDone: number;
   insertTask: action;
   password: password;
+  createTask2: action;
 };
 
 type ToDoTableRow = {
@@ -58,6 +59,7 @@ type MemberDefaultViewViewRow = {
     addTask: action;
     insertTask: action;
     password: password;
+    createTask2: action;
   };
   write: {
     email: string;

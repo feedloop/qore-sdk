@@ -95,6 +95,7 @@ yarn add @qore/react
 Once run, @qore/cli codegen will give you the following files:
 
 1. `qore-generated.ts` contains the schema of your project in typescript.
+1. `qore-schema.json` contains the schema required to run qore client.
 1. `qore.config.json` contains the config required to connect to your project.
 
 > Generate required files

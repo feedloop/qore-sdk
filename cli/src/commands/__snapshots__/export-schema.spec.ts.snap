@@ -9,18 +9,18 @@ exports[`export-schema should be able to export schema 1`] = `
       \\"id\\": \\"member\\",
       \\"fields\\": [
         {
-          \\"name\\": \\"role\\",
-          \\"type\\": \\"role\\",
-          \\"deletionProtection\\": true,
-          \\"id\\": \\"role\\",
-          \\"displayField\\": false
-        },
-        {
           \\"name\\": \\"email\\",
           \\"type\\": \\"text\\",
           \\"deletionProtection\\": true,
           \\"id\\": \\"email\\",
           \\"displayField\\": true
+        },
+        {
+          \\"name\\": \\"role\\",
+          \\"type\\": \\"role\\",
+          \\"deletionProtection\\": true,
+          \\"id\\": \\"role\\",
+          \\"displayField\\": false
         },
         {
           \\"name\\": \\"To Do\\",
@@ -138,6 +138,22 @@ exports[`export-schema should be able to export schema 1`] = `
           \\"type\\": \\"password\\",
           \\"deletionProtection\\": false,
           \\"id\\": \\"password\\"
+        },
+        {
+          \\"name\\": \\"CreateTask2\\",
+          \\"type\\": \\"action\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"createTask2\\",
+          \\"parameters\\": [{ \\"slug\\": \\"task\\", \\"type\\": \\"text\\" }],
+          \\"tasks\\": [
+            {
+              \\"type\\": \\"insert\\",
+              \\"insert\\": { \\"task\\": \\"$param.task\\" },
+              \\"table\\": \\"toDo\\"
+            }
+          ],
+          \\"condition\\": null,
+          \\"displayField\\": false
         }
       ]
     },
@@ -387,6 +403,23 @@ exports[`export-schema should be able to export schema 1`] = `
           \\"type\\": \\"password\\",
           \\"deletionProtection\\": false,
           \\"id\\": \\"password\\",
+          \\"design\\": null
+        },
+        {
+          \\"name\\": \\"CreateTask2\\",
+          \\"type\\": \\"action\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"createTask2\\",
+          \\"parameters\\": [{ \\"slug\\": \\"task\\", \\"type\\": \\"text\\" }],
+          \\"tasks\\": [
+            {
+              \\"type\\": \\"insert\\",
+              \\"insert\\": { \\"task\\": \\"$param.task\\" },
+              \\"table\\": \\"toDo\\"
+            }
+          ],
+          \\"condition\\": null,
+          \\"displayField\\": false,
           \\"design\\": null
         }
       ],

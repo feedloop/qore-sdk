@@ -72,7 +72,7 @@
     "qore": "./bin/run",
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "yarn jest --testTimeout 10000",
+    "test": "yarn jest --testTimeout 10000 -i",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts"
