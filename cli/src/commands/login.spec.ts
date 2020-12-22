@@ -1,10 +1,14 @@
 import prompts from "prompts";
 import { setupRecorder } from "nock-record";
 import Login from "./login";
+import config from "../config";
 
 const record = setupRecorder();
 
 describe("login", () => {
+  beforeEach(() => {
+    config.reset("org", "project", "token");
+  });
   it("authenticate user", async () => {
     const stdoutSpy = jest.spyOn(process.stdout, "write");
     prompts.inject(["rama@feedloop.io", "123"]);

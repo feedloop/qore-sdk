@@ -3,11 +3,15 @@ import fse from "fs-extra";
 import { default as makeUser } from "@qore/sdk/lib/user";
 import path from "path";
 import CreateProject from "./create-project";
+import config from "../config";
 
 const record = setupRecorder();
 const projectName = "qore-project-test";
 
 describe("create-project", () => {
+  beforeEach(() => {
+    config.reset("org", "project", "token");
+  });
   afterAll(() => {
     fse.removeSync(path.resolve(process.cwd(), projectName));
   });

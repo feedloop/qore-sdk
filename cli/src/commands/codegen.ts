@@ -3,9 +3,10 @@ import voca from "voca";
 import prettier from "prettier";
 import { Field } from "@qore/sdk";
 import fs from "fs";
+import fse from "fs-extra";
 import path from "path";
 import createProject, { FieldType, Vield } from "@qore/sdk/lib/project/index";
-import config from "../config";
+import config, { CLIConfig } from "../config";
 import ExportSchema from "./export-schema";
 import { configFlags, promptFlags } from "../flags";
 
@@ -16,6 +17,20 @@ export default class Codegen extends Command {
 
   static flags = {
     ...configFlags
+  };
+
+  static writeConfigFile = (configs: CLIConfig, destination?: string) => {
+    const { org, project } = configs;
+    fse.writeJSONSync(
+      path.resolve(destination || process.cwd(), "qore.config.json"),
+      {
+        version: "v1",
+        endpoint: "https://p-qore-dot-pti-feedloop.et.r.appspot.com",
+        projectId: project,
+        organizationId: org
+      },
+      { spaces: 2 }
+    );
   };
 
   private writeFieldTypes = new Set<FieldType>([
@@ -66,6 +81,14 @@ export default class Codegen extends Command {
       const { args, flags } = this.parse(Codegen);
       const configs = await promptFlags(flags, Codegen.flags);
       const schema = await ExportSchema.getSchema(configs);
+      await ExportSchema.run([
+        "--project",
+        configs.project,
+        "--org",
+        configs.org,
+        "--token",
+        configs.token
+      ]);
       const idField = { id: "id", type: "text", name: "id" } as Field<"text">;
       const typeDef = `
       ${schema.tables
@@ -148,6 +171,7 @@ export default class Codegen extends Command {
           encoding: "utf8"
         }
       );
+      Codegen.writeConfigFile(configs);
     } catch (error) {
       console.error(error.message);
     }
