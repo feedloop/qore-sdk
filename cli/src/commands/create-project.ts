@@ -4,6 +4,7 @@ import makeUser from "@qore/sdk/lib/user";
 import fs from "fs";
 import fse from "fs-extra";
 import path from "path";
+import config from "../config";
 import { orgFlag, promptFlags, tokenFlag } from "../flags";
 
 export default class CreateProject extends Command {
@@ -63,20 +64,22 @@ export default class CreateProject extends Command {
     const schemaFile = fse.readJSONSync(
       path.resolve(destination, "qore.schema.json")
     ) as QoreProjectSchema;
-    const projectId = await org.createProject({ name: args.name });
-
-    const project = makeProject({ organizationId: configs.org, projectId });
-    await project.auth.signInWithUserToken(configs.token);
-
+    const projectId = await org.createProject({
+      name: args.name,
+      schema: schemaFile
+    });
+    config.set("org", org.id);
+    config.set("project", projectId);
     fse.writeJSONSync(
       path.resolve(destination, "qore.config.json"),
       {
         version: "v1",
-        endpoint: "https://qore-api.feedloop.io",
+        endpoint: "https://p-qore-dot-pti-feedloop.et.r.appspot.com",
         projectId: projectId,
         organizationId: org.id
       },
       { spaces: 2 }
     );
+    this.log("New project initialized on", destination);
   }
 }

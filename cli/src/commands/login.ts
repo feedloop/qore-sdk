@@ -1,12 +1,12 @@
 import { Command, flags } from "@oclif/command";
+import { default as makeUser } from "@qore/sdk/lib/user";
 import prompts from "prompts";
-import axios from "../axios";
 import config from "../config";
 
 export default class Codegen extends Command {
-  static description = "Generate typescript definition file";
+  static description = "Login to qore cli";
 
-  static examples = [`$ qore codegen`];
+  static examples = [`$ qore login`];
 
   static flags = {
     email: flags.string({ char: "p", description: "project id" })
@@ -17,16 +17,12 @@ export default class Codegen extends Command {
       { name: "email", type: "text", message: "Enter your email" },
       { name: "password", type: "password", message: "Enter your password" }
     ]);
+
     try {
-      const resp = await axios.post<{ email: string; token: string }>(
-        "/login",
-        {
-          email: values.email,
-          password: values.password
-        }
-      );
-      config.set("token", resp.data.token);
-      this.log(`Logged in as ${resp.data.email}`);
+      const user = makeUser();
+      const token = await user.login(values.email, values.password);
+      config.set("token", token);
+      this.log(`Logged in as ${values.email}`);
     } catch (error) {
       this.error("Invalid login credentials", { exit: 100 });
     }

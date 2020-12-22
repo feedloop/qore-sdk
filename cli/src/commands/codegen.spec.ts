@@ -7,8 +7,6 @@ const record = setupRecorder();
 
 describe("codegen", () => {
   it("should be able to generate codegen", async () => {
-    process.env.REACT_APP_API_URL =
-      "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const { completeRecording } = await record("codegen");
     await Codegen.run([
       "--project",

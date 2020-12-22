@@ -1,0 +1,18 @@
+import prompts from "prompts";
+import { setupRecorder } from "nock-record";
+import SetProject from "./set-project";
+
+const record = setupRecorder();
+
+describe("set-project", () => {
+  it("select project", async () => {
+    const stdoutSpy = jest.spyOn(process.stdout, "write");
+    prompts.inject(["mAQjA9ypixnsBDE", "U1tJvy7XhgOuVmI"]);
+    const { completeRecording } = await record("set-project");
+    await SetProject.run([]);
+    expect(stdoutSpy).toHaveBeenCalledWith(
+      "Successfully set project to Demo of the Org Demo organization\n"
+    );
+    completeRecording();
+  });
+});

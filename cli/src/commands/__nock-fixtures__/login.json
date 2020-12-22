@@ -1,0 +1,38 @@
+[
+    {
+        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "method": "POST",
+        "path": "/login",
+        "body": {
+            "email": "rama@feedloop.io",
+            "password": "123"
+        },
+        "status": 200,
+        "response": {
+            "token": "6c42ac6c-40a7-49ee-8198-8fce1f683de0"
+        },
+        "rawHeaders": [
+            "Date",
+            "Tue, 22 Dec 2020 02:39:17 GMT",
+            "Content-Type",
+            "application/json; charset=utf-8",
+            "Content-Length",
+            "48",
+            "Vary",
+            "Accept-Encoding",
+            "X-Powered-By",
+            "Express",
+            "Access-Control-Allow-Origin",
+            "*",
+            "ETag",
+            "W/\"30-s9Z0MWHG+ziR8EVCcBroQIJy7fA\"",
+            "Via",
+            "1.1 google",
+            "Alt-Svc",
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    }
+]

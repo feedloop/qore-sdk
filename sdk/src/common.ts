@@ -9,8 +9,8 @@ Axios.interceptors.response.use(
 
 Axios.interceptors.request.use(config => {
   config.baseURL =
-    process.env.REACT_APP_API_URL ||
-    "https://s-qore-dot-pti-feedloop.et.r.appspot.com";
+    process.env.QORE_SERVER ||
+    "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
   return config;
 });
 

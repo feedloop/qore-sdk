@@ -7,8 +7,6 @@ const record = setupRecorder();
 
 describe("export-schema", () => {
   it("should be able to export schema", async () => {
-    process.env.REACT_APP_API_URL =
-      "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const { completeRecording } = await record("export-schema");
     await ExportSchema.run([
       "--project",
