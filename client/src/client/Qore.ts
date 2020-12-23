@@ -40,9 +40,9 @@ export class QoreProject {
   constructor(config: QoreConfig) {
     this.config = config;
     this.axios = Axios.create({
-      baseURL: `${config.endpoint || "http://localhost:8080"}/orgs/${
-        this.config.organizationId
-      }/projects/${this.config.projectId}`
+      baseURL: `${config.endpoint || "http://localhost:8080"}/${
+        this.config.projectId
+      }`
     });
     this.axios.interceptors.request.use(req => {
       const token = this.config.getToken && this.config.getToken();
@@ -101,7 +101,12 @@ export function withHelpers<T>(
   (source$ as PromisifiedSource<T>).revalidate = (
     config = defaultOperationConfig
   ) => {
-    client.revalidate({ ...defaultOperationConfig, ...operation, ...config });
+    client.revalidate({
+      ...defaultOperationConfig,
+      ...operation,
+      ...config,
+      networkPolicy: "network-only"
+    });
   };
 
   return source$ as PromisifiedSource<T>;
@@ -152,10 +157,16 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     );
   }
   async authenticate(email: string, password: string): Promise<string> {
-    const resp = await this.project.axios.post<{
+    const config: AxiosRequestConfig = {
+      baseURL: this.project.config.endpoint,
+      url: `/project-authenticate/${this.project.config.projectId}`,
+      method: "post",
+      data: { identifier: email, password }
+    };
+    const resp = await this.project.axios.request<{
       email: string;
       token: string;
-    }>("/login", { email, password });
+    }>(config);
     return resp.data.token;
   }
   onOperationStart(operation: QoreOperation) {
@@ -217,7 +228,8 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   }
   private async getUploadUrl(fileName: string): Promise<string> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/tables/upload-file?fileName=${fileName}`,
+      baseURL: this.project.config.endpoint,
+      url: `/orgs/${this.project.config.organizationId}/project/${this.project.config.projectId}/tables/upload-file?fileName=${fileName}`,
       method: "GET"
     };
     const result = await this.project.axios(axiosConfig);

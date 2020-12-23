@@ -1,0 +1,127 @@
+[
+    {
+        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "method": "OPTIONS",
+        "path": "/I0D3NimZQ9GKEDP/memberDefaultView/rows?limit=1",
+        "body": "",
+        "status": 204,
+        "response": "",
+        "rawHeaders": [
+            "Date",
+            "Wed, 23 Dec 2020 09:06:50 GMT",
+            "Content-Length",
+            "0",
+            "X-Powered-By",
+            "Express",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Access-Control-Allow-Methods",
+            "GET,HEAD,PUT,PATCH,POST,DELETE",
+            "Vary",
+            "Access-Control-Request-Headers",
+            "Access-Control-Allow-Headers",
+            "Authorization",
+            "Via",
+            "1.1 google",
+            "Alt-Svc",
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "method": "GET",
+        "path": "/I0D3NimZQ9GKEDP/memberDefaultView/rows?limit=1",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f",
+            "8b",
+            "08000000000000032d8ccd0a82401446dfe52ecb117f26cb590541ba6d19d162f48e7161f40e8e1222be7b2a7dcb7338df0c1da3f1a05e3310820219c715621609899916324ace229749222accea2aafabe6929e21809ead01f56fb2b28e9e053d0aaed3726c568de49dd5d39d8cdd4e35b6d4c112806935d9154c634fc7567f1c997097d7c618b4cc2e245e7ba7bdff72bfb5877db0bc031878d0f6c66337803a2d3f473990e9bb000000"
+        ],
+        "rawHeaders": [
+            "Date",
+            "Wed, 23 Dec 2020 09:06:50 GMT",
+            "Content-Type",
+            "application/json; charset=utf-8",
+            "Vary",
+            "Accept-Encoding",
+            "X-Powered-By",
+            "Express",
+            "Access-Control-Allow-Origin",
+            "*",
+            "ETag",
+            "W/\"bb-Ga4nrGC1jBRtrVlWQ49v3wGRBZQ\"",
+            "Content-Encoding",
+            "gzip",
+            "Via",
+            "1.1 google",
+            "Alt-Svc",
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+            "Transfer-Encoding",
+            "chunked"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "method": "OPTIONS",
+        "path": "/I0D3NimZQ9GKEDP/memberDefaultView/rows/411bdd60-4d6a-4027-9422-bd6cb9cbf837/addTask",
+        "body": "",
+        "status": 204,
+        "response": "",
+        "rawHeaders": [
+            "Date",
+            "Wed, 23 Dec 2020 09:06:50 GMT",
+            "Content-Length",
+            "0",
+            "X-Powered-By",
+            "Express",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Access-Control-Allow-Methods",
+            "GET,HEAD,PUT,PATCH,POST,DELETE",
+            "Vary",
+            "Access-Control-Request-Headers",
+            "Access-Control-Allow-Headers",
+            "Authorization",
+            "Via",
+            "1.1 google",
+            "Alt-Svc",
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "method": "POST",
+        "path": "/I0D3NimZQ9GKEDP/memberDefaultView/rows/411bdd60-4d6a-4027-9422-bd6cb9cbf837/addTask",
+        "body": {
+            "task": "new task",
+            "description": "new task desc"
+        },
+        "status": 200,
+        "response": {
+            "isExecuted": true
+        },
+        "rawHeaders": [
+            "Date",
+            "Wed, 23 Dec 2020 09:06:50 GMT",
+            "Content-Type",
+            "application/json; charset=utf-8",
+            "Content-Length",
+            "19",
+            "X-Powered-By",
+            "Express",
+            "Access-Control-Allow-Origin",
+            "*",
+            "ETag",
+            "W/\"13-gwIi//LGjoMcqMV0AqKnG2OXpk4\"",
+            "Via",
+            "1.1 google",
+            "Alt-Svc",
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+        ],
+        "responseIsBinary": false
+    }
+]

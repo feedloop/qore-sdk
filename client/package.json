@@ -24,6 +24,7 @@
     "axios": "^0.21.0",
     "immer": "^8.0.0",
     "nock": "^13.0.5",
+    "nock-record": "^0.3.9",
     "normalizr": "^3.6.1",
     "sequency": "^0.19.2",
     "type-fest": "^0.20.1",
