@@ -14,16 +14,22 @@ const createNewQoreContext = () => {
       };
     };
   }>({
-    organisationId: "FAKE_ORG",
+    endpoint: "http://localhost:8080",
+    organizationId: "FAKE_ORG",
     projectId: "FAKE_PROJECT"
   });
 
   qoreClient.init({
-    version: "v1",
+    forms: [],
+    roles: [],
+    tables: [],
     views: [
       {
         id: "allTasks",
         name: "All tasks",
+        filter: "",
+        parameters: [],
+        sorts: [],
         tableId: "tasks",
         fields: [
           {
