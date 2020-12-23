@@ -2,7 +2,6 @@ import { renderHook, act } from "@testing-library/react-hooks";
 import createQoreContext from ".";
 import { QoreClient } from "@qore/client";
 import nock from "nock";
-import axios from "axios";
 
 const createNewQoreContext = () => {
   const qoreClient = new QoreClient<{
@@ -10,6 +9,9 @@ const createNewQoreContext = () => {
       read: { id: string; title: string };
       write: { title: string };
       params: { slug?: string };
+      actions: {
+        finishTask: {};
+      };
     };
   }>({
     organisationId: "FAKE_ORG",
@@ -29,6 +31,14 @@ const createNewQoreContext = () => {
             type: "text",
             name: "title",
             id: "title",
+            deletionProtection: false
+          },
+          {
+            id: "finishTask",
+            name: "finishTask",
+            type: "action",
+            tasks: [{ update: { done: "true" }, type: "update" }],
+            parameters: [],
             deletionProtection: false
           }
         ]
@@ -339,6 +349,57 @@ describe("useDeleteRow", () => {
     });
     expect(result.current.status).toEqual("error");
     expect(result.current.error?.message).toEqual(
+      "Request failed with status code 500"
+    );
+  });
+});
+
+describe("useActions", () => {
+  it("should trigger action", async () => {
+    nock("http://localhost:8080")
+      .post(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
+      )
+      .reply(200, { ok: true });
+
+    const qoreContext = createNewQoreContext();
+
+    const { result } = renderHook(() =>
+      qoreContext.views.allTasks.useActions(
+        "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+    );
+
+    expect(result.current.statuses.finishTask).toEqual("idle");
+    await act(async () => {
+      await expect(
+        result.current.rowActions.finishTask.trigger({})
+      ).resolves.toEqual(true);
+    });
+    expect(result.current.statuses.finishTask).toEqual("success");
+  });
+
+  it("should get error message if network failed", async () => {
+    nock("http://localhost:8080")
+      .post(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
+      )
+      .reply(500);
+
+    const qoreContext = createNewQoreContext();
+
+    const { result } = renderHook(() =>
+      qoreContext.views.allTasks.useActions(
+        "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+    );
+
+    expect(result.current.statuses.finishTask).toEqual("idle");
+    await act(async () => {
+      await result.current.rowActions.finishTask.trigger({});
+    });
+    expect(result.current.statuses.finishTask).toEqual("error");
+    expect(result.current.errors.finishTask?.message).toEqual(
       "Request failed with status code 500"
     );
   });

@@ -1,5 +1,4 @@
 import nock from "nock";
-import Wonka from "wonka";
 import { QoreProjectSchema } from "../types";
 import QoreClient from "./Qore";
 
@@ -29,7 +28,15 @@ const fakeProjectSchema = (): QoreProjectSchema => ({
         },
         { id: "done", name: "done", type: "boolean", deletionProtection: true },
         { type: "text", name: "id", id: "id", deletionProtection: false },
-        { type: "text", name: "name", id: "name", deletionProtection: false }
+        { type: "text", name: "name", id: "name", deletionProtection: false },
+        {
+          id: "finishTask",
+          name: "finishTask",
+          type: "action",
+          tasks: [{ update: { done: "true" }, type: "update" }],
+          parameters: [],
+          deletionProtection: false
+        }
       ]
     }
   ]
@@ -49,6 +56,7 @@ describe("Qore SDK", () => {
         read: { id: string; name: string };
         write: { id: string; name: string };
         params: { slug?: string };
+        actions: {};
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -110,6 +118,7 @@ describe("Qore SDK", () => {
           "$by.name"?: "asc" | "desc";
           "$by.description"?: "asc";
         };
+        actions: {};
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -158,6 +167,7 @@ describe("Qore SDK", () => {
         read: { id: string; name: string };
         write: { id: string; name: string };
         params: { slug?: string };
+        actions: {};
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -221,6 +231,7 @@ describe("Qore SDK", () => {
         read: { id: string; name: string };
         write: { id: string; name: string };
         params: { slug?: string };
+        actions: {};
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -272,6 +283,7 @@ describe("Qore SDK", () => {
           subtasks: string[];
         };
         params: { slug?: string };
+        actions: {};
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -293,7 +305,7 @@ describe("Qore SDK", () => {
     });
   });
 
-  it.only("delete a row", async () => {
+  it("delete a row", async () => {
     scope = scope
       .delete(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
@@ -304,6 +316,7 @@ describe("Qore SDK", () => {
         read: { id: string; name: string };
         write: { id: string; name: string };
         params: { slug?: string };
+        actions: {};
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -326,6 +339,7 @@ describe("Qore SDK", () => {
         read: { id: string; name: string };
         write: { id: string; name: string };
         params: { slug?: string };
+        actions: { slug?: string };
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -357,6 +371,7 @@ describe("Qore SDK", () => {
         read: { id: string; name: string };
         write: { id: string; name: string };
         params: { slug?: string };
+        actions: {};
       };
     }>({
       organisationId: "FAKE_ORG",
@@ -382,5 +397,63 @@ describe("Qore SDK", () => {
       new Error("Request failed with status code 401")
     );
     expect(mockGetToken.mock.calls.length).toEqual(3);
+  });
+
+  it("trigger an action", async () => {
+    scope = scope
+      .post(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
+      )
+      .reply(200, { ok: true });
+
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+        actions: {
+          finishTask: {};
+        };
+      };
+    }>({
+      organisationId: "FAKE_ORG",
+      projectId: "FAKE_PROJECT"
+    });
+    qore.init(fakeProjectSchema());
+
+    await expect(
+      qore.views.allTasks
+        .rowActions("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
+        .finishTask.trigger({})
+    ).resolves.toEqual(true);
+  });
+
+  it("reject promise when trigger action failed", async () => {
+    scope = scope
+      .post(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
+      )
+      .reply(500);
+
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+        actions: {
+          finishTask: {};
+        };
+      };
+    }>({
+      organisationId: "FAKE_ORG",
+      projectId: "FAKE_PROJECT"
+    });
+    qore.init(fakeProjectSchema());
+
+    await expect(
+      qore.views.allTasks
+        .rowActions("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
+        .finishTask.trigger({})
+    ).rejects.toThrow("Request failed with status code 500");
   });
 });

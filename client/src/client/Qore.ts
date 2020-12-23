@@ -1,4 +1,4 @@
-import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import Wonka, { merge } from "wonka";
 import {
   Exchange,

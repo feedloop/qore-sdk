@@ -3,7 +3,8 @@ import {
   QoreSchema,
   QoreClient,
   ViewDriver,
-  QoreOperationConfig
+  QoreOperationConfig,
+  RowActions
 } from "@qore/client";
 
 type QoreRequestStatus = "idle" | "loading" | "success" | "error";
@@ -49,6 +50,14 @@ type QoreHooks<T extends QoreSchema[string]> = {
     status: QoreRequestStatus;
     error: Error | null;
   };
+
+  useActions: (
+    rowId: string
+  ) => {
+    rowActions: RowActions<T["actions"]>;
+    statuses: Record<keyof RowActions<T["actions"]>, QoreRequestStatus>;
+    errors: Record<keyof RowActions<T["actions"]>, Error | null>;
+  };
 };
 
 type QoreContextViews<ProjectSchema extends QoreSchema> = {
@@ -86,6 +95,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
                   setStatus("error");
                 }
                 if (data) {
+                  setError(null);
                   setData(data.nodes);
                   setStatus("success");
                 }
@@ -122,6 +132,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
                 }
                 if (data) {
                   setData(data);
+                  setError(null);
                   setStatus("success");
                 }
               }
@@ -144,6 +155,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               const result = await qoreClient.views[currentViewId].insertRow(
                 data
               );
+              setError(null);
               setStatus("success");
               return result;
             } catch (error) {
@@ -169,6 +181,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
                 rowId,
                 data
               );
+              setError(null);
               setStatus("success");
               return result;
             } catch (error) {
@@ -190,6 +203,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               const result = await qoreClient.views[currentViewId].deleteRow(
                 rowId
               );
+              setError(null);
               setStatus("success");
               return result;
             } catch (error) {
@@ -199,6 +213,57 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           };
 
           return { deleteRow, status, error };
+        },
+
+        useActions: rowId => {
+          const qoreClientRowActions = qoreClient.views[
+            currentViewId
+          ].rowActions(rowId);
+
+          const [statuses, setStatuses] = React.useState<
+            Record<keyof RowActions<ProjectSchema>, QoreRequestStatus>
+          >(
+            Object.keys(qoreClientRowActions).reduce(
+              (prev, curr) => ({ ...prev, [curr]: "idle" }),
+              {} as Record<keyof RowActions<ProjectSchema>, QoreRequestStatus>
+            )
+          );
+
+          const [errors, setErrors] = React.useState<
+            Record<keyof RowActions<ProjectSchema>, Error | null>
+          >(
+            Object.keys(qoreClientRowActions).reduce(
+              (prev, curr) => ({ ...prev, [curr]: null }),
+              {} as Record<keyof RowActions<ProjectSchema>, Error | null>
+            )
+          );
+
+          const rowActions = Object.entries(qoreClientRowActions).reduce(
+            (prev, [fieldId, action]) => ({
+              ...prev,
+              [fieldId]: {
+                trigger: async input => {
+                  try {
+                    setStatuses({ ...statuses, [fieldId]: "loading" });
+                    const result = await action.trigger(input);
+                    setStatuses({ ...statuses, [fieldId]: "success" });
+                    setErrors({ ...errors, [fieldId]: null });
+                    return result;
+                  } catch (newError) {
+                    setStatuses({ ...statuses, [fieldId]: "error" });
+                    setErrors({ ...errors, [fieldId]: newError });
+                  }
+                }
+              }
+            }),
+            {} as RowActions<ProjectSchema[string]["actions"]>
+          );
+
+          return {
+            statuses,
+            errors,
+            rowActions
+          };
         }
       }
     }),
