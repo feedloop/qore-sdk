@@ -63,9 +63,25 @@ const createNewQoreContext = () => {
   return createQoreContext(qoreClient);
 };
 
+let scope: nock.Scope;
+
+beforeEach(() => {
+  scope = scope = nock("http://localhost:8080")
+    .defaultReplyHeaders({
+      "access-control-allow-origin": "*",
+      "access-control-allow-credentials": "true",
+      "access-control-allow-headers": "Authorization"
+    })
+    .options(() => true)
+    .reply(200, undefined, {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application:json"
+    });
+});
+
 describe("useListRow", () => {
   it("should fetch data successfully", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows")
       .reply(200, {
         nodes: [
@@ -108,7 +124,7 @@ describe("useListRow", () => {
   });
 
   it("should get error message if network failed", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows")
       .reply(500, undefined);
 
@@ -131,7 +147,7 @@ describe("useListRow", () => {
 
 describe("useGetRow", () => {
   it("should fetch data successfully", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -167,7 +183,7 @@ describe("useGetRow", () => {
   });
 
   it("should get error message if network failed", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -194,7 +210,7 @@ describe("useGetRow", () => {
 
 describe("useInsertRow", () => {
   it("should insert new row, write, and read from cache", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
@@ -240,7 +256,7 @@ describe("useInsertRow", () => {
   });
 
   it("should get error message if network failed", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows")
       .reply(500, undefined);
 
@@ -262,7 +278,7 @@ describe("useInsertRow", () => {
 
 describe("useUpdateRow", () => {
   it("should update row", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -293,7 +309,7 @@ describe("useUpdateRow", () => {
   });
 
   it("should get error message if network failed", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .get(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -323,7 +339,7 @@ describe("useUpdateRow", () => {
 
 describe("useDeleteRow", () => {
   it("should delete row", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .delete(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -346,7 +362,7 @@ describe("useDeleteRow", () => {
   });
 
   it("should get error message if network failed", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .delete(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
@@ -370,7 +386,7 @@ describe("useDeleteRow", () => {
 
 describe("useActions", () => {
   it("should trigger action", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .post(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
       )
@@ -394,7 +410,7 @@ describe("useActions", () => {
   });
 
   it("should get error message if network failed", async () => {
-    nock("http://localhost:8080")
+    scope = scope
       .post(
         "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
       )
