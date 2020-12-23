@@ -44,7 +44,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
   > {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/views/${this.id}/v2rows`,
+      url: `/${this.id}/rows`,
       params: opts,
       method: "GET"
     };
@@ -63,7 +63,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"]>> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/views/${this.id}/v2rows/${id}`,
+      url: `/${this.id}/rows/${id}`,
       method: "GET"
     };
     const operation: QoreOperation = {
@@ -97,7 +97,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         };
       }, {});
     const axiosConfig: AxiosRequestConfig = {
-      url: `/tables/${this.tableId}/rows/${id}`,
+      url: `/${this.id}/rows/${id}`,
       data: { ...nonRelational, ...relational },
       method: "PATCH"
     };
@@ -116,7 +116,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   }
   async deleteRow(id: string): Promise<boolean> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/tables/${this.tableId}/rows/${id}`,
+      url: `/${this.id}/rows/${id}`,
       method: "DELETE"
     };
     const operation: QoreOperation = {
@@ -133,7 +133,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   }
   async insertRow(input: Partial<T["write"]>): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/tables/${this.tableId}/rows`,
+      url: `/${this.id}/rows`,
       data: input,
       method: "POST"
     };
@@ -163,7 +163,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           [fieldId]: {
             trigger: async input => {
               const axiosConfig: AxiosRequestConfig = {
-                url: `/tables/${this.tableId}/rows/${rowId}/action/${fieldId}`,
+                url: `/${this.id}/rows/${rowId}/${fieldId}`,
                 data: input,
                 method: "POST"
               };
@@ -175,9 +175,12 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
                 pollInterval: 0,
                 networkPolicy: "network-only"
               };
-              const res = await this.client.execute(operation).toPromise();
+              const res = await this.client
+                .execute<{ isExecuted: false }>(operation)
+                .toPromise();
+              if (res.data?.isExecuted) return true;
               if (res.error) throw res.error;
-              return true;
+              throw new Error("Trigger has failed");
             }
           }
         }),
