@@ -7,6 +7,11 @@ export type QoreViewSchema = {
   read: Record<string, any>;
   write: Record<string, any>;
   params: Record<string, any>;
+  actions: Record<string, any>;
+};
+
+export type RowActions<T extends QoreViewSchema["actions"]> = {
+  [K in keyof T]: { trigger: (params: T[K]) => Promise<boolean> };
 };
 
 export type QoreSchema = Record<string, QoreViewSchema>;

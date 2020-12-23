@@ -4,10 +4,10 @@ import {
   QoreOperation,
   QoreOperationConfig,
   QoreOperationResult,
-  QoreViewSchema
+  QoreViewSchema,
+  RowActions
 } from "../types";
 import QoreClient, {
-  QoreRow,
   QoreProject,
   RelationValue,
   PromisifiedSource,
@@ -152,5 +152,36 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const row = await this.readRow(result.data.id).toPromise();
     if (!row.data) throw row.error;
     return row.data;
+  }
+
+  rowActions(rowId: string): RowActions<T["actions"]> {
+    return Object.entries(this.fields)
+      .filter(([_, field]) => field.type === "action")
+      .reduce(
+        (prev, [fieldId]) => ({
+          ...prev,
+          [fieldId]: {
+            trigger: async input => {
+              const axiosConfig: AxiosRequestConfig = {
+                url: `/tables/${this.tableId}/rows/${rowId}/action/${fieldId}`,
+                data: input,
+                method: "POST"
+              };
+              const operation: QoreOperation = {
+                key: JSON.stringify(axiosConfig),
+                request: axiosConfig,
+                type: axiosConfig.method,
+                meta: {},
+                pollInterval: 0,
+                networkPolicy: "network-only"
+              };
+              const res = await this.client.execute(operation).toPromise();
+              if (res.error) throw res.error;
+              return true;
+            }
+          }
+        }),
+        {} as RowActions<T["actions"]>
+      );
   }
 }
