@@ -1,11 +1,14 @@
 import { Command, flags } from "@oclif/command";
 import voca from "voca";
 import prettier from "prettier";
-import { Field } from "@qore/sdk";
+import { Field } from "@feedloop/qore-sdk";
 import fs from "fs";
 import fse from "fs-extra";
 import path from "path";
-import createProject, { FieldType, Vield } from "@qore/sdk/lib/project/index";
+import createProject, {
+  FieldType,
+  Vield
+} from "@feedloop/qore-sdk/lib/project/index";
 import config, { CLIConfig } from "../config";
 import ExportSchema from "./export-schema";
 import { configFlags, promptFlags } from "../flags";

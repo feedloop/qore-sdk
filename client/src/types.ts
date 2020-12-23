@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from "axios";
 import Wonka from "wonka";
 import QoreClient from "./client/Qore";
-import { APIField } from "./sdk/project/field";
+import { APIField } from "@feedloop/qore-sdk";
 
 export type QoreViewSchema = {
   read: Record<string, any>;

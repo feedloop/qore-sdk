@@ -15,11 +15,11 @@ qore cli
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g @qore/cli
+$ npm install -g @feedloop/qore-cli
 $ qore COMMAND
 running command...
 $ qore (-v|--version|version)
-@qore/cli/0.0.0 linux-x64 node-v14.8.0
+@feedloop/qore-cli/0.1.2 linux-x64 node-v14.8.0
 $ qore --help [COMMAND]
 USAGE
   $ qore COMMAND
@@ -28,26 +28,63 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`qore hello [FILE]`](#qore-hello-file)
+* [`qore codegen`](#qore-codegen)
+* [`qore create-project [NAME]`](#qore-create-project-name)
+* [`qore export-schema [FILE]`](#qore-export-schema-file)
 * [`qore help [COMMAND]`](#qore-help-command)
+* [`qore login`](#qore-login)
+* [`qore set-project`](#qore-set-project)
 
-## `qore hello [FILE]`
+## `qore codegen`
 
 ```
 USAGE
-  $ qore hello [FILE]
+  $ qore codegen
 
 OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+  --org=org          organization id
+  --project=project  project id
+  --token=token      organization id
 
 EXAMPLE
-  $ qore hello
-  hello world from ./src/hello.ts!
+  $ qore codegen --project projectId --org orgId
 ```
 
-_See code: [src/commands/hello.ts](https://github.com/rrmdn/cli/blob/v0.0.0/src/commands/hello.ts)_
+_See code: [src/commands/codegen.ts](https://github.com/rrmdn/cli/blob/v0.1.2/src/commands/codegen.ts)_
+
+## `qore create-project [NAME]`
+
+```
+USAGE
+  $ qore create-project [NAME]
+
+OPTIONS
+  -t, --template=template  [default: todo-list-typescript] qore project template
+  --org=org                organization id
+  --token=token            organization id
+
+EXAMPLE
+  $ qore create-project --template todo-list-typescript your-project-name
+```
+
+_See code: [src/commands/create-project.ts](https://github.com/rrmdn/cli/blob/v0.1.2/src/commands/create-project.ts)_
+
+## `qore export-schema [FILE]`
+
+```
+USAGE
+  $ qore export-schema [FILE]
+
+OPTIONS
+  --org=org          organization id
+  --project=project  project id
+  --token=token      organization id
+
+EXAMPLE
+  $ qore export-schema
+```
+
+_See code: [src/commands/export-schema.ts](https://github.com/rrmdn/cli/blob/v0.1.2/src/commands/export-schema.ts)_
 
 ## `qore help [COMMAND]`
 
@@ -63,4 +100,34 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.0/src/commands/help.ts)_
+
+## `qore login`
+
+```
+USAGE
+  $ qore login
+
+OPTIONS
+  -p, --email=email  project id
+
+EXAMPLE
+  $ qore login
+```
+
+_See code: [src/commands/login.ts](https://github.com/rrmdn/cli/blob/v0.1.2/src/commands/login.ts)_
+
+## `qore set-project`
+
+```
+USAGE
+  $ qore set-project
+
+OPTIONS
+  --token=token  organization id
+
+EXAMPLE
+  $ qore set-project
+```
+
+_See code: [src/commands/set-project.ts](https://github.com/rrmdn/cli/blob/v0.1.2/src/commands/set-project.ts)_
 <!-- commandsstop -->

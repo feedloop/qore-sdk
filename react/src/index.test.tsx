@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-hooks";
 import createQoreContext from ".";
-import { QoreClient } from "@qore/client";
+import { QoreClient } from "@feedloop/qore-client";
 import nock from "nock";
 
 const createNewQoreContext = () => {
@@ -26,10 +26,17 @@ const createNewQoreContext = () => {
         name: "All tasks",
         tableId: "tasks",
         fields: [
-          { type: "text", name: "id", id: "id", deletionProtection: false },
+          {
+            type: "text",
+            name: "id",
+            linked: true,
+            id: "id",
+            deletionProtection: false
+          },
           {
             type: "text",
             name: "title",
+            linked: true,
             id: "title",
             deletionProtection: false
           },
@@ -37,6 +44,7 @@ const createNewQoreContext = () => {
             id: "finishTask",
             name: "finishTask",
             type: "action",
+            linked: true,
             tasks: [{ update: { done: "true" }, type: "update" }],
             parameters: [],
             deletionProtection: false

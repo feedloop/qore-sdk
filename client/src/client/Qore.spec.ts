@@ -14,6 +14,7 @@ const fakeProjectSchema = (): QoreProjectSchema => ({
           id: "user",
           name: "user",
           type: "relation",
+          linked: true,
           table: "member",
           multiple: false,
           deletionProtection: false
@@ -22,16 +23,36 @@ const fakeProjectSchema = (): QoreProjectSchema => ({
           id: "subtasks",
           name: "subtasks",
           type: "relation",
+          linked: true,
           deletionProtection: false,
           table: "subtasks",
           multiple: true
         },
-        { id: "done", name: "done", type: "boolean", deletionProtection: true },
-        { type: "text", name: "id", id: "id", deletionProtection: false },
-        { type: "text", name: "name", id: "name", deletionProtection: false },
+        {
+          id: "done",
+          name: "done",
+          linked: true,
+          type: "boolean",
+          deletionProtection: true
+        },
+        {
+          type: "text",
+          name: "id",
+          linked: true,
+          id: "id",
+          deletionProtection: false
+        },
+        {
+          type: "text",
+          name: "name",
+          linked: true,
+          id: "name",
+          deletionProtection: false
+        },
         {
           id: "finishTask",
           name: "finishTask",
+          linked: true,
           type: "action",
           tasks: [{ update: { done: "true" }, type: "update" }],
           parameters: [],

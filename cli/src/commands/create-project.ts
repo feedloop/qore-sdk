@@ -1,6 +1,8 @@
 import { Command, flags } from "@oclif/command";
-import makeProject, { QoreProjectSchema } from "@qore/sdk/lib/project/index";
-import makeUser from "@qore/sdk/lib/user";
+import makeProject, {
+  QoreProjectSchema
+} from "@feedloop/qore-sdk/lib/project/index";
+import makeUser from "@feedloop/qore-sdk/lib/user";
 import fs from "fs";
 import fse from "fs-extra";
 import path from "path";
