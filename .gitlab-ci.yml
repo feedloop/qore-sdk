@@ -13,12 +13,7 @@ cli-test:
   image: node:latest
   stage: test
   script:
-    - cd sdk
-    - yarn
-    - yarn build
-    - yarn link
-    - cd ../cli
-    - yarn link @qore/sdk
+    - cd cli
     - yarn
     - yarn test
   only:
@@ -39,6 +34,19 @@ client-test:
       - merge_requests
     changes:
       - client/**/*
+
+react-test:
+  image: node:latest
+  stage: test
+  script:
+    - cd react
+    - yarn
+    - yarn test
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - react/**/*
 
 release-doc:
   image: docker:19.03.12

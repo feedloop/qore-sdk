@@ -1,5 +1,5 @@
 import { Command, flags } from "@oclif/command";
-import { default as makeUser } from "@qore/sdk/lib/user";
+import { default as makeUser } from "@feedloop/qore-sdk/lib/user";
 import prompts from "prompts";
 import config from "../config";
 import { promptFlags, tokenFlag } from "../flags";

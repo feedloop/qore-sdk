@@ -1,6 +1,6 @@
 import { setupRecorder } from "nock-record";
 import fse from "fs-extra";
-import { default as makeUser } from "@qore/sdk/lib/user";
+import { default as makeUser } from "@feedloop/qore-sdk/lib/user";
 import path from "path";
 import CreateProject from "./create-project";
 import config from "../config";

@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { APIField } from "../sdk/project/field";
+import { APIField } from "@feedloop/qore-sdk";
 import {
   QoreOperation,
   QoreOperationConfig,

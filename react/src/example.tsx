@@ -1,4 +1,4 @@
-import { QoreClient } from "@qore/client";
+import { QoreClient } from "@feedloop/qore-client";
 import React from "react";
 import createQoreContext from ".";
 
@@ -7,11 +7,13 @@ const qoreClient = new QoreClient<{
     read: { id: string; name: string };
     write: { name: string };
     params: { slug?: string };
+    actions: {};
   };
   allTasks: {
     read: { id: string; title: string };
     write: { title: string };
     params: { slug?: string };
+    actions: {};
   };
 }>({
   organisationId: "FAKE_ORG",
@@ -31,6 +33,7 @@ qoreClient.init({
           name: "user",
           type: "relation",
           table: "member",
+          linked: true,
           multiple: false,
           deletionProtection: false
         },
@@ -40,16 +43,30 @@ qoreClient.init({
           type: "relation",
           deletionProtection: false,
           table: "subtasks",
+          linked: true,
           multiple: true
         },
         {
           id: "done",
           name: "done",
           type: "boolean",
+          linked: true,
           deletionProtection: true
         },
-        { type: "text", name: "id", id: "id", deletionProtection: false },
-        { type: "text", name: "name", id: "name", deletionProtection: false }
+        {
+          type: "text",
+          name: "id",
+          linked: true,
+          id: "id",
+          deletionProtection: false
+        },
+        {
+          type: "text",
+          name: "name",
+          linked: true,
+          id: "name",
+          deletionProtection: false
+        }
       ]
     }
   ]

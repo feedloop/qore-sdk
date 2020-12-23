@@ -5,7 +5,7 @@ import {
   ViewDriver,
   QoreOperationConfig,
   RowActions
-} from "@qore/client";
+} from "@feedloop/qore-client";
 
 type QoreRequestStatus = "idle" | "loading" | "success" | "error";
 

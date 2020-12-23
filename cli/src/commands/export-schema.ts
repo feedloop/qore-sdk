@@ -1,6 +1,8 @@
 import { Command } from "@oclif/command";
 import prettier from "prettier";
-import makeProject, { QoreProjectSchema } from "@qore/sdk/lib/project/index";
+import makeProject, {
+  QoreProjectSchema
+} from "@feedloop/qore-sdk/lib/project/index";
 import fs from "fs";
 import path from "path";
 import config, { CLIConfig } from "../config";
