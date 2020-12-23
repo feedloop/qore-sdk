@@ -215,4 +215,25 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, Data>> {
     return withHelpers(this.executeOperation(operation), this, operation);
   }
+  private async getUploadUrl(fileName: string): Promise<string> {
+    const axiosConfig: AxiosRequestConfig = {
+      url: `/tables/upload-file?fileName=${fileName}`,
+      method: "GET"
+    };
+    const result = await this.project.axios(axiosConfig);
+    return result.data.url;
+  }
+  async upload(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const uploadUrl = await this.getUploadUrl(file.name);
+    const axiosConfig: AxiosRequestConfig = {
+      url: uploadUrl,
+      method: "POST",
+      data: formData
+    };
+    await this.project.axios(axiosConfig);
+    return uploadUrl;
+  }
 }

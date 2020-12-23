@@ -71,7 +71,17 @@ const fakeProjectSchema = (): QoreProjectSchema => ({
 describe("Qore SDK", () => {
   let scope: nock.Scope;
   beforeEach(() => {
-    scope = scope = nock("http://localhost:8080");
+    scope = scope = nock("http://localhost:8080")
+      .defaultReplyHeaders({
+        "access-control-allow-origin": "*",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-headers": "Authorization"
+      })
+      .options(() => true)
+      .reply(200, undefined, {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application:json"
+      });
   });
   afterEach(() => {
     // scope.done();
@@ -491,5 +501,34 @@ describe("Qore SDK", () => {
         .rowActions("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
         .finishTask.trigger({})
     ).rejects.toThrow("Request failed with status code 500");
+  });
+
+  it("upload file", async () => {
+    scope = scope
+      .get(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/upload-file?fileName=photo.jpg"
+      )
+      .reply(200, { url: "/upload" })
+      .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/upload")
+      .reply(200, { ok: true });
+
+    const qore = new QoreClient<{
+      allTasks: {
+        read: { id: string; name: string };
+        write: { id: string; name: string };
+        params: { slug?: string };
+        actions: {
+          finishTask: {};
+        };
+      };
+    }>({
+      organizationId: "FAKE_ORG",
+      projectId: "FAKE_PROJECT",
+      endpoint: "http://localhost:8080"
+    });
+    qore.init(fakeProjectSchema());
+
+    const fileUrl = await qore.upload(new File([], "photo.jpg"));
+    expect(fileUrl).toEqual("/upload");
   });
 });
