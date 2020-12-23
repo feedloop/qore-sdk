@@ -1,12 +1,17 @@
+import { QoreProjectSchema } from "@feedloop/qore-sdk";
 import nock from "nock";
-import { QoreProjectSchema } from "../types";
 import QoreClient from "./Qore";
 
 const fakeProjectSchema = (): QoreProjectSchema => ({
-  version: "v1",
+  forms: [],
+  roles: [],
+  tables: [],
   views: [
     {
       id: "allTasks",
+      filter: "",
+      parameters: [],
+      sorts: [],
       name: "All tasks",
       tableId: "tasks",
       fields: [
@@ -80,7 +85,8 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -142,7 +148,8 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -191,7 +198,8 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -255,7 +263,8 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -307,7 +316,8 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -340,7 +350,8 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -363,7 +374,8 @@ describe("Qore SDK", () => {
         actions: { slug?: string };
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -395,7 +407,8 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT",
       getToken: mockGetToken,
       onError: mockOnError
@@ -437,7 +450,8 @@ describe("Qore SDK", () => {
         };
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());
@@ -466,7 +480,8 @@ describe("Qore SDK", () => {
         };
       };
     }>({
-      organisationId: "FAKE_ORG",
+      organizationId: "FAKE_ORG",
+      endpoint: "http://localhost:8080",
       projectId: "FAKE_PROJECT"
     });
     qore.init(fakeProjectSchema());

@@ -6,13 +6,13 @@ import {
   QoreOperation,
   QoreOperationConfig,
   QoreOperationResult,
-  QoreProjectSchema,
   QoreSchema
 } from "../types";
 import debugExchange from "../exchanges/debugExchange";
 import networkExchange from "../exchanges/networkExchange";
 import { ViewDriver } from "./ViewDriver";
 import cacheExchange from "../exchanges/cacheExchange";
+import { QoreProjectSchema } from "@feedloop/qore-sdk";
 
 export type RelationValue = { id: string } | Array<{ id: string }>;
 
@@ -22,8 +22,9 @@ export type QoreRow = { id: string } & Record<
 >;
 
 export type QoreConfig = {
+  endpoint: string;
   projectId: string;
-  organisationId: string;
+  organizationId: string;
   getToken?: () => string | undefined;
   onError?: (error: Error) => void;
 };
@@ -39,8 +40,8 @@ export class QoreProject {
   constructor(config: QoreConfig) {
     this.config = config;
     this.axios = Axios.create({
-      baseURL: `${process.env.QORE_API || "http://localhost:8080"}/orgs/${
-        this.config.organisationId
+      baseURL: `${config.endpoint || "http://localhost:8080"}/orgs/${
+        this.config.organizationId
       }/projects/${this.config.projectId}`
     });
     this.axios.interceptors.request.use(req => {

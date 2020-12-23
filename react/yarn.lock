@@ -935,12 +935,12 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@feedloop/qore-client@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-0.1.2.tgz#532d882e548718a90a0f24f1113626b75be3870e"
-  integrity sha512-7Sko/N+wbR30EO46bSr8CN+nEeOHLBL52+YAVarX5OdlZuSgBBWwMVqoBLq+Vhhf+c3k9DVQtW+FEehActGkXw==
+"@feedloop/qore-client@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-0.1.3.tgz#11e28bdc13aea85fa35f06dc446fbd191586b0f6"
+  integrity sha512-wh2o1AEW+r1SvbrWoivzgJpO2iC8gqB5Cn47BZtdy2mWSucVxqP6wSKvzobZbUi1b49SQ90SYjKX45mB5yv9XA==
   dependencies:
-    "@feedloop/qore-sdk" "^0.1.1"
+    "@feedloop/qore-sdk" "^0.1.2"
     "@types/nock" "^11.1.0"
     axios "^0.21.0"
     immer "^8.0.0"
@@ -950,10 +950,10 @@
     type-fest "^0.20.1"
     wonka "^4.0.15"
 
-"@feedloop/qore-sdk@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-sdk/-/qore-sdk-0.1.1.tgz#74dcf3e5b1b521c3fd7af45ff946b7c7bdf9b589"
-  integrity sha512-jmIot7bN/wz+KIMIZBK5iILL2LYDvKE4K1yE/6c8w2mSB0cdXWor1neCMdLijuFZuyusIxN+Upe+j6X/lYZ9eQ==
+"@feedloop/qore-sdk@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-sdk/-/qore-sdk-0.1.2.tgz#3870c6ef15c548d04b2a88a058c12258a2ab7ba8"
+  integrity sha512-tW0mDq1ep++zN3p6f06qKGj+rAWQDM9+Gv5gwXy7UTE96YzKtws4apI0pyHaRxSN1bISYCi8oxG884GDsmYZtA==
   dependencies:
     axios "^0.21.0"
 

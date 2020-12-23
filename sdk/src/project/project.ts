@@ -28,7 +28,7 @@ import {
   FormSummaryImpl
 } from "./form";
 import { APIWorkflow, Workflow, WorkflowImpl } from "./workflow";
-import { Field } from "./field";
+import { APIField } from "./field";
 
 export type ProjectConfig = {
   organizationId: string;
@@ -37,12 +37,12 @@ export type ProjectConfig = {
 };
 
 export type TableSchema = APITable & {
-  fields: Field[];
+  fields: APIField[];
   forms: Form[];
 };
 
 export type ViewSchema = APIView & {
-  fields: Field[];
+  fields: APIField[];
 };
 
 export type FormSchema = APIForm;
