@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from "axios";
+import { nanoid } from "nanoid";
 import { APIField } from "@feedloop/qore-sdk";
 import {
   QoreOperation,
@@ -186,5 +187,28 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         }),
         {} as RowActions<T["actions"]>
       );
+  }
+  private async generateFileUrl(filename: string): Promise<string> {
+    const axiosConfig: AxiosRequestConfig = {
+      baseURL: this.project.config.endpoint,
+      url: `/orgs/${this.project.config.organizationId}/projects/${this.project.config.projectId}/tables/${this.tableId}/upload-url?fileName=${filename}`,
+      method: "GET"
+    };
+    const result = await this.project.axios(axiosConfig);
+    return result.data.url;
+  }
+  async upload(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file);
+    const [ext] = file.name.split(".").reverse();
+    const uploadUrl = await this.generateFileUrl(`${nanoid()}.${ext}`);
+    const axiosConfig: AxiosRequestConfig = {
+      url: uploadUrl,
+      method: "POST",
+      data: formData
+    };
+    await this.project.axios(axiosConfig);
+    const [url] = uploadUrl.split("?");
+    return url;
   }
 }

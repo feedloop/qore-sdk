@@ -30,9 +30,8 @@ describe("create-project", () => {
       throw error;
     }
 
-    const qoreConfig = fse.readFileSync(
-      path.resolve(process.cwd(), projectName, "qore.config.json"),
-      { encoding: "utf8" }
+    const qoreConfig = await fse.readJson(
+      path.resolve(process.cwd(), projectName, "qore.config.json")
     );
     expect(qoreConfig).toMatchSnapshot();
     await expect(

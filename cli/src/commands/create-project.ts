@@ -75,7 +75,10 @@ export default class CreateProject extends Command {
     });
     config.set("org", org.id);
     config.set("project", projectId);
-    Codegen.writeConfigFile({ ...configs, project: projectId }, destination);
+    await Codegen.writeConfigFile(
+      { ...configs, project: projectId },
+      destination
+    );
     this.log("New project initialized on", destination);
   }
 }

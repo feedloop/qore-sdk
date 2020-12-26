@@ -24,6 +24,7 @@ interface TestSchema extends QoreSchema {
       difficulty: string;
       points: number;
       person: { nodes: Array<{ id: string; displayField: string }> };
+      attachment: string[];
     };
     write: {
       id: string;
@@ -32,6 +33,7 @@ interface TestSchema extends QoreSchema {
       difficulty: string;
       points: number;
       person: string[];
+      attachment: string[];
     };
     params: { slug?: string };
     actions: {};
@@ -44,6 +46,7 @@ describe("Qore SDK", () => {
   const userToken = "3960f3b8-a139-42eb-8295-3d669e4da4c9";
   let projectToken: string | undefined;
   let schema: QoreProjectSchema;
+  let authenticationId: string | undefined;
   const config: QoreConfig = {
     endpoint: "https://p-qore-dot-pti-feedloop.et.r.appspot.com",
     organizationId: "lIdfC42DJCN2XzQ",
@@ -55,6 +58,8 @@ describe("Qore SDK", () => {
     const project = makeProject(config);
     await project.auth.signInWithUserToken(userToken);
     projectToken = project.auth.token()?.replace("Bearer ", "");
+    const authConfig = await project.authConfig();
+    authenticationId = authConfig.password?.id;
     schema = await project.exportSchema();
     completeRecording();
   });
@@ -200,13 +205,14 @@ describe("Qore SDK", () => {
     completeRecording();
   });
 
-  it.skip("authenticate a user", async () => {
+  it("authenticate a user", async () => {
     const { completeRecording } = await recorder("authenticate a user");
     let token: string | undefined = undefined;
     const mockGetToken = jest.fn(() => token);
     const mockOnError = jest.fn(error => {});
     const qore = new QoreClient<TestSchema>({
       ...config,
+      authenticationId,
       getToken: mockGetToken,
       onError: mockOnError
     });
@@ -216,12 +222,8 @@ describe("Qore SDK", () => {
       .toPromise();
     expect(tasks.data).toEqual(undefined);
     expect(tasks.error?.message).toEqual("Request failed with status code 401");
-    try {
-      token = await qore.authenticate("rama@feedloop.io", "123");
-    } catch (error) {
-      console.log(error);
-    }
-    const { data: rows } = await qore.views.toDoDefaultView
+    token = await qore.authenticate("rama@feedloop.io", "123");
+    const { data: rows, error } = await qore.views.toDoDefaultView
       .readRows({ limit: 1 })
       .toPromise();
     expect(rows).not.toEqual(undefined);
@@ -269,10 +271,12 @@ describe("Qore SDK", () => {
       const qore = new QoreClient<TestSchema>(config);
       qore.init(schema);
 
-      const fileUrl = await qore.upload(new File([], "photo.jpg"));
-      expect(fileUrl).toEqual("/upload");
+      const fileUrl = await qore.views.toDoDefaultView.upload(
+        new File([], "photo.jpg")
+      );
+      expect(fileUrl).toEqual("");
     } catch (error) {
-      console.error(error.response.data.errors);
+      console.error(error);
       throw error;
     }
 
