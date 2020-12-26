@@ -23,6 +23,7 @@
     "@types/nock": "^11.1.0",
     "axios": "^0.21.0",
     "immer": "^8.0.0",
+    "nanoid": "^3.1.20",
     "nock": "^13.0.5",
     "nock-record": "^0.3.9",
     "normalizr": "^3.6.1",

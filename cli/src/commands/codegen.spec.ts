@@ -1,5 +1,6 @@
 import { setupRecorder } from "nock-record";
 import fs from "fs";
+import fse from "fs-extra";
 import path from "path";
 import Codegen from "./codegen";
 import config from "../config";
@@ -21,12 +22,13 @@ describe("codegen", () => {
       "3960f3b8-a139-42eb-8295-3d669e4da4c9"
     ]);
     completeRecording();
-    const filename = path.resolve(process.cwd() + "/qore-generated.ts");
+    const qoreGenerated = path.resolve(process.cwd(), "qore-generated.ts");
     expect(
-      fs.readFileSync(filename, {
-        encoding: "utf8"
-      })
+      fse.readFileSync(qoreGenerated, { encoding: "utf-8" })
     ).toMatchSnapshot();
-    fs.unlinkSync(filename);
+    const qoreConfig = path.resolve(process.cwd(), "qore.config.json");
+    expect(await fse.readJSON(qoreConfig)).toMatchSnapshot();
+    const qoreSchema = path.resolve(process.cwd(), "qore-schema.json");
+    expect(await fse.readJSON(qoreSchema)).toMatchSnapshot();
   });
 });

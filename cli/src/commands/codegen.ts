@@ -5,7 +5,7 @@ import { Field } from "@feedloop/qore-sdk";
 import fs from "fs";
 import fse from "fs-extra";
 import path from "path";
-import createProject, {
+import makeProject, {
   FieldType,
   Vield
 } from "@feedloop/qore-sdk/lib/project/index";
@@ -22,15 +22,21 @@ export default class Codegen extends Command {
     ...configFlags
   };
 
-  static writeConfigFile = (configs: CLIConfig, destination?: string) => {
-    const { org, project } = configs;
+  static writeConfigFile = async (configs: CLIConfig, destination?: string) => {
+    const project = makeProject({
+      organizationId: configs.org,
+      projectId: configs.project
+    });
+    await project.auth.signInWithUserToken(configs.token);
+    const authConfig = await project.authConfig();
     fse.writeJSONSync(
       path.resolve(destination || process.cwd(), "qore.config.json"),
       {
         version: "v1",
         endpoint: "https://p-qore-dot-pti-feedloop.et.r.appspot.com",
-        projectId: project,
-        organizationId: org
+        projectId: configs.project,
+        organizationId: configs.org,
+        authenticationId: authConfig.password?.id
       },
       { spaces: 2 }
     );
@@ -174,7 +180,7 @@ export default class Codegen extends Command {
           encoding: "utf8"
         }
       );
-      Codegen.writeConfigFile(configs);
+      await Codegen.writeConfigFile(configs);
     } catch (error) {
       console.error(error.message);
     }

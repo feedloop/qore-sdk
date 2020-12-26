@@ -1,11 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`create-project should be able to export schema 1`] = `
-"{
-  \\"version\\": \\"v1\\",
-  \\"endpoint\\": \\"https://p-qore-dot-pti-feedloop.et.r.appspot.com\\",
-  \\"projectId\\": \\"Gdpqj6tL4AyTQ7o\\",
-  \\"organizationId\\": \\"lIdfC42DJCN2XzQ\\"
+Object {
+  "endpoint": "https://p-qore-dot-pti-feedloop.et.r.appspot.com",
+  "organizationId": "lIdfC42DJCN2XzQ",
+  "projectId": "yrPJtOrQGpdDeFF",
+  "version": "v1",
 }
-"
 `;

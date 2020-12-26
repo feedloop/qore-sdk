@@ -1079,11 +1079,11 @@
         },
         "status": 200,
         "response": {
-            "id": "Gdpqj6tL4AyTQ7o"
+            "id": "yrPJtOrQGpdDeFF"
         },
         "rawHeaders": [
             "Date",
-            "Tue, 22 Dec 2020 03:23:20 GMT",
+            "Wed, 23 Dec 2020 12:30:38 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
             "Content-Length",
@@ -1095,7 +1095,83 @@
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"18-UGUK4l07pzrMrsIbj2GVeIBsoBk\"",
+            "W/\"18-kYBINgnNSUYMXN45uZbsZTqeJ30\"",
+            "Via",
+            "1.1 google",
+            "Alt-Svc",
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "method": "POST",
+        "path": "/orgs/lIdfC42DJCN2XzQ/projects/yrPJtOrQGpdDeFF/authenticate",
+        "body": {
+            "token": "3960f3b8-a139-42eb-8295-3d669e4da4c9"
+        },
+        "status": 200,
+        "response": {
+            "token": "3de55385-a035-4a47-b30f-d65b489d8014"
+        },
+        "rawHeaders": [
+            "Date",
+            "Wed, 23 Dec 2020 12:30:38 GMT",
+            "Content-Type",
+            "application/json; charset=utf-8",
+            "Content-Length",
+            "48",
+            "Vary",
+            "Accept-Encoding",
+            "X-Powered-By",
+            "Express",
+            "Access-Control-Allow-Origin",
+            "*",
+            "ETag",
+            "W/\"30-fA3LwLlwWA4eiNtQGCOrfPVgWCU\"",
+            "Via",
+            "1.1 google",
+            "Alt-Svc",
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "method": "GET",
+        "path": "/orgs/lIdfC42DJCN2XzQ/projects/yrPJtOrQGpdDeFF/authConfig",
+        "body": "",
+        "status": 200,
+        "response": {
+            "qore": {
+                "id": "zeNPYSFcrVOP7XB",
+                "type": "qore",
+                "createdAt": "2020-12-23T12:30:34.642Z",
+                "updatedAt": "2020-12-23T12:30:34.642Z",
+                "table": "member",
+                "identifierField": "email",
+                "roleField": "role"
+            }
+        },
+        "rawHeaders": [
+            "Date",
+            "Wed, 23 Dec 2020 12:30:39 GMT",
+            "Content-Type",
+            "application/json; charset=utf-8",
+            "Content-Length",
+            "187",
+            "Vary",
+            "Accept-Encoding",
+            "X-Powered-By",
+            "Express",
+            "Access-Control-Allow-Origin",
+            "*",
+            "ETag",
+            "W/\"bb-FJXUhfNdSNHL+3HxjLbnlaIhmGU\"",
             "Via",
             "1.1 google",
             "Alt-Svc",

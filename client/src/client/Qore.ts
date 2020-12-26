@@ -25,6 +25,7 @@ export type QoreConfig = {
   endpoint: string;
   projectId: string;
   organizationId: string;
+  authenticationId?: string;
   getToken?: () => string | undefined;
   onError?: (error: Error) => void;
 };
@@ -161,6 +162,9 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
       baseURL: this.project.config.endpoint,
       url: `/project-authenticate/${this.project.config.projectId}`,
       method: "post",
+      headers: {
+        "X-Qore-Authentication": this.project.config.authenticationId
+      },
       data: { identifier: email, password }
     };
     const resp = await this.project.axios.request<{
@@ -225,27 +229,5 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     operation: QoreOperation
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, Data>> {
     return withHelpers(this.executeOperation(operation), this, operation);
-  }
-  private async getUploadUrl(fileName: string): Promise<string> {
-    const axiosConfig: AxiosRequestConfig = {
-      baseURL: this.project.config.endpoint,
-      url: `/orgs/${this.project.config.organizationId}/project/${this.project.config.projectId}/tables/upload-file?fileName=${fileName}`,
-      method: "GET"
-    };
-    const result = await this.project.axios(axiosConfig);
-    return result.data.url;
-  }
-  async upload(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const uploadUrl = await this.getUploadUrl(file.name);
-    const axiosConfig: AxiosRequestConfig = {
-      url: uploadUrl,
-      method: "POST",
-      data: formData
-    };
-    await this.project.axios(axiosConfig);
-    return uploadUrl;
   }
 }
