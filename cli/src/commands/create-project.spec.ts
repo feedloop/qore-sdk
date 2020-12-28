@@ -17,18 +17,13 @@ describe("create-project", () => {
   });
   it("should be able to export schema", async () => {
     const { completeRecording } = await record("create-project");
-    try {
-      await CreateProject.run([
-        "--org",
-        "lIdfC42DJCN2XzQ",
-        "--token",
-        "3960f3b8-a139-42eb-8295-3d669e4da4c9",
-        projectName
-      ]);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+    await CreateProject.run([
+      "--org",
+      "lIdfC42DJCN2XzQ",
+      "--token",
+      "3960f3b8-a139-42eb-8295-3d669e4da4c9",
+      projectName
+    ]);
 
     const qoreConfig = await fse.readJson(
       path.resolve(process.cwd(), projectName, "qore.config.json")

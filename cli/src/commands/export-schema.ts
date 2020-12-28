@@ -34,7 +34,7 @@ export default class ExportSchema extends Command {
     const configs = await promptFlags(flags, ExportSchema.flags);
     const schema = await ExportSchema.getSchema(configs);
     fs.writeFileSync(
-      path.resolve(process.cwd() + "/qore-schema.json"),
+      path.resolve(process.cwd() + "/qore.schema.json"),
       prettier.format(JSON.stringify(schema), { parser: "json" }),
       {
         encoding: "utf8"

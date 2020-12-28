@@ -17,14 +17,12 @@ export default class Codegen extends Command {
       { name: "email", type: "text", message: "Enter your email" },
       { name: "password", type: "password", message: "Enter your password" }
     ]);
-
-    try {
-      const user = makeUser();
-      const token = await user.login(values.email, values.password);
-      config.set("token", token);
-      this.log(`Logged in as ${values.email}`);
-    } catch (error) {
-      this.error("Invalid login credentials", { exit: 100 });
-    }
+    const user = makeUser();
+    const token = await user.login(values.email, values.password);
+    config.set("token", token);
+    const orgs = await user.organizations();
+    const defaultOrg = orgs[0].id;
+    config.set("org", defaultOrg);
+    this.log(`Logged in as ${values.email}`);
   }
 }

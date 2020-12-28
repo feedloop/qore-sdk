@@ -28,7 +28,7 @@ describe("codegen", () => {
     ).toMatchSnapshot();
     const qoreConfig = path.resolve(process.cwd(), "qore.config.json");
     expect(await fse.readJSON(qoreConfig)).toMatchSnapshot();
-    const qoreSchema = path.resolve(process.cwd(), "qore-schema.json");
+    const qoreSchema = path.resolve(process.cwd(), "qore.schema.json");
     expect(await fse.readJSON(qoreSchema)).toMatchSnapshot();
   });
 });
