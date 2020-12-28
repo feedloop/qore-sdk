@@ -1,7 +1,7 @@
 {
   "name": "@feedloop/qore-cli",
   "description": "qore cli",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "Rizki Romadhoni @rrmdn",
   "bin": {
     "qore": "./bin/run"
@@ -53,6 +53,7 @@
     "/bin",
     "/lib",
     "/npm-shrinkwrap.json",
+    "/templates",
     "/oclif.manifest.json"
   ],
   "homepage": "https://github.com/rrmdn/cli",
