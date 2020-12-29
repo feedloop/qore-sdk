@@ -19,6 +19,7 @@ cli-test:
   only:
     refs:
       - merge_requests
+      - master
     changes:
       - cli/**/*
 
@@ -32,6 +33,7 @@ client-test:
   only:
     refs:
       - merge_requests
+      - master
     changes:
       - client/**/*
 
@@ -45,6 +47,7 @@ react-test:
   only:
     refs:
       - merge_requests
+      - master
     changes:
       - react/**/*
 
