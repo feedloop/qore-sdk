@@ -21,6 +21,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   fields: Record<string, APIField> = {};
   project: QoreProject;
   client: QoreClient;
+  actions: RowActions<T["actions"]>;
   constructor(
     client: QoreClient,
     project: QoreProject,
@@ -36,6 +37,37 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       (map, field) => ({ ...map, [field.id]: field }),
       {}
     );
+    this.actions = Object.entries(this.fields)
+      .filter(([_, field]) => field.type === "action")
+      .reduce(
+        (prev, [fieldId]): RowActions<T["actions"]> => ({
+          ...prev,
+          [fieldId]: {
+            trigger: async (rowId, params) => {
+              const axiosConfig: AxiosRequestConfig = {
+                url: `/${this.id}/rows/${rowId}/${fieldId}`,
+                data: params,
+                method: "POST"
+              };
+              const operation: QoreOperation = {
+                key: JSON.stringify(axiosConfig),
+                request: axiosConfig,
+                type: axiosConfig.method,
+                meta: {},
+                pollInterval: 0,
+                networkPolicy: "network-only"
+              };
+              const res = await this.client
+                .execute<{ isExecuted: false }>(operation)
+                .toPromise();
+              if (res.data?.isExecuted) return true;
+              if (res.error) throw res.error;
+              throw new Error("Trigger has failed");
+            }
+          }
+        }),
+        {} as RowActions<T["actions"]>
+      );
   }
   readRows(
     opts: Partial<{ offset: number; limit: number; order: "asc" | "desc" }> &
@@ -155,39 +187,6 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     return row.data;
   }
 
-  rowActions(rowId: string): RowActions<T["actions"]> {
-    return Object.entries(this.fields)
-      .filter(([_, field]) => field.type === "action")
-      .reduce(
-        (prev, [fieldId]) => ({
-          ...prev,
-          [fieldId]: {
-            trigger: async input => {
-              const axiosConfig: AxiosRequestConfig = {
-                url: `/${this.id}/rows/${rowId}/${fieldId}`,
-                data: input,
-                method: "POST"
-              };
-              const operation: QoreOperation = {
-                key: JSON.stringify(axiosConfig),
-                request: axiosConfig,
-                type: axiosConfig.method,
-                meta: {},
-                pollInterval: 0,
-                networkPolicy: "network-only"
-              };
-              const res = await this.client
-                .execute<{ isExecuted: false }>(operation)
-                .toPromise();
-              if (res.data?.isExecuted) return true;
-              if (res.error) throw res.error;
-              throw new Error("Trigger has failed");
-            }
-          }
-        }),
-        {} as RowActions<T["actions"]>
-      );
-  }
   private async generateFileUrl(filename: string): Promise<string> {
     const axiosConfig: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,

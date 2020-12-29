@@ -243,9 +243,10 @@ describe("Qore SDK", () => {
       .toPromise();
     const id = rows?.nodes[0].id || "";
     await expect(
-      qore.views.memberDefaultView
-        .rowActions(id)
-        .addTask.trigger({ task: "new task", description: "new task desc" })
+      qore.views.memberDefaultView.actions.addTask.trigger(id, {
+        task: "new task",
+        description: "new task desc"
+      })
     ).resolves.toEqual(true);
     completeRecording();
   });
@@ -258,9 +259,10 @@ describe("Qore SDK", () => {
     qore.init(schema);
 
     await expect(
-      qore.views.memberDefaultView
-        .rowActions("this id does not exist")
-        .addTask.trigger({ task: "new task", description: "new task desc" })
+      qore.views.memberDefaultView.actions.addTask.trigger(
+        "this id does not exist",
+        { task: "new task", description: "new task desc" }
+      )
     ).rejects.toThrow("Trigger has failed");
     completeRecording();
   });
