@@ -5,16 +5,12 @@ exports[`codegen should be able to generate codegen 1`] = `
   id: string;
   email: string;
   role: { id: string; displayField: string };
-  toDo: ToDoTableRow[];
+  toDo: { nodes: ToDoTableRow[] };
   totalTask: number;
   totalPoint: number;
   totalHardTask: number;
-  createTask: action;
-  addTask: action;
   taskDone: number;
-  insertTask: action;
-  password: password;
-  createTask2: action;
+  password: string;
 };
 
 type ToDoTableRow = {
@@ -23,12 +19,12 @@ type ToDoTableRow = {
   description: string;
   done: boolean;
   points: number;
-  deadline: date;
-  difficulty: select;
-  person: PersonTableRow[];
-  role: lookup;
-  attachment: file;
-  timeAllocation: formula;
+  deadline: Date;
+  difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
+  person: { nodes: MemberTableRow[] };
+  role: { id: string; displayField: string };
+  attachment: string;
+  timeAllocation: string;
 };
 
 type DoneViewRow = {
@@ -38,16 +34,17 @@ type DoneViewRow = {
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
+    deadline: Date;
   };
   write: {
     task: string;
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
+    deadline: Date;
   };
   params: {};
+  actions: {};
 };
 
 type MemberDefaultViewViewRow = {
@@ -55,17 +52,27 @@ type MemberDefaultViewViewRow = {
     id: string;
     email: string;
     role: { id: string; displayField: string };
-    createTask: action;
-    addTask: action;
-    insertTask: action;
-    password: password;
-    createTask2: action;
+    password: string;
   };
   write: {
     email: string;
-    password: password;
+    password: string;
   };
   params: {};
+  actions: {
+    createTask: {
+      task?: string;
+      description?: string;
+    };
+    addTask: {
+      task?: string;
+      description?: string;
+    };
+    insertTask: {};
+    createTask2: {
+      task?: string;
+    };
+  };
 };
 
 type MemberMetricViewRow = {
@@ -84,6 +91,7 @@ type MemberMetricViewRow = {
   params: {
     email: string;
   };
+  actions: {};
 };
 
 type RamasTaskViewRow = {
@@ -93,24 +101,25 @@ type RamasTaskViewRow = {
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
-    person: PersonTableRow[];
-    role: lookup;
-    attachment: file;
-    timeAllocation: formula;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
+    person: { nodes: MemberTableRow[] };
+    role: { id: string; displayField: string };
+    attachment: string;
+    timeAllocation: string;
   };
   write: {
     task: string;
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
     person: string[];
-    attachment: file;
+    attachment: string;
   };
   params: {};
+  actions: {};
 };
 
 type ReisTaskViewRow = {
@@ -120,26 +129,27 @@ type ReisTaskViewRow = {
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
-    person: PersonTableRow[];
-    role: lookup;
-    attachment: file;
-    timeAllocation: formula;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
+    person: { nodes: MemberTableRow[] };
+    role: { id: string; displayField: string };
+    attachment: string;
+    timeAllocation: string;
   };
   write: {
     task: string;
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
     person: string[];
-    attachment: file;
+    attachment: string;
   };
   params: {
     timeAllocation?: string;
   };
+  actions: {};
 };
 
 type TestViewRow = {
@@ -153,6 +163,7 @@ type TestViewRow = {
     description: string;
   };
   params: {};
+  actions: {};
 };
 
 type ToDoViewRow = {
@@ -162,16 +173,17 @@ type ToDoViewRow = {
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
+    deadline: Date;
   };
   write: {
     task: string;
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
+    deadline: Date;
   };
   params: {};
+  actions: {};
 };
 
 type ToDoDefaultViewViewRow = {
@@ -181,26 +193,27 @@ type ToDoDefaultViewViewRow = {
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
-    person: PersonTableRow[];
-    role: lookup;
-    timeAllocation: formula;
-    attachment: file;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
+    person: { nodes: MemberTableRow[] };
+    role: { id: string; displayField: string };
+    timeAllocation: string;
+    attachment: string;
   };
   write: {
     task: string;
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
     person: string[];
-    attachment: file;
+    attachment: string;
   };
   params: {
     \\"$by.points\\"?: \\"desc\\";
   };
+  actions: {};
 };
 
 type UndoneViewRow = {
@@ -210,26 +223,27 @@ type UndoneViewRow = {
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
-    person: PersonTableRow[];
-    role: lookup;
-    attachment: file;
-    timeAllocation: formula;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
+    person: { nodes: MemberTableRow[] };
+    role: { id: string; displayField: string };
+    attachment: string;
+    timeAllocation: string;
   };
   write: {
     task: string;
     description: string;
     done: boolean;
     points: number;
-    deadline: date;
-    difficulty: select;
+    deadline: Date;
+    difficulty: \\"Easy\\" | \\"Medium\\" | \\"Hard\\";
     person: string[];
-    attachment: file;
+    attachment: string;
   };
   params: {
     undone?: string;
   };
+  actions: {};
 };
 
 export type QoreProjectSchema = {

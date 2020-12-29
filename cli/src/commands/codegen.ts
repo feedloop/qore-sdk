@@ -57,15 +57,31 @@ export default class Codegen extends Command {
   readFieldType(field: Field | Vield) {
     switch (field.type) {
       case "text":
+      case "file":
+      case "password":
         return "string";
       case "role":
         return "{id: string; displayField: string}";
       case "relation":
-        return `${voca.capitalize(field.id)}TableRow${
-          field.multiple ? "[]" : ""
-        }`;
+        if (field.multiple)
+          return `{nodes: ${voca.capitalize(
+            field.id === "person" ? "member" : field.id
+          )}TableRow[]}`;
+        return `${voca.capitalize(
+          field.id === "person" ? "member" : field.id
+        )}TableRow${field.multiple ? "[]" : ""}`;
       case "rollup":
         return "number";
+      case "date":
+        return "Date";
+      case "select":
+        return field.select.map(select => `"${select}"`).join("|");
+      case "lookup":
+      case "formula":
+        if (field.returnType === "table")
+          return "{id: string; displayField: string}";
+        if (field.returnType === "text") return "string";
+        return field.returnType;
       default:
         return field.type;
     }
@@ -73,10 +89,16 @@ export default class Codegen extends Command {
   writeFieldType(field: Field | Vield) {
     switch (field.type) {
       case "text":
+      case "file":
+      case "password":
       case "role":
         return "string";
       case "relation":
         return "string[]";
+      case "date":
+        return "Date";
+      case "select":
+        return field.select.map(select => `"${select}"`).join("|");
       default:
         return field.type;
     }
@@ -104,6 +126,7 @@ export default class Codegen extends Command {
         .map(
           ({ id, fields }) => `
             type ${voca.capitalize(id)}TableRow = {${[idField, ...fields]
+            .filter(field => field.type !== "action")
             .map(
               field => `
             ${field.id}: ${this.readFieldType(field)};`
@@ -117,6 +140,7 @@ export default class Codegen extends Command {
         ({ id, parameters, sorts, fields }) => `
           type ${voca.capitalize(id)}ViewRow = {
             read: {${[idField, ...fields]
+              .filter(field => field.type !== "action")
               .map(
                 field => `
             ${field.id}: ${this.readFieldType(field)};`
@@ -162,6 +186,21 @@ export default class Codegen extends Command {
                       .join("|")};`
                 )
                 .join("")}
+            }
+            actions: {${fields
+              .filter(
+                (vield): vield is Field<"action"> => vield.type === "action"
+              )
+              .map(
+                action => `${action.id}: {
+                ${action.parameters.map(
+                  param =>
+                    `${param.slug}${!param.required && "?"}: ${
+                      param.type === "text" ? "string" : param.type
+                    }`
+                )}
+              }`
+              )}
             }
           }`
       )
