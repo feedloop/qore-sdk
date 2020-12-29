@@ -284,4 +284,46 @@ describe("Qore SDK", () => {
 
     completeRecording();
   });
+
+  it("add & remove relation", async () => {
+    const { completeRecording } = await recorder("add & remove relation");
+    const qore = new QoreClient<TestSchema>(config);
+    qore.init(schema);
+    const { data: members } = await qore.views.memberDefaultView
+      .readRows({ limit: 1 })
+      .toPromise();
+    const member = members?.nodes[0];
+    if (!member) throw new Error("No member");
+    const { id: taskId } = await qore.views.toDoDefaultView.insertRow({
+      task: "New task",
+      difficulty: "Easy"
+    });
+    const { data: task } = await qore.views.toDoDefaultView
+      .readRow(taskId, { networkPolicy: "network-only" })
+      .toPromise();
+    expect(task?.person.nodes).toEqual([]);
+    await qore.views.toDoDefaultView.addRelation(taskId, {
+      person: [member.id]
+    });
+    const {
+      data: taskWithPerson
+    } = await qore.views.toDoDefaultView
+      .readRow(taskId, { networkPolicy: "network-only" })
+      .toPromise();
+    if (!taskWithPerson) throw new Error("No taskWithPerson");
+    expect(taskWithPerson?.person.nodes[0].id).toEqual(member.id);
+    await qore.views.toDoDefaultView.removeRelation(taskWithPerson?.id, {
+      person: [taskWithPerson.person.nodes[0].id]
+    });
+
+    const {
+      data: taskWithoutPerson
+    } = await qore.views.toDoDefaultView
+      .readRow(taskId, { networkPolicy: "network-only" })
+      .toPromise();
+
+    expect(taskWithoutPerson?.person.nodes).toEqual([]);
+
+    completeRecording();
+  });
 });

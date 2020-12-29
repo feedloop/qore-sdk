@@ -14,6 +14,7 @@ import QoreClient, {
   PromisifiedSource,
   defaultOperationConfig
 } from "./Qore";
+import { ConditionalPick, ConditionalExcept } from "type-fest";
 
 export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   id: string;
@@ -108,30 +109,13 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     };
     return this.client.execute(operation);
   }
-  async updateRow(id: string, input: Partial<T["write"]>): Promise<T["read"]> {
-    const inputs = Object.entries(input);
-    const nonRelational = inputs
-      .filter(([key]) => {
-        return this.fields[key].type !== "relation";
-      })
-      .reduce(
-        (obj, [key, value]): Record<string, any> => ({ ...obj, [key]: value }),
-        {}
-      );
-    const relational = inputs
-      .filter(([key]) => {
-        const fieldDef = this.fields[key];
-        return fieldDef.type === "relation";
-      })
-      .reduce((acc, [key, value]: [string, RelationValue]) => {
-        return {
-          ...acc,
-          [key]: Array.isArray(value) ? value.map(val => val.id) : value.id
-        };
-      }, {});
+  async updateRow(
+    id: string,
+    input: Partial<ConditionalExcept<T["write"], string[]>>
+  ): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/${this.id}/rows/${id}`,
-      data: { ...nonRelational, ...relational },
+      data: input,
       method: "PATCH"
     };
     const operation: QoreOperation = {
@@ -142,7 +126,10 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       pollInterval: 0,
       networkPolicy: "network-only"
     };
-    await this.client.execute(operation).toPromise();
+    const { error: patchError } = await this.client
+      .execute(operation)
+      .toPromise();
+    if (patchError) throw patchError;
     const row = await this.readRow(id).toPromise();
     if (!row.data) throw row.error;
     return row.data;
@@ -164,7 +151,9 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     if (res.error) throw res.error;
     return true;
   }
-  async insertRow(input: Partial<T["write"]>): Promise<T["read"]> {
+  async insertRow(
+    input: Partial<ConditionalExcept<T["write"], string[]>>
+  ): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/${this.id}/rows`,
       data: input,
@@ -185,6 +174,43 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const row = await this.readRow(result.data.id).toPromise();
     if (!row.data) throw row.error;
     return row.data;
+  }
+
+  async addRelation(
+    rowId: string,
+    relations: Partial<ConditionalPick<T["write"], string[]>>
+  ): Promise<boolean> {
+    await Promise.all(
+      Object.entries(relations).flatMap(([field, values]) => {
+        return (values as string[]).map(value => {
+          const axiosConfig: AxiosRequestConfig = {
+            baseURL: this.project.config.endpoint,
+            url: `/orgs/${this.project.config.organizationId}/projects/${this.project.config.projectId}/tables/${this.tableId}/rows/${rowId}/relation/${field}`,
+            method: "POST",
+            data: { value }
+          };
+          return this.project.axios(axiosConfig);
+        });
+      })
+    );
+    return true;
+  }
+
+  async removeRelation(
+    rowId: string,
+    relations: Partial<ConditionalPick<T["write"], string[]>>
+  ): Promise<boolean> {
+    await Promise.all(
+      Object.entries(relations).map(([field, relationId]) => {
+        const axiosConfig: AxiosRequestConfig = {
+          baseURL: this.project.config.endpoint,
+          url: `/orgs/${this.project.config.organizationId}/projects/${this.project.config.projectId}/tables/${this.tableId}/rows/${rowId}/relation/${field}/${relationId}`,
+          method: "DELETE"
+        };
+        return this.project.axios(axiosConfig);
+      })
+    );
+    return true;
   }
 
   private async generateFileUrl(filename: string): Promise<string> {
