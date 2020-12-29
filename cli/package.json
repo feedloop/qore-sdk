@@ -1,7 +1,7 @@
 {
   "name": "@feedloop/qore-cli",
   "description": "qore cli",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": "Rizki Romadhoni @rrmdn",
   "bin": {
     "qore": "./bin/run"
