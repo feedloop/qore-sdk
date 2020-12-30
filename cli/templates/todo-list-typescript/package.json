@@ -8,11 +8,16 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@feedloop/qore-client": "^0.1.12",
+    "@feedloop/qore-react": "^0.1.11",
     "next": "latest",
     "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react-dom": "^16.12.0",
+    "todomvc-app-css": "^2.3.0",
+    "todomvc-common": "^1.0.5"
   },
   "devDependencies": {
+    "@feedloop/qore-cli": "^0.1.7",
     "@types/node": "^12.12.21",
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",

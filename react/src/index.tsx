@@ -21,6 +21,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
     opts?: {
       limit?: number;
       offset?: number;
+      order?: "asc" | "desc";
     } & T["params"],
     config?: Partial<QoreOperationConfig>
   ) => {
@@ -41,13 +42,13 @@ type QoreHooks<T extends QoreSchema[string]> = {
   };
 
   useInsertRow: () => {
-    insertRow: (data: T["write"]) => Promise<T["read"]>;
+    insertRow: (data: Partial<T["write"]>) => Promise<T["read"]>;
     status: QoreRequestStatus;
     error: Error | null;
   };
 
   useUpdateRow: () => {
-    updateRow: (rowId: string, data: T["write"]) => Promise<T["read"]>;
+    updateRow: (rowId: string, data: Partial<T["write"]>) => Promise<T["read"]>;
     status: QoreRequestStatus;
     error: Error | null;
   };
@@ -87,33 +88,30 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
           const [error, setError] = React.useState<Error | null>(null);
 
-          const streamRef = React.useRef<ReturnType<ViewDriver["readRows"]>>(
-            qoreClient.views[currentViewId].readRows(opts, config)
+          const stream = React.useMemo(
+            () => qoreClient.views[currentViewId].readRows(opts, config),
+            [JSON.stringify(opts), JSON.stringify(config)]
           );
-
-          const revalidate = streamRef.current?.revalidate;
 
           React.useEffect(() => {
             setStatus("loading");
-            const subscription = streamRef.current?.subscribe(
-              ({ error, data }) => {
-                if (error) {
-                  setError(error);
-                  setStatus("error");
-                }
-                if (data) {
-                  setError(null);
-                  setData(data.nodes);
-                  setStatus("success");
-                }
+            const subscription = stream.subscribe(({ error, data }) => {
+              if (error) {
+                setError(error);
+                setStatus("error");
               }
-            );
+              if (data) {
+                setError(null);
+                setData(data.nodes);
+                setStatus("success");
+              }
+            });
             return () => {
               subscription?.unsubscribe();
             };
-          }, [opts]);
+          }, [stream]);
 
-          return { data, error, status, revalidate };
+          return { data, error, status, revalidate: stream.revalidate };
         },
 
         useGetRow: (rowId, config) => {
@@ -156,7 +154,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
           const [error, setError] = React.useState<Error | null>(null);
 
-          const insertRow = async (data: ProjectSchema[string]["write"]) => {
+          const insertRow = async (
+            data: Partial<ProjectSchema[string]["write"]>
+          ) => {
             try {
               setStatus("loading");
               const result = await qoreClient.views[currentViewId].insertRow(
@@ -180,7 +180,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
           const updateRow = async (
             rowId: string,
-            data: ProjectSchema[string]["write"]
+            data: Partial<ProjectSchema[string]["write"]>
           ) => {
             try {
               setStatus("loading");

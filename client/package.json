@@ -1,6 +1,6 @@
 {
   "name": "@feedloop/qore-client",
-  "version": "0.1.4",
+  "version": "0.1.12",
   "main": "lib/index.js",
   "license": "MIT",
   "files": [

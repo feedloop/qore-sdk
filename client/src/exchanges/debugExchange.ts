@@ -1,4 +1,4 @@
-import Wonka from "wonka";
+import * as Wonka from "wonka";
 import { ExchangeIO } from "../types";
 
 const debugExchange: ExchangeIO = ops => {

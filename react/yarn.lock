@@ -935,10 +935,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@feedloop/qore-client@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-0.1.4.tgz#f2e1a9f7c1839c8a719594f7c5b65a67e6addf63"
-  integrity sha512-ALMbcB67JvmZsULYRURxbsYglodO/dw7XcxDiLl9lX+Xi7yMCLzSMe6oSPDfTxe+cGxn1c+n0jq+xe1X8RVDUw==
+"@feedloop/qore-client@^0.1.12":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-0.1.12.tgz#e491b04605860f11c086233748fe41db88c213f4"
+  integrity sha512-Fz49vhkbc6B2sQ5S8ihDG1LjGzxJDWg4FnF9EO1WHwQsNAnp5g7pcexkdVanI7E5FIq3iFGRG1ClKhgcujbjKw==
   dependencies:
     "@feedloop/qore-sdk" "^0.1.2"
     "@types/nock" "^11.1.0"

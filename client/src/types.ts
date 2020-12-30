@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import Wonka from "wonka";
+import * as Wonka from "wonka";
 import QoreClient from "./client/Qore";
 import { APIField } from "@feedloop/qore-sdk";
 

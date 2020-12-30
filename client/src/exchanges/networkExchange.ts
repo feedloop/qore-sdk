@@ -1,5 +1,5 @@
 import Axios, { AxiosRequestConfig } from "axios";
-import Wonka from "wonka";
+import * as Wonka from "wonka";
 import QoreClient from "../client/Qore";
 import {
   Exchange,

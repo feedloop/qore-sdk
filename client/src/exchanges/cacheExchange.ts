@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import Wonka from "wonka";
+import * as Wonka from "wonka";
 import { Exchange, QoreOperation, QoreOperationResult } from "../types";
 
 const cachedOperations = new Set<QoreOperation["type"]>(["GET", "get"]);

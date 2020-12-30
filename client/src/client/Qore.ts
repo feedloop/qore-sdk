@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import Wonka, { merge } from "wonka";
+import * as Wonka from "wonka";
 import {
   Exchange,
   ExchangeInput,
@@ -219,7 +219,10 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
 
     if (operation.pollInterval > 0) {
       return Wonka.pipe(
-        merge([Wonka.fromValue(0), Wonka.interval(operation.pollInterval)]),
+        Wonka.merge([
+          Wonka.fromValue(0),
+          Wonka.interval(operation.pollInterval)
+        ]),
         Wonka.switchMap(() => resultStream)
       );
     }
