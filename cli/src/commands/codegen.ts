@@ -222,6 +222,7 @@ export default class Codegen extends Command {
       await Codegen.writeConfigFile(configs);
     } catch (error) {
       console.error(error.message);
+      throw error;
     }
   }
 }
