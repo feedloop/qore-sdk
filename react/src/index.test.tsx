@@ -10,7 +10,7 @@ const createNewQoreContext = () => {
       write: { title: string };
       params: { slug?: string };
       actions: {
-        finishTask: {};
+        finishTask: { notes?: string };
       };
     };
   }>({
@@ -81,22 +81,20 @@ beforeEach(() => {
 
 describe("useListRow", () => {
   it("should fetch data successfully", async () => {
-    scope = scope
-      .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows")
-      .reply(200, {
-        nodes: [
-          {
-            id: "25b0cccf-4851-43e2-80c7-f68e7883dbd6",
-            user: {
-              id: "9275e876-fd95-45a0-ad67-b947a1296c32",
-              displayField: "rrmdn@pm.me"
-            },
-            name: "Meeting 1",
-            done: true
-          }
-        ],
-        totalCount: "1"
-      });
+    scope = scope.get("/FAKE_PROJECT/allTasks/rows").reply(200, {
+      nodes: [
+        {
+          id: "25b0cccf-4851-43e2-80c7-f68e7883dbd6",
+          user: {
+            id: "9275e876-fd95-45a0-ad67-b947a1296c32",
+            displayField: "rrmdn@pm.me"
+          },
+          name: "Meeting 1",
+          done: true
+        }
+      ],
+      totalCount: "1"
+    });
 
     const qoreContext = createNewQoreContext();
 
@@ -124,9 +122,7 @@ describe("useListRow", () => {
   });
 
   it("should get error message if network failed", async () => {
-    scope = scope
-      .get("/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows")
-      .reply(500, undefined);
+    scope = scope.get("/FAKE_PROJECT/allTasks/rows").reply(500, undefined);
 
     const qoreContext = createNewQoreContext();
 
@@ -148,9 +144,7 @@ describe("useListRow", () => {
 describe("useGetRow", () => {
   it("should fetch data successfully", async () => {
     scope = scope
-      .get(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .get("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
         description: null,
@@ -184,9 +178,7 @@ describe("useGetRow", () => {
 
   it("should get error message if network failed", async () => {
     scope = scope
-      .get(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .get("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(500, undefined);
 
     const qoreContext = createNewQoreContext();
@@ -211,20 +203,16 @@ describe("useGetRow", () => {
 describe("useInsertRow", () => {
   it("should insert new row, write, and read from cache", async () => {
     scope = scope
-      .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows")
+      .post("/FAKE_PROJECT/allTasks/rows")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       })
-      .get(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .get("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
         title: "New task"
       })
-      .get(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .get("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
         title: "New task"
@@ -256,9 +244,7 @@ describe("useInsertRow", () => {
   });
 
   it("should get error message if network failed", async () => {
-    scope = scope
-      .post("/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows")
-      .reply(500, undefined);
+    scope = scope.post("/FAKE_PROJECT/allTasks/rows").reply(500, undefined);
 
     const qoreContext = createNewQoreContext();
     const { result } = renderHook(() =>
@@ -279,16 +265,12 @@ describe("useInsertRow", () => {
 describe("useUpdateRow", () => {
   it("should update row", async () => {
     scope = scope
-      .get(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .get("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(200, {
         id: "beba4104-44ee-46b2-9ddc-e6bfd0a1570f",
         title: "Old task"
       })
-      .patch(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .patch("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(200, { ok: true });
 
     const qoreContext = createNewQoreContext();
@@ -310,13 +292,9 @@ describe("useUpdateRow", () => {
 
   it("should get error message if network failed", async () => {
     scope = scope
-      .get(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/views/allTasks/v2rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .get("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(500, undefined)
-      .patch(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      .patch("/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
       .reply(500, undefined);
 
     const qoreContext = createNewQoreContext();
@@ -341,7 +319,7 @@ describe("useDeleteRow", () => {
   it("should delete row", async () => {
     scope = scope
       .delete(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+        "/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
       .reply(200, { ok: true });
 
@@ -364,7 +342,7 @@ describe("useDeleteRow", () => {
   it("should get error message if network failed", async () => {
     scope = scope
       .delete(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+        "/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
       )
       .reply(500);
 
@@ -388,9 +366,9 @@ describe("useActions", () => {
   it("should trigger action", async () => {
     scope = scope
       .post(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
+        "/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/finishTask"
       )
-      .reply(200, { ok: true });
+      .reply(200, { isExecuted: true });
 
     const qoreContext = createNewQoreContext();
 
@@ -403,7 +381,7 @@ describe("useActions", () => {
     expect(result.current.statuses.finishTask).toEqual("idle");
     await act(async () => {
       await expect(
-        result.current.rowActions.finishTask.trigger({})
+        result.current.rowActions.finishTask.trigger({ notes: "some notes" })
       ).resolves.toEqual(true);
     });
     expect(result.current.statuses.finishTask).toEqual("success");
@@ -412,7 +390,7 @@ describe("useActions", () => {
   it("should get error message if network failed", async () => {
     scope = scope
       .post(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/action/finishTask"
+        "/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/finishTask"
       )
       .reply(500);
 

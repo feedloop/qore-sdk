@@ -4,10 +4,17 @@ import {
   QoreClient,
   ViewDriver,
   QoreOperationConfig,
-  RowActions
+  RowActions,
+  QoreViewSchema
 } from "@feedloop/qore-client";
 
 type QoreRequestStatus = "idle" | "loading" | "success" | "error";
+
+export declare type RowActionsHooks<T extends QoreViewSchema["actions"]> = {
+  [K in keyof T]: {
+    trigger: (params: T[K]) => Promise<boolean>;
+  };
+};
 
 type QoreHooks<T extends QoreSchema[string]> = {
   useListRow: (
@@ -54,7 +61,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
   useActions: (
     rowId: string
   ) => {
-    rowActions: RowActions<T["actions"]>;
+    rowActions: RowActionsHooks<T["actions"]>;
     statuses: Record<keyof RowActions<T["actions"]>, QoreRequestStatus>;
     errors: Record<keyof RowActions<T["actions"]>, Error | null>;
   };
@@ -216,9 +223,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         },
 
         useActions: rowId => {
-          const qoreClientRowActions = qoreClient.views[
-            currentViewId
-          ].rowActions(rowId);
+          const qoreClientRowActions = qoreClient.views[currentViewId].actions;
 
           const [statuses, setStatuses] = React.useState<
             Record<keyof RowActions<ProjectSchema>, QoreRequestStatus>
@@ -239,24 +244,31 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           );
 
           const rowActions = Object.entries(qoreClientRowActions).reduce(
-            (prev, [fieldId, action]) => ({
+            (
+              prev,
+              [fieldId, action]: [
+                string,
+                RowActions<ProjectSchema[string]["actions"]>[string]
+              ]
+            ) => ({
               ...prev,
               [fieldId]: {
                 trigger: async input => {
                   try {
                     setStatuses({ ...statuses, [fieldId]: "loading" });
-                    const result = await action.trigger(input);
+                    const result = await action.trigger(rowId, input);
                     setStatuses({ ...statuses, [fieldId]: "success" });
                     setErrors({ ...errors, [fieldId]: null });
                     return result;
                   } catch (newError) {
                     setStatuses({ ...statuses, [fieldId]: "error" });
                     setErrors({ ...errors, [fieldId]: newError });
+                    return false;
                   }
                 }
               }
             }),
-            {} as RowActions<ProjectSchema[string]["actions"]>
+            {} as RowActionsHooks<ProjectSchema[string]["actions"]>
           );
 
           return {
