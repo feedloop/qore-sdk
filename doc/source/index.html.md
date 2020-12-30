@@ -425,6 +425,82 @@ Update a data of `allTasks` view with an id of _some-task-id_.
 
 `data` must be compliant to the schema of the view, excluding the `id` field.
 
+## Add & remove relationships
+
+```javascript
+await client.views.allTasks.addRelation(taskId, {
+  person: [member.id],
+  links: links.map(link => link.id)
+});
+
+await client.views.allTasks.removeRelation(taskId, {
+  person: [member.id]
+});
+```
+
+```jsx
+import qoreContext from "./qoreContext";
+
+const Component = () => {
+  const [removeRelation, status] = qoreContext.allTasks.removeRelation(taskId);
+  const [addRelation, status] = qoreContext.allTasks.addRelation(taskId);
+  return (
+    <div>
+      <button
+        onClick={async () => {
+          await addRelation({
+            person: [member.id],
+            links: links.map(link => link.id)
+          });
+        }}
+      >
+        add relation
+      </button>
+      <button
+        onClick={async () => {
+          await removeRelation({ person: [member.id] });
+        }}
+      >
+        remove relation
+      </button>
+    </div>
+  );
+};
+```
+
+Both `addRelation` and `removeRelation` accept the `id` of the target row, followed by an object with the key being the relation name and the value is an array of reference id of the relationship.
+
+In this example we are adding `member.id` to the relationship of a specific row on the `allTasks` view and then removing it.
+
+## Update a row
+
+```javascript
+await client.views.allTasks.updateRow("some-task-id", {
+  ...data
+});
+```
+
+```jsx
+import qoreContext from "./qoreContext";
+
+const Component = () => {
+  const [updateRow, status] = qoreContext.allTasks.useUpdateRow();
+  return (
+    <button
+      onClick={async () => {
+        await updateRow("some-task-id", { ...data });
+      }}
+    >
+      update
+    </button>
+  );
+};
+```
+
+Update a data of `allTasks` view with an id of _some-task-id_.
+
+`data` must be compliant to the schema of the view, excluding the `id` field.
+
 ## Upload a file
 
 ```javascript
