@@ -1,7 +1,7 @@
 {
   "name": "@feedloop/qore-cli",
   "description": "qore cli",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "author": "Rizki Romadhoni @rrmdn",
   "bin": {
     "qore": "./bin/run"
@@ -78,7 +78,7 @@
     "qore": "DEBUG=@feedloop/qore-cli ./bin/run",
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "yarn jest --testTimeout 20000",
+    "test": "yarn jest --testTimeout 20000 -i",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts"

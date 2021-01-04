@@ -9,18 +9,18 @@ exports[`export-schema should be able to export schema 1`] = `
       \\"id\\": \\"member\\",
       \\"fields\\": [
         {
-          \\"name\\": \\"email\\",
-          \\"type\\": \\"text\\",
-          \\"deletionProtection\\": true,
-          \\"id\\": \\"email\\",
-          \\"displayField\\": true
-        },
-        {
           \\"name\\": \\"role\\",
           \\"type\\": \\"role\\",
           \\"deletionProtection\\": true,
           \\"id\\": \\"role\\",
           \\"displayField\\": false
+        },
+        {
+          \\"name\\": \\"email\\",
+          \\"type\\": \\"text\\",
+          \\"deletionProtection\\": true,
+          \\"id\\": \\"email\\",
+          \\"displayField\\": true
         },
         {
           \\"name\\": \\"To Do\\",
@@ -102,17 +102,6 @@ exports[`export-schema should be able to export schema 1`] = `
           \\"displayField\\": false
         },
         {
-          \\"name\\": \\"Task Done\\",
-          \\"type\\": \\"rollup\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"taskDone\\",
-          \\"source\\": \\"toDo\\",
-          \\"destinations\\": [\\"id\\"],
-          \\"aggregate\\": \\"count\\",
-          \\"condition\\": \\"done = 'TRUE'\\",
-          \\"displayField\\": false
-        },
-        {
           \\"name\\": \\"Insert Task\\",
           \\"type\\": \\"action\\",
           \\"deletionProtection\\": false,
@@ -137,7 +126,8 @@ exports[`export-schema should be able to export schema 1`] = `
           \\"name\\": \\"Password\\",
           \\"type\\": \\"password\\",
           \\"deletionProtection\\": false,
-          \\"id\\": \\"password\\"
+          \\"id\\": \\"password\\",
+          \\"displayField\\": false
         },
         {
           \\"name\\": \\"CreateTask2\\",
@@ -153,6 +143,26 @@ exports[`export-schema should be able to export schema 1`] = `
             }
           ],
           \\"condition\\": null,
+          \\"displayField\\": false
+        },
+        {
+          \\"name\\": \\"Task Done\\",
+          \\"type\\": \\"rollup\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"taskDone\\",
+          \\"source\\": \\"toDo\\",
+          \\"destinations\\": [\\"id\\"],
+          \\"aggregate\\": \\"count\\",
+          \\"condition\\": \\"done = 'TRUE'\\",
+          \\"displayField\\": false
+        },
+        {
+          \\"name\\": \\"Undone task\\",
+          \\"type\\": \\"formula\\",
+          \\"deletionProtection\\": false,
+          \\"id\\": \\"undoneTask\\",
+          \\"formula\\": \\"totalTask - taskDone\\",
+          \\"returnType\\": \\"number\\",
           \\"displayField\\": false
         }
       ]
@@ -247,8 +257,100 @@ exports[`export-schema should be able to export schema 1`] = `
     }
   ],
   \\"roles\\": [
-    { \\"id\\": \\"6Hc0YGiQGoc3Huf\\", \\"name\\": \\"admin\\", \\"isAdmin\\": true },
-    { \\"id\\": \\"1gjCDJq3oX0I6RZ\\", \\"name\\": \\"Fullstack\\", \\"isAdmin\\": false }
+    {
+      \\"name\\": \\"admin\\",
+      \\"isAdmin\\": true,
+      \\"isEditor\\": false,
+      \\"isPublic\\": false,
+      \\"permissions\\": []
+    },
+    {
+      \\"name\\": \\"Fullstack\\",
+      \\"isAdmin\\": false,
+      \\"isEditor\\": false,
+      \\"isPublic\\": false,
+      \\"permissions\\": [
+        {
+          \\"insert\\": true,
+          \\"select\\": true,
+          \\"update\\": true,
+          \\"delete\\": true,
+          \\"viewId\\": \\"toDo\\"
+        },
+        {
+          \\"insert\\": true,
+          \\"select\\": true,
+          \\"update\\": true,
+          \\"delete\\": true,
+          \\"viewId\\": \\"toDoDefaultView\\"
+        },
+        {
+          \\"insert\\": true,
+          \\"select\\": true,
+          \\"update\\": true,
+          \\"delete\\": true,
+          \\"viewId\\": \\"done\\"
+        },
+        {
+          \\"insert\\": true,
+          \\"select\\": true,
+          \\"update\\": true,
+          \\"delete\\": true,
+          \\"viewId\\": \\"memberDefaultView\\"
+        },
+        {
+          \\"insert\\": true,
+          \\"select\\": true,
+          \\"update\\": true,
+          \\"delete\\": true,
+          \\"viewId\\": \\"test\\"
+        }
+      ]
+    },
+    {
+      \\"name\\": \\"anonymous\\",
+      \\"isAdmin\\": false,
+      \\"isEditor\\": false,
+      \\"isPublic\\": false,
+      \\"permissions\\": [
+        {
+          \\"insert\\": false,
+          \\"select\\": false,
+          \\"update\\": false,
+          \\"delete\\": false,
+          \\"viewId\\": \\"memberMetric\\"
+        },
+        {
+          \\"insert\\": true,
+          \\"select\\": true,
+          \\"update\\": true,
+          \\"delete\\": true,
+          \\"viewId\\": \\"toDo\\"
+        },
+        {
+          \\"insert\\": false,
+          \\"select\\": false,
+          \\"update\\": false,
+          \\"delete\\": false,
+          \\"viewId\\": \\"memberDefaultView\\"
+        }
+      ]
+    },
+    {
+      \\"name\\": \\"public\\",
+      \\"isAdmin\\": false,
+      \\"isEditor\\": false,
+      \\"isPublic\\": false,
+      \\"permissions\\": [
+        {
+          \\"insert\\": true,
+          \\"select\\": true,
+          \\"update\\": true,
+          \\"delete\\": true,
+          \\"viewId\\": \\"toDoDefaultView\\"
+        }
+      ]
+    }
   ],
   \\"forms\\": [
     {
@@ -403,6 +505,7 @@ exports[`export-schema should be able to export schema 1`] = `
           \\"type\\": \\"password\\",
           \\"deletionProtection\\": false,
           \\"id\\": \\"password\\",
+          \\"displayField\\": false,
           \\"design\\": null
         },
         {
@@ -495,105 +598,14 @@ exports[`export-schema should be able to export schema 1`] = `
           \\"condition\\": \\"done = 'TRUE'\\",
           \\"displayField\\": false,
           \\"design\\": null
-        }
-      ],
-      \\"design\\": null
-    },
-    {
-      \\"id\\": \\"ramasTask\\",
-      \\"name\\": \\"Rama's Task\\",
-      \\"tableId\\": \\"toDo\\",
-      \\"parameters\\": [],
-      \\"sorts\\": [],
-      \\"fields\\": [
-        {
-          \\"name\\": \\"Task\\",
-          \\"type\\": \\"text\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"task\\",
-          \\"displayField\\": true,
-          \\"design\\": null
         },
         {
-          \\"name\\": \\"description\\",
-          \\"type\\": \\"text\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"description\\",
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Done\\",
-          \\"type\\": \\"boolean\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"done\\",
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Points\\",
-          \\"type\\": \\"number\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"points\\",
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Deadline\\",
-          \\"type\\": \\"date\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"deadline\\",
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Difficulty\\",
-          \\"type\\": \\"select\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"difficulty\\",
-          \\"select\\": [\\"Easy\\", \\"Medium\\", \\"Hard\\"],
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Person\\",
-          \\"type\\": \\"relation\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"person\\",
-          \\"table\\": \\"member\\",
-          \\"column\\": \\"toDo\\",
-          \\"multiple\\": true,
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Role\\",
-          \\"type\\": \\"lookup\\",
-          \\"deletionProtection\\": false,
-          \\"id\\": \\"role\\",
-          \\"source\\": \\"person\\",
-          \\"destinations\\": [\\"role\\"],
-          \\"returnType\\": \\"table\\",
-          \\"multiple\\": false,
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Attachment\\",
-          \\"type\\": \\"file\\",
-          \\"deletionProtection\\": false,
-          \\"fileType\\": \\"image\\",
-          \\"id\\": \\"attachment\\",
-          \\"displayField\\": false,
-          \\"design\\": null
-        },
-        {
-          \\"name\\": \\"Time Allocation\\",
+          \\"name\\": \\"Undone task\\",
           \\"type\\": \\"formula\\",
           \\"deletionProtection\\": false,
-          \\"id\\": \\"timeAllocation\\",
-          \\"formula\\": \\"(points < 50) ? 'SHORT' : 'LONG'\\",
-          \\"returnType\\": \\"text\\",
+          \\"id\\": \\"undoneTask\\",
+          \\"formula\\": \\"totalTask - taskDone\\",
+          \\"returnType\\": \\"number\\",
           \\"displayField\\": false,
           \\"design\\": null
         }

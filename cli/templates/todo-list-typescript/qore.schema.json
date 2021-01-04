@@ -254,8 +254,71 @@
     }
   ],
   "roles": [
-    { "id": "6Hc0YGiQGoc3Huf", "name": "admin", "isAdmin": true },
-    { "id": "1gjCDJq3oX0I6RZ", "name": "Fullstack", "isAdmin": false }
+    {
+      "name": "admin",
+      "isAdmin": true,
+      "isEditor": false,
+      "isPublic": false,
+      "permissions": []
+    },
+    {
+      "name": "Fullstack",
+      "isAdmin": false,
+      "isEditor": false,
+      "isPublic": false,
+      "permissions": [
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "toDo"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "toDoDefaultView"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "done"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "memberDefaultView"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "test"
+        }
+      ]
+    },
+    {
+      "name": "public",
+      "isAdmin": false,
+      "isEditor": false,
+      "isPublic": true,
+      "permissions": [
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "toDoDefaultView"
+        }
+      ]
+    }
   ],
   "forms": [
     {

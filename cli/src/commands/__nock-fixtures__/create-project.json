@@ -301,14 +301,69 @@
                 ],
                 "roles": [
                     {
-                        "id": "6Hc0YGiQGoc3Huf",
                         "name": "admin",
-                        "isAdmin": true
+                        "isAdmin": true,
+                        "isEditor": false,
+                        "isPublic": false,
+                        "permissions": []
                     },
                     {
-                        "id": "1gjCDJq3oX0I6RZ",
                         "name": "Fullstack",
-                        "isAdmin": false
+                        "isAdmin": false,
+                        "isEditor": false,
+                        "isPublic": false,
+                        "permissions": [
+                            {
+                                "insert": true,
+                                "select": true,
+                                "update": true,
+                                "delete": true,
+                                "viewId": "toDo"
+                            },
+                            {
+                                "insert": true,
+                                "select": true,
+                                "update": true,
+                                "delete": true,
+                                "viewId": "toDoDefaultView"
+                            },
+                            {
+                                "insert": true,
+                                "select": true,
+                                "update": true,
+                                "delete": true,
+                                "viewId": "done"
+                            },
+                            {
+                                "insert": true,
+                                "select": true,
+                                "update": true,
+                                "delete": true,
+                                "viewId": "memberDefaultView"
+                            },
+                            {
+                                "insert": true,
+                                "select": true,
+                                "update": true,
+                                "delete": true,
+                                "viewId": "test"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "public",
+                        "isAdmin": false,
+                        "isEditor": false,
+                        "isPublic": true,
+                        "permissions": [
+                            {
+                                "insert": true,
+                                "select": true,
+                                "update": true,
+                                "delete": true,
+                                "viewId": "toDoDefaultView"
+                            }
+                        ]
                     }
                 ],
                 "forms": [
@@ -1039,11 +1094,11 @@
         },
         "status": 200,
         "response": {
-            "id": "timteCiCakRzBVf"
+            "id": "xmS7YA50agpAhd3"
         },
         "rawHeaders": [
             "Date",
-            "Mon, 04 Jan 2021 03:12:38 GMT",
+            "Mon, 04 Jan 2021 07:14:18 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
             "Content-Length",
@@ -1055,7 +1110,7 @@
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"18-j+TqQB9eTZEVp1bBY/LEIN1eO+M\"",
+            "W/\"18-i3fJDTUMo8BPT60jCk3J8H72vAc\"",
             "Via",
             "1.1 google",
             "Alt-Svc",
@@ -1068,17 +1123,17 @@
     {
         "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
         "method": "POST",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/timteCiCakRzBVf/authenticate",
+        "path": "/orgs/lIdfC42DJCN2XzQ/projects/xmS7YA50agpAhd3/authenticate",
         "body": {
             "token": "3960f3b8-a139-42eb-8295-3d669e4da4c9"
         },
         "status": 200,
         "response": {
-            "token": "3cb3f693-6465-464f-90cb-e2419088e57e"
+            "token": "0ec72a80-5e7e-4252-af9d-cd52ceee3154"
         },
         "rawHeaders": [
             "Date",
-            "Mon, 04 Jan 2021 03:12:38 GMT",
+            "Mon, 04 Jan 2021 07:14:18 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
             "Content-Length",
@@ -1090,7 +1145,7 @@
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"30-a0tLcmrnieCf3pmnVVqRtweseww\"",
+            "W/\"30-jnTjKqz6ojQ/bTDQE3gL/wTAgqQ\"",
             "Via",
             "1.1 google",
             "Alt-Svc",
@@ -1103,15 +1158,15 @@
     {
         "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
         "method": "GET",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/timteCiCakRzBVf/authConfig",
+        "path": "/orgs/lIdfC42DJCN2XzQ/projects/xmS7YA50agpAhd3/authConfig",
         "body": "",
         "status": 200,
         "response": {
             "qore": {
-                "id": "Xu6OLxE3uJpa8Bt",
+                "id": "Zo47zay09Rb7RyC",
                 "type": "qore",
-                "createdAt": "2021-01-04T03:12:34.518Z",
-                "updatedAt": "2021-01-04T03:12:34.518Z",
+                "createdAt": "2021-01-04T07:14:14.279Z",
+                "updatedAt": "2021-01-04T07:14:14.279Z",
                 "table": "member",
                 "identifierField": "email",
                 "roleField": "role"
@@ -1119,7 +1174,7 @@
         },
         "rawHeaders": [
             "Date",
-            "Mon, 04 Jan 2021 03:12:39 GMT",
+            "Mon, 04 Jan 2021 07:14:18 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
             "Content-Length",
@@ -1131,7 +1186,7 @@
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"bb-uyBE4ZAjqLVOof0N93t23ifHbxw\"",
+            "W/\"bb-JUQz8xfy9rgAORR+mKr7JPELCA8\"",
             "Via",
             "1.1 google",
             "Alt-Svc",
