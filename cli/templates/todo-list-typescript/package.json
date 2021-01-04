@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@feedloop/qore-client": "^0.1.12",
-    "@feedloop/qore-react": "^0.1.11",
+    "@feedloop/qore-react": "^0.1.12",
     "next": "latest",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",

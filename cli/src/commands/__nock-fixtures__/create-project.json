@@ -130,19 +130,6 @@
                                 "displayField": false
                             },
                             {
-                                "name": "Task Done",
-                                "type": "rollup",
-                                "deletionProtection": false,
-                                "id": "taskDone",
-                                "source": "toDo",
-                                "destinations": [
-                                    "id"
-                                ],
-                                "aggregate": "count",
-                                "condition": "done = 'TRUE'",
-                                "displayField": false
-                            },
-                            {
                                 "name": "Insert Task",
                                 "type": "action",
                                 "deletionProtection": false,
@@ -168,6 +155,51 @@
                                 "type": "password",
                                 "deletionProtection": false,
                                 "id": "password",
+                                "displayField": false
+                            },
+                            {
+                                "name": "CreateTask2",
+                                "type": "action",
+                                "deletionProtection": false,
+                                "id": "createTask2",
+                                "parameters": [
+                                    {
+                                        "slug": "task",
+                                        "type": "text"
+                                    }
+                                ],
+                                "tasks": [
+                                    {
+                                        "type": "insert",
+                                        "insert": {
+                                            "task": "$param.task"
+                                        },
+                                        "table": "toDo"
+                                    }
+                                ],
+                                "condition": null,
+                                "displayField": false
+                            },
+                            {
+                                "name": "Task Done",
+                                "type": "rollup",
+                                "deletionProtection": false,
+                                "id": "taskDone",
+                                "source": "toDo",
+                                "destinations": [
+                                    "id"
+                                ],
+                                "aggregate": "count",
+                                "condition": "done = 'TRUE'",
+                                "displayField": false
+                            },
+                            {
+                                "name": "Undone task",
+                                "type": "formula",
+                                "deletionProtection": false,
+                                "id": "undoneTask",
+                                "formula": "totalTask - taskDone",
+                                "returnType": "number",
                                 "displayField": false
                             }
                         ]
@@ -460,6 +492,31 @@
                                 "type": "password",
                                 "deletionProtection": false,
                                 "id": "password",
+                                "displayField": false,
+                                "design": null
+                            },
+                            {
+                                "name": "CreateTask2",
+                                "type": "action",
+                                "deletionProtection": false,
+                                "id": "createTask2",
+                                "parameters": [
+                                    {
+                                        "slug": "task",
+                                        "type": "text"
+                                    }
+                                ],
+                                "tasks": [
+                                    {
+                                        "type": "insert",
+                                        "insert": {
+                                            "task": "$param.task"
+                                        },
+                                        "table": "toDo"
+                                    }
+                                ],
+                                "condition": null,
+                                "displayField": false,
                                 "design": null
                             }
                         ],
@@ -549,111 +606,14 @@
                                 "condition": "done = 'TRUE'",
                                 "displayField": false,
                                 "design": null
-                            }
-                        ],
-                        "design": null
-                    },
-                    {
-                        "id": "ramasTask",
-                        "name": "Rama's Task",
-                        "tableId": "toDo",
-                        "parameters": [],
-                        "sorts": [],
-                        "fields": [
-                            {
-                                "name": "Task",
-                                "type": "text",
-                                "deletionProtection": false,
-                                "id": "task",
-                                "displayField": true,
-                                "design": null
                             },
                             {
-                                "name": "description",
-                                "type": "text",
-                                "deletionProtection": false,
-                                "id": "description",
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Done",
-                                "type": "boolean",
-                                "deletionProtection": false,
-                                "id": "done",
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Points",
-                                "type": "number",
-                                "deletionProtection": false,
-                                "id": "points",
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Deadline",
-                                "type": "date",
-                                "deletionProtection": false,
-                                "id": "deadline",
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Difficulty",
-                                "type": "select",
-                                "deletionProtection": false,
-                                "id": "difficulty",
-                                "select": [
-                                    "Easy",
-                                    "Medium",
-                                    "Hard"
-                                ],
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Person",
-                                "type": "relation",
-                                "deletionProtection": false,
-                                "id": "person",
-                                "table": "member",
-                                "column": "toDo",
-                                "multiple": true,
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Role",
-                                "type": "lookup",
-                                "deletionProtection": false,
-                                "id": "role",
-                                "source": "person",
-                                "destinations": [
-                                    "role"
-                                ],
-                                "returnType": "table",
-                                "multiple": false,
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Attachment",
-                                "type": "file",
-                                "deletionProtection": false,
-                                "fileType": "image",
-                                "id": "attachment",
-                                "displayField": false,
-                                "design": null
-                            },
-                            {
-                                "name": "Time Allocation",
+                                "name": "Undone task",
                                 "type": "formula",
                                 "deletionProtection": false,
-                                "id": "timeAllocation",
-                                "formula": "(points < 50) ? 'SHORT' : 'LONG'",
-                                "returnType": "text",
+                                "id": "undoneTask",
+                                "formula": "totalTask - taskDone",
+                                "returnType": "number",
                                 "displayField": false,
                                 "design": null
                             }
@@ -1079,11 +1039,11 @@
         },
         "status": 200,
         "response": {
-            "id": "yrPJtOrQGpdDeFF"
+            "id": "timteCiCakRzBVf"
         },
         "rawHeaders": [
             "Date",
-            "Wed, 23 Dec 2020 12:30:38 GMT",
+            "Mon, 04 Jan 2021 03:12:38 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
             "Content-Length",
@@ -1095,7 +1055,7 @@
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"18-kYBINgnNSUYMXN45uZbsZTqeJ30\"",
+            "W/\"18-j+TqQB9eTZEVp1bBY/LEIN1eO+M\"",
             "Via",
             "1.1 google",
             "Alt-Svc",
@@ -1108,17 +1068,17 @@
     {
         "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
         "method": "POST",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/yrPJtOrQGpdDeFF/authenticate",
+        "path": "/orgs/lIdfC42DJCN2XzQ/projects/timteCiCakRzBVf/authenticate",
         "body": {
             "token": "3960f3b8-a139-42eb-8295-3d669e4da4c9"
         },
         "status": 200,
         "response": {
-            "token": "3de55385-a035-4a47-b30f-d65b489d8014"
+            "token": "3cb3f693-6465-464f-90cb-e2419088e57e"
         },
         "rawHeaders": [
             "Date",
-            "Wed, 23 Dec 2020 12:30:38 GMT",
+            "Mon, 04 Jan 2021 03:12:38 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
             "Content-Length",
@@ -1130,7 +1090,7 @@
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"30-fA3LwLlwWA4eiNtQGCOrfPVgWCU\"",
+            "W/\"30-a0tLcmrnieCf3pmnVVqRtweseww\"",
             "Via",
             "1.1 google",
             "Alt-Svc",
@@ -1143,15 +1103,15 @@
     {
         "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
         "method": "GET",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/yrPJtOrQGpdDeFF/authConfig",
+        "path": "/orgs/lIdfC42DJCN2XzQ/projects/timteCiCakRzBVf/authConfig",
         "body": "",
         "status": 200,
         "response": {
             "qore": {
-                "id": "zeNPYSFcrVOP7XB",
+                "id": "Xu6OLxE3uJpa8Bt",
                 "type": "qore",
-                "createdAt": "2020-12-23T12:30:34.642Z",
-                "updatedAt": "2020-12-23T12:30:34.642Z",
+                "createdAt": "2021-01-04T03:12:34.518Z",
+                "updatedAt": "2021-01-04T03:12:34.518Z",
                 "table": "member",
                 "identifierField": "email",
                 "roleField": "role"
@@ -1159,7 +1119,7 @@
         },
         "rawHeaders": [
             "Date",
-            "Wed, 23 Dec 2020 12:30:39 GMT",
+            "Mon, 04 Jan 2021 03:12:39 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
             "Content-Length",
@@ -1171,7 +1131,7 @@
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"bb-FJXUhfNdSNHL+3HxjLbnlaIhmGU\"",
+            "W/\"bb-uyBE4ZAjqLVOof0N93t23ifHbxw\"",
             "Via",
             "1.1 google",
             "Alt-Svc",

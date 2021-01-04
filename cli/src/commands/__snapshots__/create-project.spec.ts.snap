@@ -4,7 +4,7 @@ exports[`create-project should be able to export schema 1`] = `
 Object {
   "endpoint": "https://p-qore-dot-pti-feedloop.et.r.appspot.com",
   "organizationId": "lIdfC42DJCN2XzQ",
-  "projectId": "yrPJtOrQGpdDeFF",
+  "projectId": "timteCiCakRzBVf",
   "version": "v1",
 }
 `;
