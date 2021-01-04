@@ -137,10 +137,10 @@
     type-fest "^0.20.1"
     wonka "^4.0.15"
 
-"@feedloop/qore-react@^0.1.11":
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-react/-/qore-react-0.1.11.tgz#ec34b7585dae7d00de7e55db13915ea8606da1b9"
-  integrity sha512-SNgFtu/q2lT/vwkrpfgeuaNBGzQl8jmjI08wPA91D33Ek/IXXYPn+LfHqw4AOfluWOHf2GnQjlEaQCJdMNE4Rg==
+"@feedloop/qore-react@^0.1.12":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-react/-/qore-react-0.1.12.tgz#861170d713aa61e6abf6a7f6e189712977425ae2"
+  integrity sha512-n+Dq/TNcyNEuJ/4lGlzSlInF0s2ATJcM1w1rFLcCBASmO4lyE4RyTcpOr2n4KJKmX4MZkTarsgKsiG0ebM2mbg==
   dependencies:
     typescript "^4.1.2"
 

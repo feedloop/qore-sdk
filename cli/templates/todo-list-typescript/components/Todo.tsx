@@ -12,12 +12,26 @@ const TodoItem = (props: {
   const [state, setState] = React.useState({
     isEditing: false
   });
+  const { data: task, status } = qoreContext.views.toDoDefaultView.useGetRow(
+    props.task.id
+  );
   const deleteTask = qoreContext.views.toDoDefaultView.useDeleteRow();
   const updateTask = qoreContext.views.toDoDefaultView.useUpdateRow();
+  if (status === "loading" || !task)
+    return (
+      <li key={props.task.id}>
+        <div className="view">
+          <input className="toggle" type="checkbox" />
+          <label>Loading</label>
+          <button className="destroy"></button>
+        </div>
+        <input className="edit" />
+      </li>
+    );
   return (
     <li
-      key={props.task.id}
-      className={`${props.task.done ? "completed" : ""} ${
+      key={task.id}
+      className={`${task.done ? "completed" : ""} ${
         state.isEditing && "editing"
       }`}
     >
@@ -25,14 +39,15 @@ const TodoItem = (props: {
         <input
           disabled={updateTask.status === "loading"}
           onClick={() => {
-            updateTask.updateRow(props.task.id, { done: !props.task.done });
+            updateTask.updateRow(task.id, { done: !task.done });
           }}
           className="toggle"
           type="checkbox"
-          checked={props.task.done}
+          checked={task.done}
         />
         <label
           onClick={() => {
+            if (deleteTask.status == "success") return;
             setState({ isEditing: true });
             setTimeout(() => {
               editInputRef.current?.focus();
@@ -44,13 +59,13 @@ const TodoItem = (props: {
             : deleteTask.status === "success"
             ? "[Removed]"
             : undefined}
-          {props.task.task}
+          {task.task}
         </label>
         <button
           className="destroy"
           disabled={deleteTask.status !== "idle"}
           onClick={async () => {
-            await deleteTask.deleteRow(props.task.id);
+            await deleteTask.deleteRow(task.id);
           }}
         ></button>
       </div>
@@ -58,13 +73,13 @@ const TodoItem = (props: {
         ref={editInputRef}
         className="edit"
         disabled={updateTask.status === "loading"}
-        defaultValue={props.task.task}
+        defaultValue={task.task}
         onBlur={() => {
           setState({ isEditing: false });
         }}
         onKeyPress={async e => {
           if (e.key === "Enter") {
-            await updateTask.updateRow(props.task.id, {
+            await updateTask.updateRow(task.id, {
               task: e.currentTarget.value
             });
             setState({ isEditing: false });
@@ -79,7 +94,7 @@ const Todo = () => {
   const taskInputRef = React.useRef<HTMLInputElement>(null);
   const tasks = qoreContext.views.toDoDefaultView.useListRow(
     { limit: 10, order: "desc" },
-    { pollInterval: 1000 }
+    { pollInterval: 5000 }
   );
   const insertTask = qoreContext.views.toDoDefaultView.useInsertRow();
   const handleAddTask = React.useCallback(

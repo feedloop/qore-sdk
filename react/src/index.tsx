@@ -81,7 +81,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     (previous, currentViewId) => ({
       ...previous,
       [currentViewId]: {
-        useListRow: (opts, config) => {
+        useListRow: (opts = {}, config = {}) => {
           const [data, setData] = React.useState<
             ProjectSchema[string]["read"][]
           >([]);
@@ -90,7 +90,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
           const stream = React.useMemo(
             () => qoreClient.views[currentViewId].readRows(opts, config),
-            [JSON.stringify(opts), JSON.stringify(config)]
+            [...Object.entries(opts).flat(), ...Object.entries(config).flat()]
           );
 
           React.useEffect(() => {
@@ -114,40 +114,37 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           return { data, error, status, revalidate: stream.revalidate };
         },
 
-        useGetRow: (rowId, config) => {
+        useGetRow: (rowId, config = {}) => {
           const [data, setData] = React.useState<
             ProjectSchema[string]["read"] | null
           >(null);
           const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
           const [error, setError] = React.useState<Error | null>(null);
 
-          const streamRef = React.useRef<ReturnType<ViewDriver["readRow"]>>(
-            qoreClient.views[currentViewId].readRow(rowId, config)
+          const stream = React.useMemo(
+            () => qoreClient.views[currentViewId].readRow(rowId, config),
+            [rowId, ...Object.entries(config).flat()]
           );
-
-          const revalidate = streamRef.current?.revalidate;
 
           React.useEffect(() => {
             setStatus("loading");
-            const subscription = streamRef.current?.subscribe(
-              ({ data, error }) => {
-                if (error) {
-                  setError(error);
-                  setStatus("error");
-                }
-                if (data) {
-                  setData(data);
-                  setError(null);
-                  setStatus("success");
-                }
+            const subscription = stream.subscribe(({ data, error }) => {
+              if (error) {
+                setError(error);
+                setStatus("error");
               }
-            );
+              if (data) {
+                setData(data);
+                setError(null);
+                setStatus("success");
+              }
+            });
             return () => {
               subscription?.unsubscribe();
             };
-          }, [rowId]);
+          }, [stream]);
 
-          return { data, error, status, revalidate };
+          return { data, error, status, revalidate: stream.revalidate };
         },
 
         useInsertRow: () => {
