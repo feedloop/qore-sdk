@@ -20,7 +20,7 @@ Welcome to Qore Client SDK documentation page, this document will guide you to s
 ## Prerequisites
 
 1. Node.js 12+
-1. Qore account, signup [here](https://qore.feedloop.io).
+1. Qore account, signup [here](https://qore.feedloop.io) & don't forget to verify your account.
 
 ## Features
 
@@ -66,10 +66,10 @@ qore create-project --template todo-list-typescript <your-new-project-name>
 
 If you start a new project, this is the recommended way to setup a qore project.
 
-This command will create a new project for you, including a starter-kit project selected (in this case, todo-list-typescript based on **Nextjs**) on your current working directory. This starter project includes common SDK implementations that should get you started.
+This command will create a new project for you, including a starter-kit project selected (in this case, todo-list-typescript -- a todo list app based on **Nextjs** written in TypeScript) on your current working directory. This starter project includes common SDK implementations that should get you started.
 
 Once created, navigate to your project from your terminal to install the dependencies using `$ yarn install` or `$ npm install`.
-Hit `$ yarn dev` or `$ npm dev` to start running your project locally.
+Hit `$ yarn dev` or `$ npm run dev` to start running your project locally.
 
 <p>
 <script id="asciicast-382474" src="https://asciinema.org/a/382474.js" async></script>
@@ -121,7 +121,7 @@ yarn add @feedloop/qore-react
 qore codegen
 ```
 
-Everytime there are changes on your project structure (includes views, fields, tables and forms), please don't forget to execute the _codegen_ command to update the following configuration files.
+If these files doesn't exist on your root project directory, or everytime there are changes on your project structure (includes views, fields, tables and forms), please don't forget to execute the _codegen_ command to update the following configuration files.
 
 1. `qore-generated.ts` contains the schema of your project in typescript.
 1. `qore.schema.json` contains the schema required to run qore client.
@@ -191,7 +191,9 @@ const { data, error } = await client.views.allTasks
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks, stale, error }] = qoreContext.allTasks.useListRows({
+  const [
+    { data: allTasks, stale, error }
+  ] = qoreContext.views.allTasks.useListRows({
     offset: 10,
     limit: 10,
     order: "asc"
@@ -222,9 +224,9 @@ const { data, error } = await client.views.allTasks
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: someTask, stale, error }] = qoreContext.allTasks.useGetRow(
-    "some-task-id"
-  );
+  const [
+    { data: someTask, stale, error }
+  ] = qoreContext.views.allTasks.useGetRow("some-task-id");
   return (
     <ul>
       {allTasks.map(task => (
@@ -254,7 +256,9 @@ const { data, error } = await client.views.allTasks
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks, stale, error }] = qoreContext.allTasks.useListRows(
+  const [
+    { data: allTasks, stale, error }
+  ] = qoreContext.views.allTasks.useListRows(
     {
       offset: 10,
       limit: 10,
@@ -293,7 +297,7 @@ You don't need to subscribe to anything if you use the React Hooks as it does th
 ```javascript
 const operation = client.views.allTasks.readRows(
   { offset: 10, limit: 10, order: "desc" },
-  { networkPolicy: "cache-and-network" }
+  { networkPolicy: "network-and-cache" }
 );
 
 const subscription = operation.subscribe(({ data, error, stale }) => {
@@ -311,7 +315,7 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 ```javascript
 const operation = client.views.allTasks.readRows(
   { offset: 10, limit: 10, order: "desc" },
-  { networkPolicy: "cache-and-network" }
+  { networkPolicy: "network-and-cache" }
 );
 
 const subscription = operation.subscribe(({ data, error, stale }) => {
@@ -325,13 +329,13 @@ operation.revalidate();
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.allTasks.useListRows(
+  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRows(
     {
       offset: 10,
       limit: 10,
       order: "asc",
     },
-    { networkPolicy: "cache-and-network" }
+    { networkPolicy: "network-and-cache" }
   );
   return (
     <>
@@ -355,7 +359,7 @@ By calling `revalidate()`, you are asking qore client to send a `network-only` m
 ```javascript
 const operation = client.views.allTasks.readRows(
   { offset: 10, limit: 10, order: "desc" },
-  { networkPolicy: "cache-and-network", pollInterval: 5000 }
+  { networkPolicy: "network-and-cache", pollInterval: 5000 }
 );
 
 const subscription = operation.subscribe(({ data, error, stale }) => {
@@ -367,13 +371,13 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.allTasks.useListRows(
+  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRows(
     {
       offset: 10,
       limit: 10,
       order: "asc",
     },
-    { networkPolicy: "cache-and-network", pollInterval: 5000 }
+    { networkPolicy: "network-and-cache", pollInterval: 5000 }
   );
   return (
     <>
@@ -406,7 +410,7 @@ const newRow = await client.views.allTasks.insertRow({ ...data });
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [insertRow, status] = qoreContext.allTasks.useInsertRow();
+  const [insertRow, status] = qoreContext.views.allTasks.useInsertRow();
   return (
     <button
       onClick={async () => {
@@ -435,7 +439,7 @@ await client.views.allTasks.updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.allTasks.useUpdateRow();
+  const [updateRow, status] = qoreContext.views.allTasks.useUpdateRow();
   return (
     <button
       onClick={async () => {
@@ -469,8 +473,10 @@ await client.views.allTasks.removeRelation(taskId, {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [removeRelation, status] = qoreContext.allTasks.removeRelation(taskId);
-  const [addRelation, status] = qoreContext.allTasks.addRelation(taskId);
+  const [removeRelation, status] = qoreContext.views.allTasks.removeRelation(
+    taskId
+  );
+  const [addRelation, status] = qoreContext.views.allTasks.addRelation(taskId);
   return (
     <div>
       <button
@@ -511,7 +517,7 @@ await client.views.allTasks.updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.allTasks.useUpdateRow();
+  const [updateRow, status] = qoreContext.views.allTasks.useUpdateRow();
   return (
     <button
       onClick={async () => {
@@ -542,7 +548,7 @@ await client.views.allTasks.updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.allTasks.useUpdateRow();
+  const [updateRow, status] = qoreContext.views.allTasks.useUpdateRow();
   const handleUpload = async event => {
     const files = await client.upload(event.target.files);
     await updateRow("some-task-id", { ...data, avatar: files });
@@ -563,7 +569,7 @@ await client.views.allTasks.deleteRow("some-task-id");
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [deleteRow, status] = qoreContext.allTasks.useDeleteRow();
+  const [deleteRow, status] = qoreContext.views.allTasks.useDeleteRow();
   return (
     <button
       onClick={async () => {
@@ -592,7 +598,9 @@ await rowActions.archiveTask.trigger({
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [rowActions, status] = qoreContext.allTasks.useActions("some-task-id");
+  const [rowActions, status] = qoreContext.views.allTasks.useActions(
+    "some-task-id"
+  );
   return (
     <button
       onClick={async () => {
@@ -621,7 +629,7 @@ await client.views.allTasks.forms.newTaskForm.send({
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [forms, status] = qoreContext.allTasks.useForms();
+  const [forms, status] = qoreContext.views.allTasks.useForms();
   return (
     <button
       onClick={async () => {
