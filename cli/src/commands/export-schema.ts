@@ -3,10 +3,11 @@ import prettier from "prettier";
 import makeProject, {
   QoreProjectSchema
 } from "@feedloop/qore-sdk/lib/project/index";
-import fs from "fs";
+import fse from "fs-extra";
 import path from "path";
 import config, { CLIConfig } from "../config";
 import { configFlags, promptFlags } from "../flags";
+import Codegen from "./codegen";
 
 export default class ExportSchema extends Command {
   static description = "export the schema of a given project";
@@ -33,9 +34,12 @@ export default class ExportSchema extends Command {
     const { args, flags } = this.parse(ExportSchema);
     const configs = await promptFlags(flags, ExportSchema.flags);
     const schema = await ExportSchema.getSchema(configs);
-    fs.writeFileSync(
+    await fse.writeFile(
       path.resolve(process.cwd() + "/qore.schema.json"),
-      prettier.format(JSON.stringify(schema), { parser: "json" }),
+      prettier.format(
+        JSON.stringify({ WARNING: Codegen.warningMessage, ...schema }),
+        { parser: "json" }
+      ),
       {
         encoding: "utf8"
       }
