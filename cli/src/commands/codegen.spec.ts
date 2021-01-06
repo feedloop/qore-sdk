@@ -22,7 +22,7 @@ describe("codegen", () => {
       "3960f3b8-a139-42eb-8295-3d669e4da4c9"
     ]);
     completeRecording();
-    const qoreGenerated = path.resolve(process.cwd(), "qore-generated.ts");
+    const qoreGenerated = path.resolve(process.cwd(), "qore-env.d.ts");
     expect(
       fse.readFileSync(qoreGenerated, { encoding: "utf-8" })
     ).toMatchSnapshot();

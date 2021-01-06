@@ -126,98 +126,104 @@ export default class Codegen extends Command {
       const idField = { id: "id", type: "text", name: "id" } as Field<"text">;
       const typeDef = `
       // ${Codegen.warningMessage}
-      ${schema.tables
-        .map(
-          ({ id, fields }) => `
-            type ${voca.capitalize(id)}TableRow = {${[idField, ...fields]
-            .filter(field => field.type !== "action")
-            .map(
-              field => `
-            ${field.id}: ${this.readFieldType(field)};`
-            )
-            .join("")}}`
-        )
-        .join("\n")}
 
-    ${schema.views
-      .map(
-        ({ id, parameters, sorts, fields }) => `
-          type ${voca.capitalize(id)}ViewRow = {
-            read: {${[idField, ...fields]
+      /// <reference types="@feedloop/qore-client" />
+      import { QoreSchema } from "@feedloop/qore-client";
+
+      declare module "@feedloop/qore-client" {
+        ${schema.tables
+          .map(
+            ({ id, fields }) => `
+              type ${voca.capitalize(id)}TableRow = {${[idField, ...fields]
               .filter(field => field.type !== "action")
               .map(
                 field => `
-            ${field.id}: ${this.readFieldType(field)};`
+              ${field.id}: ${this.readFieldType(field)};`
               )
-              .join("")}}
-            write: {${fields
-              .filter(vield => this.isWriteField(vield))
-              .map(
-                field => `
-                ${field.id}: ${this.writeFieldType(field)};`
-              )
-              .join("")}
-            }
-            params: {${parameters
-              .map(
-                param => `
-                ${param.slug}${param.required ? "" : "?"}: ${
-                  param.type === "text" ? "string" : "number"
-                };`
-              )
-              .join("")}
-              ${sorts
-                .filter(sort => !!sort.order && !!sort.by)
-                // group order by "sort.by"
-                .reduce((group, sort) => {
-                  const targetIdx = group.findIndex(
-                    sortGroup => sortGroup.by === sort.by
-                  );
-                  if (group[targetIdx]) {
-                    group[targetIdx].order.push(sort.order);
-                  } else {
-                    group.push({
-                      by: sort.by,
-                      order: [sort.order]
-                    });
-                  }
-                  return group;
-                }, [] as Array<{ by: string; order: string[] }>)
-                .map(
-                  sortGroup =>
-                    `"$by.${sortGroup.by}"?: ${sortGroup.order
-                      .map(order => `"${order}"`)
-                      .join("|")};`
-                )
-                .join("")}
-            }
-            actions: {${fields
-              .filter(
-                (vield): vield is Field<"action"> => vield.type === "action"
-              )
-              .map(
-                action => `${action.id}: {
-                ${action.parameters.map(
-                  param =>
-                    `${param.slug}${!param.required && "?"}: ${
-                      param.type === "text" ? "string" : param.type
-                    }`
-                )}
-              }`
-              )}
-            }
-          }`
-      )
-      .join("\n")}
+              .join("")}}`
+          )
+          .join("\n")}
 
-      export type QoreProjectSchema = {
         ${schema.views
-          .map(view => `${view.id}: ${voca.capitalize(view.id)}ViewRow;`)
-          .join("")}
+          .map(
+            ({ id, parameters, sorts, fields }) => `
+              type ${voca.capitalize(id)}ViewRow = {
+                read: {${[idField, ...fields]
+                  .filter(field => field.type !== "action")
+                  .map(
+                    field => `
+                ${field.id}: ${this.readFieldType(field)};`
+                  )
+                  .join("")}}
+                write: {${fields
+                  .filter(vield => this.isWriteField(vield))
+                  .map(
+                    field => `
+                    ${field.id}: ${this.writeFieldType(field)};`
+                  )
+                  .join("")}
+                }
+                params: {${parameters
+                  .map(
+                    param => `
+                    ${param.slug}${param.required ? "" : "?"}: ${
+                      param.type === "text" ? "string" : "number"
+                    };`
+                  )
+                  .join("")}
+                  ${sorts
+                    .filter(sort => !!sort.order && !!sort.by)
+                    // group order by "sort.by"
+                    .reduce((group, sort) => {
+                      const targetIdx = group.findIndex(
+                        sortGroup => sortGroup.by === sort.by
+                      );
+                      if (group[targetIdx]) {
+                        group[targetIdx].order.push(sort.order);
+                      } else {
+                        group.push({
+                          by: sort.by,
+                          order: [sort.order]
+                        });
+                      }
+                      return group;
+                    }, [] as Array<{ by: string; order: string[] }>)
+                    .map(
+                      sortGroup =>
+                        `"$by.${sortGroup.by}"?: ${sortGroup.order
+                          .map(order => `"${order}"`)
+                          .join("|")};`
+                    )
+                    .join("")}
+                }
+                actions: {${fields
+                  .filter(
+                    (vield): vield is Field<"action"> => vield.type === "action"
+                  )
+                  .map(
+                    action => `${action.id}: {
+                    ${action.parameters.map(
+                      param =>
+                        `${param.slug}${!param.required && "?"}: ${
+                          param.type === "text" ? "string" : param.type
+                        }`
+                    )}
+                  }`
+                  )}
+                }
+              }`
+          )
+          .join("\n")}
+
+        interface ProjectSchema extends QoreSchema {
+          ${schema.views
+            .map(view => `${view.id}: ${voca.capitalize(view.id)}ViewRow;`)
+            .join("")}
+        }
       }
     `;
       fs.writeFileSync(
-        path.resolve(process.cwd() + "/qore-generated.ts"),
+        path.resolve(process.cwd() + "/qore-env.d.ts"),
         prettier.format(typeDef, { parser: "babel-ts" }),
         {
           encoding: "utf8"
