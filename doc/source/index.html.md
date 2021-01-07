@@ -161,7 +161,7 @@ import config from "./qore.config.json";
 import schema from "./qore.schema.json";
 
 const client = new QoreClient(config);
-client.init(client);
+client.init(schema);
 
 export default client;
 ```
@@ -169,6 +169,7 @@ export default client;
 ```jsx
 // Create a new file called qoreContext.js that contains the following lines
 
+import { QoreClient } from "@feedloop/qore-client";
 import createQoreContext from "@feedloop/qore-react";
 import config from "./qore.config.json";
 import schema from "./qore.schema.json";

@@ -9,8 +9,7 @@ Axios.interceptors.response.use(
 
 Axios.interceptors.request.use(config => {
   config.baseURL =
-    process.env.QORE_SERVER ||
-    "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
+    process.env.QORE_SERVER || "https://stg-qore-app.qorebase.io";
   return config;
 });
 

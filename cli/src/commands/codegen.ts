@@ -6,6 +6,7 @@ import fs from "fs";
 import fse from "fs-extra";
 import path from "path";
 import makeProject, {
+  APIField,
   FieldType,
   Vield
 } from "@feedloop/qore-sdk/lib/project/index";
@@ -57,7 +58,7 @@ export default class Codegen extends Command {
     "relation"
   ]);
 
-  readFieldType(field: Field | Vield) {
+  readFieldType(field: APIField) {
     switch (field.type) {
       case "text":
       case "file":
@@ -89,7 +90,7 @@ export default class Codegen extends Command {
         return field.type;
     }
   }
-  writeFieldType(field: Field | Vield) {
+  writeFieldType(field: APIField) {
     switch (field.type) {
       case "text":
       case "file":
@@ -106,7 +107,7 @@ export default class Codegen extends Command {
         return field.type;
     }
   }
-  isWriteField(field: Field | Vield) {
+  isWriteField(field: APIField) {
     return this.writeFieldTypes.has(field.type);
   }
 
