@@ -59,6 +59,7 @@ release-doc:
     - npm install --global vercel
     - cd doc
     - sh ./build.sh
+    - "[[ ! -d build ]] && echo 'Build failed' && exit 1"
     - vercel --token $VERCEL_TOKEN --confirm --prod
   only:
     refs:

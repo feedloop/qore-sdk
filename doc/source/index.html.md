@@ -20,7 +20,7 @@ Welcome to Qore Client SDK documentation page, this document will guide you to s
 ## Prerequisites
 
 1. Node.js 12+
-1. Qore account, signup [here](https://qore.feedloop.io) & don't forget to verify your account.
+1. Qore account, signup [here](https://dashboard.qorebase.io) & don't forget to verify your account.
 
 ## Features
 
@@ -102,38 +102,38 @@ Now you are ready to:
 
 If you prefer to setup qore manually, please follow this guide all the way through.
 
-Create a new qore project from your qore dashboard.
+1. Create a new qore project from your [qore dashboard](https://dashboard.qorebase.io).
 
 <p>
 <iframe src="https://drive.google.com/file/d/1PJLqDiwEXjo0tmVuHKqAyk1rxHZudeo6/preview" width="100%" height="320"></iframe>
 </p>
 
-Create a new directory for your project.
+2. Create a new directory for your project.
 
 ```shell
 mkdir my-new-project
 cd ./my-new-project
 ```
 
-Set your newly-created project as the current project.
+3. Set your newly-created project as the current project.
 
 ```shell
 qore set-project
 ```
 
-On your root project directory, run the [codegen](#codegen) command to generate required config files.
+4. On your root project directory, run the [codegen](#codegen) command to generate required config files.
 
 ```shell
 qore codegen
 ```
 
-Watch this video to see how it is done.
+Watch this video to see how step 3-4 is done.
 
 <p>
 <script id="asciicast-383016" src="https://asciinema.org/a/383016.js" async></script>
 </p>
 
-Initialize `package.json` file on your root project directory by triggering `npm init -y`, followed by installing required dependencies.
+5. Initialize `package.json` file on your root project directory by triggering `npm init -y`, followed by installing required dependencies.
 
 ```shell
 npm install --save @feedloop/qore-client
@@ -145,15 +145,13 @@ npm install --save @feedloop/qore-client
 npm install --save @feedloop/qore-react
 ```
 
-Watch this video to see how it is done.
+Watch this video to see how step 5 is done.
 
 <p>
 <script id="asciicast-383017" src="https://asciinema.org/a/383017.js" async></script>
 </p>
 
-### Initialize
-
-Initialize qore client by creating the following file.
+6. Initialize qore client by creating the following file.
 
 ```javascript
 // Create a new file called client.js that contains the following lines
@@ -165,7 +163,7 @@ import schema from "./qore.schema.json";
 const client = new QoreClient(config);
 client.init(client);
 
-export default ;
+export default client;
 ```
 
 ```jsx
