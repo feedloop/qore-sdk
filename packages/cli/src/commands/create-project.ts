@@ -62,8 +62,6 @@ export default class CreateProject extends Command {
       path.resolve(CreateProject.templatesLocation, configs.template),
       destination
     );
-    const output = execSync("ls -lah", { encoding: "utf-8" });
-    console.log({ output });
     const user = makeUser();
     user.setToken(configs.token);
 

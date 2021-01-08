@@ -1,13 +1,12 @@
 name: Test Client
 on:
-  [push]
-  # push:
-  #   paths:
-  #     - "packages/cli/**"
-  #   branches:
-  #     - main
+  push:
+    paths:
+      - "packages/client/**"
+    branches:
+      - main
 jobs:
-  deploy-vercel:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
