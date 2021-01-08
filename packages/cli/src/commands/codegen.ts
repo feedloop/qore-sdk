@@ -36,7 +36,7 @@ export default class Codegen extends Command {
       path.resolve(destination || process.cwd(), "qore.config.json"),
       {
         version: "v1",
-        endpoint: "https://p-qore-dot-pti-feedloop.et.r.appspot.com",
+        endpoint: "https://stg-qore-app.qorebase.io",
         projectId: configs.project,
         organizationId: configs.org,
         authenticationId: authConfig.password?.id,
