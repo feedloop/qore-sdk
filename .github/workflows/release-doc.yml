@@ -9,9 +9,7 @@ jobs:
         with:
           image: docker:latest
           run: |
-            cd doc
-            sh ./build.sh
-            [[ ! -d build ]] && echo 'Build failed' && exit 1
+            cd doc && sh ./build.sh && [[ ! -d build ]] && echo 'Build failed' && exit 1
       - uses: actions/setup-node@v2
       - run: cd doc && npx vercel --confirm
         env:
