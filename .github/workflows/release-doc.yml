@@ -1,23 +1,16 @@
 name: Release Doc
-
-on:
-  push:
-    paths:
-      - "doc/**"
-
+on: [push]
 jobs:
-  deploy:
+  deploy-vercel:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: addnab/docker-run-action@v1
-        with:
-          image: docker:latest
-          run: |
-            cd doc
-            sh ./build.sh
-            [[ ! -d build ]] && echo 'Build failed' && exit 1
+      - uses: docker-practice/actions-setup-docker@master
+      - run: |
+          ls
+          cd doc
+          sh ./build.sh
       - uses: actions/setup-node@v2
-      - run: cd doc && npx vercel --confirm
+      - run: cd doc && npx vercel --confirm --token $VERCEL_TOKEN
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
