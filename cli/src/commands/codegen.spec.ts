@@ -12,6 +12,8 @@ describe("codegen", () => {
     config.reset("org", "project", "token");
   });
   it("should be able to generate codegen", async () => {
+    process.env.QORE_SERVER =
+      "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const { completeRecording } = await record("codegen");
     await Codegen.run([
       "--project",

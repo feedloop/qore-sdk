@@ -10,6 +10,8 @@ describe("login", () => {
     config.reset("org", "project", "token");
   });
   it("authenticate user", async () => {
+    process.env.QORE_SERVER =
+      "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const stdoutSpy = jest.spyOn(process.stdout, "write");
     prompts.inject(["rama@feedloop.io", "123"]);
     const { completeRecording } = await record("login");

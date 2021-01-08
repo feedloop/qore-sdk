@@ -10,6 +10,8 @@ describe("set-project", () => {
     config.reset("org", "project", "token");
   });
   it("select project", async () => {
+    process.env.QORE_SERVER =
+      "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const stdoutSpy = jest.spyOn(process.stdout, "write");
     prompts.inject(["mAQjA9ypixnsBDE", "U1tJvy7XhgOuVmI"]);
     const { completeRecording } = await record("set-project");
