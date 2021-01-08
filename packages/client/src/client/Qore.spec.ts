@@ -43,6 +43,7 @@ interface TestSchema extends QoreSchema {
 const recorder = setupRecorder();
 
 describe("Qore SDK", () => {
+  process.env.QORE_SERVER = "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
   const userToken = "3960f3b8-a139-42eb-8295-3d669e4da4c9";
   let projectToken: string | undefined;
   let schema: QoreProjectSchema;

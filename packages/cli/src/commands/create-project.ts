@@ -9,6 +9,7 @@ import path from "path";
 import config from "../config";
 import { orgFlag, promptFlags, tokenFlag } from "../flags";
 import Codegen from "./codegen";
+import { exec, execSync } from "child_process";
 
 export default class CreateProject extends Command {
   static description = "create a project from template";
@@ -61,7 +62,6 @@ export default class CreateProject extends Command {
       path.resolve(CreateProject.templatesLocation, configs.template),
       destination
     );
-
     const user = makeUser();
     user.setToken(configs.token);
 

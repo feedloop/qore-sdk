@@ -1,0 +1,17 @@
+name: Test Client
+on:
+  push:
+    paths:
+      - "packages/client/**"
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+      - run: |
+          cd packages/client
+          yarn
+          yarn test

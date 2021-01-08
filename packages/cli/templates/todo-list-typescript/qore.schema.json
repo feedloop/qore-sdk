@@ -1,0 +1,965 @@
+{
+  "tables": [
+    {
+      "name": "member",
+      "type": "auth",
+      "id": "member",
+      "fields": [
+        {
+          "name": "role",
+          "type": "role",
+          "deletionProtection": true,
+          "id": "role",
+          "displayField": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "deletionProtection": true,
+          "id": "email",
+          "displayField": true
+        },
+        {
+          "name": "To Do",
+          "type": "relation",
+          "deletionProtection": false,
+          "id": "toDo",
+          "table": "toDo",
+          "column": "person",
+          "multiple": true,
+          "displayField": false
+        },
+        {
+          "name": "Total task",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "totalTask",
+          "source": "toDo",
+          "destinations": ["id"],
+          "aggregate": "count",
+          "condition": null,
+          "displayField": false
+        },
+        {
+          "name": "Total point",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "totalPoint",
+          "source": "toDo",
+          "destinations": ["points"],
+          "aggregate": "sum",
+          "condition": null,
+          "displayField": false
+        },
+        {
+          "name": "Total hard task",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "totalHardTask",
+          "source": "toDo",
+          "destinations": ["id"],
+          "aggregate": "count",
+          "condition": "difficulty = 'Hard'",
+          "displayField": false
+        },
+        {
+          "name": "Create task",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "createTask",
+          "parameters": [
+            { "slug": "task", "type": "text" },
+            { "slug": "description", "type": "text" }
+          ],
+          "tasks": [
+            {
+              "type": "insert",
+              "insert": {
+                "description": "$param.description",
+                "person": "id",
+                "task": "$param.task"
+              },
+              "table": "toDo"
+            }
+          ],
+          "condition": null,
+          "displayField": false
+        },
+        {
+          "name": "Add Task",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "addTask",
+          "parameters": [
+            { "slug": "task", "type": "text" },
+            { "slug": "description", "type": "text" }
+          ],
+          "tasks": [{ "type": "insert", "insert": {}, "table": "toDo" }],
+          "condition": null,
+          "displayField": false
+        },
+        {
+          "name": "Insert Task",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "insertTask",
+          "parameters": [],
+          "tasks": [
+            {
+              "type": "insert",
+              "insert": {
+                "done": "'TRUE'",
+                "description": "$param.description",
+                "person": "email",
+                "task": "$param.task"
+              },
+              "table": "toDo"
+            }
+          ],
+          "condition": null,
+          "displayField": false
+        },
+        {
+          "name": "Password",
+          "type": "password",
+          "deletionProtection": false,
+          "id": "password",
+          "displayField": false
+        },
+        {
+          "name": "CreateTask2",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "createTask2",
+          "parameters": [{ "slug": "task", "type": "text" }],
+          "tasks": [
+            {
+              "type": "insert",
+              "insert": { "task": "$param.task" },
+              "table": "toDo"
+            }
+          ],
+          "condition": null,
+          "displayField": false
+        },
+        {
+          "name": "Task Done",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "taskDone",
+          "source": "toDo",
+          "destinations": ["id"],
+          "aggregate": "count",
+          "condition": "done = 'TRUE'",
+          "displayField": false
+        },
+        {
+          "name": "Undone task",
+          "type": "formula",
+          "deletionProtection": false,
+          "id": "undoneTask",
+          "formula": "totalTask - taskDone",
+          "returnType": "number",
+          "displayField": false
+        }
+      ]
+    },
+    {
+      "name": "To Do",
+      "type": null,
+      "id": "toDo",
+      "fields": [
+        {
+          "name": "Task",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "task",
+          "displayField": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "description",
+          "displayField": false
+        },
+        {
+          "name": "Done",
+          "type": "boolean",
+          "deletionProtection": false,
+          "id": "done",
+          "displayField": false
+        },
+        {
+          "name": "Points",
+          "type": "number",
+          "deletionProtection": false,
+          "id": "points",
+          "displayField": false
+        },
+        {
+          "name": "Deadline",
+          "type": "date",
+          "deletionProtection": false,
+          "id": "deadline",
+          "displayField": false
+        },
+        {
+          "name": "Difficulty",
+          "type": "select",
+          "deletionProtection": false,
+          "id": "difficulty",
+          "select": ["Easy", "Medium", "Hard"],
+          "displayField": false
+        },
+        {
+          "name": "Person",
+          "type": "relation",
+          "deletionProtection": false,
+          "id": "person",
+          "table": "member",
+          "column": "toDo",
+          "multiple": true,
+          "displayField": false
+        },
+        {
+          "name": "Role",
+          "type": "lookup",
+          "deletionProtection": false,
+          "id": "role",
+          "source": "person",
+          "destinations": ["role"],
+          "returnType": "table",
+          "multiple": false,
+          "displayField": false
+        },
+        {
+          "name": "Attachment",
+          "type": "file",
+          "deletionProtection": false,
+          "fileType": "image",
+          "id": "attachment",
+          "displayField": false
+        },
+        {
+          "name": "Time Allocation",
+          "type": "formula",
+          "deletionProtection": false,
+          "id": "timeAllocation",
+          "formula": "(points < 50) ? 'SHORT' : 'LONG'",
+          "returnType": "text",
+          "displayField": false
+        }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "isAdmin": true,
+      "isEditor": false,
+      "isPublic": false,
+      "permissions": []
+    },
+    {
+      "name": "Fullstack",
+      "isAdmin": false,
+      "isEditor": false,
+      "isPublic": false,
+      "permissions": [
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "toDo"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "toDoDefaultView"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "done"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "memberDefaultView"
+        },
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "test"
+        }
+      ]
+    },
+    {
+      "name": "public",
+      "isAdmin": false,
+      "isEditor": false,
+      "isPublic": true,
+      "permissions": [
+        {
+          "insert": true,
+          "select": true,
+          "update": true,
+          "delete": true,
+          "viewId": "toDoDefaultView"
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "name": "new form 3muYd8OVj-6fdlg-EnmUv",
+      "id": "newForm3MuYd8OVj6FdlgEnmUv",
+      "tableId": "toDo",
+      "fields": [
+        { "id": "task" },
+        { "id": "description" },
+        { "id": "done" },
+        { "id": "points" },
+        { "id": "deadline" }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "id": "done",
+      "name": "Done",
+      "tableId": "toDo",
+      "parameters": [],
+      "sorts": [],
+      "fields": [
+        {
+          "name": "Task",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "task",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "description",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Done",
+          "type": "boolean",
+          "deletionProtection": false,
+          "id": "done",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Points",
+          "type": "number",
+          "deletionProtection": false,
+          "id": "points",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Deadline",
+          "type": "date",
+          "deletionProtection": false,
+          "id": "deadline",
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    },
+    {
+      "id": "memberDefaultView",
+      "name": "member Default View",
+      "tableId": "member",
+      "parameters": [],
+      "sorts": [],
+      "fields": [
+        {
+          "name": "email",
+          "type": "text",
+          "deletionProtection": true,
+          "id": "email",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "role",
+          "type": "role",
+          "deletionProtection": true,
+          "id": "role",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Create task",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "createTask",
+          "parameters": [
+            { "slug": "task", "type": "text" },
+            { "slug": "description", "type": "text" }
+          ],
+          "tasks": [
+            {
+              "type": "insert",
+              "insert": {
+                "description": "$param.description",
+                "person": "id",
+                "task": "$param.task"
+              },
+              "table": "toDo"
+            }
+          ],
+          "condition": null,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Add Task",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "addTask",
+          "parameters": [
+            { "slug": "task", "type": "text" },
+            { "slug": "description", "type": "text" }
+          ],
+          "tasks": [{ "type": "insert", "insert": {}, "table": "toDo" }],
+          "condition": null,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Insert Task",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "insertTask",
+          "parameters": [],
+          "tasks": [
+            {
+              "type": "insert",
+              "insert": {
+                "done": "'TRUE'",
+                "description": "$param.description",
+                "person": "email",
+                "task": "$param.task"
+              },
+              "table": "toDo"
+            }
+          ],
+          "condition": null,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Password",
+          "type": "password",
+          "deletionProtection": false,
+          "id": "password",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "CreateTask2",
+          "type": "action",
+          "deletionProtection": false,
+          "id": "createTask2",
+          "parameters": [{ "slug": "task", "type": "text" }],
+          "tasks": [
+            {
+              "type": "insert",
+              "insert": { "task": "$param.task" },
+              "table": "toDo"
+            }
+          ],
+          "condition": null,
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    },
+    {
+      "id": "memberMetric",
+      "name": "Member Metric",
+      "tableId": "member",
+      "parameters": [{ "slug": "email", "type": "text", "required": true }],
+      "sorts": [],
+      "fields": [
+        {
+          "name": "email",
+          "type": "text",
+          "deletionProtection": true,
+          "id": "email",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "role",
+          "type": "role",
+          "deletionProtection": true,
+          "id": "role",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Total task",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "totalTask",
+          "source": "toDo",
+          "destinations": ["id"],
+          "aggregate": "count",
+          "condition": null,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Total point",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "totalPoint",
+          "source": "toDo",
+          "destinations": ["points"],
+          "aggregate": "sum",
+          "condition": null,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Total hard task",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "totalHardTask",
+          "source": "toDo",
+          "destinations": ["id"],
+          "aggregate": "count",
+          "condition": "difficulty = 'Hard'",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Task Done",
+          "type": "rollup",
+          "deletionProtection": false,
+          "id": "taskDone",
+          "source": "toDo",
+          "destinations": ["id"],
+          "aggregate": "count",
+          "condition": "done = 'TRUE'",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Undone task",
+          "type": "formula",
+          "deletionProtection": false,
+          "id": "undoneTask",
+          "formula": "totalTask - taskDone",
+          "returnType": "number",
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    },
+    {
+      "id": "reisTask",
+      "name": "Task by timeAllocation",
+      "tableId": "toDo",
+      "parameters": [
+        { "slug": "timeAllocation", "type": "text", "required": false }
+      ],
+      "sorts": [],
+      "fields": [
+        {
+          "name": "Task",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "task",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "description",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Done",
+          "type": "boolean",
+          "deletionProtection": false,
+          "id": "done",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Points",
+          "type": "number",
+          "deletionProtection": false,
+          "id": "points",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Deadline",
+          "type": "date",
+          "deletionProtection": false,
+          "id": "deadline",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Difficulty",
+          "type": "select",
+          "deletionProtection": false,
+          "id": "difficulty",
+          "select": ["Easy", "Medium", "Hard"],
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Person",
+          "type": "relation",
+          "deletionProtection": false,
+          "id": "person",
+          "table": "member",
+          "column": "toDo",
+          "multiple": true,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Role",
+          "type": "lookup",
+          "deletionProtection": false,
+          "id": "role",
+          "source": "person",
+          "destinations": ["role"],
+          "returnType": "table",
+          "multiple": false,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Attachment",
+          "type": "file",
+          "deletionProtection": false,
+          "fileType": "image",
+          "id": "attachment",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Time Allocation",
+          "type": "formula",
+          "deletionProtection": false,
+          "id": "timeAllocation",
+          "formula": "(points < 50) ? 'SHORT' : 'LONG'",
+          "returnType": "text",
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    },
+    {
+      "id": "test",
+      "name": "Priorities",
+      "tableId": "toDo",
+      "parameters": [],
+      "sorts": [],
+      "fields": [
+        {
+          "name": "Task",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "task",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "description",
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    },
+    {
+      "id": "toDo",
+      "name": "To Do",
+      "tableId": "toDo",
+      "parameters": [],
+      "sorts": [],
+      "fields": [
+        {
+          "name": "Task",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "task",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "description",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Done",
+          "type": "boolean",
+          "deletionProtection": false,
+          "id": "done",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Points",
+          "type": "number",
+          "deletionProtection": false,
+          "id": "points",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Deadline",
+          "type": "date",
+          "deletionProtection": false,
+          "id": "deadline",
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    },
+    {
+      "id": "toDoDefaultView",
+      "name": "Tasks",
+      "tableId": "toDo",
+      "parameters": [],
+      "sorts": [{ "by": "points", "order": "desc" }],
+      "fields": [
+        {
+          "name": "Task",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "task",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "description",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Done",
+          "type": "boolean",
+          "deletionProtection": false,
+          "id": "done",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Points",
+          "type": "number",
+          "deletionProtection": false,
+          "id": "points",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Deadline",
+          "type": "date",
+          "deletionProtection": false,
+          "id": "deadline",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Difficulty",
+          "type": "select",
+          "deletionProtection": false,
+          "id": "difficulty",
+          "select": ["Easy", "Medium", "Hard"],
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Person",
+          "type": "relation",
+          "deletionProtection": false,
+          "id": "person",
+          "table": "member",
+          "column": "toDo",
+          "multiple": true,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Role",
+          "type": "lookup",
+          "deletionProtection": false,
+          "id": "role",
+          "source": "person",
+          "destinations": ["role"],
+          "returnType": "table",
+          "multiple": false,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Time Allocation",
+          "type": "formula",
+          "deletionProtection": false,
+          "id": "timeAllocation",
+          "formula": "(points < 50) ? 'SHORT' : 'LONG'",
+          "returnType": "text",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Attachment",
+          "type": "file",
+          "deletionProtection": false,
+          "fileType": "image",
+          "id": "attachment",
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    },
+    {
+      "id": "undone",
+      "name": "Undone",
+      "tableId": "toDo",
+      "parameters": [{ "slug": "undone", "type": "text", "required": false }],
+      "sorts": [],
+      "fields": [
+        {
+          "name": "Task",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "task",
+          "displayField": true,
+          "design": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "deletionProtection": false,
+          "id": "description",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Done",
+          "type": "boolean",
+          "deletionProtection": false,
+          "id": "done",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Points",
+          "type": "number",
+          "deletionProtection": false,
+          "id": "points",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Deadline",
+          "type": "date",
+          "deletionProtection": false,
+          "id": "deadline",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Difficulty",
+          "type": "select",
+          "deletionProtection": false,
+          "id": "difficulty",
+          "select": ["Easy", "Medium", "Hard"],
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Person",
+          "type": "relation",
+          "deletionProtection": false,
+          "id": "person",
+          "table": "member",
+          "column": "toDo",
+          "multiple": true,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Role",
+          "type": "lookup",
+          "deletionProtection": false,
+          "id": "role",
+          "source": "person",
+          "destinations": ["role"],
+          "returnType": "table",
+          "multiple": false,
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Attachment",
+          "type": "file",
+          "deletionProtection": false,
+          "fileType": "image",
+          "id": "attachment",
+          "displayField": false,
+          "design": null
+        },
+        {
+          "name": "Time Allocation",
+          "type": "formula",
+          "deletionProtection": false,
+          "id": "timeAllocation",
+          "formula": "(points < 50) ? 'SHORT' : 'LONG'",
+          "returnType": "text",
+          "displayField": false,
+          "design": null
+        }
+      ],
+      "design": null
+    }
+  ]
+}
