@@ -11,6 +11,6 @@ jobs:
           cd doc
           sh ./build.sh
       - uses: actions/setup-node@v2
-      - run: cd doc && npx vercel --confirm
+      - run: cd doc && npx vercel --confirm --token $VERCEL_TOKEN
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
