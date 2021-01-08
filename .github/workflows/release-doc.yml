@@ -5,12 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: addnab/docker-run-action@v1
-        with:
-          image: docker:latest
-          run: |
-            ls
-            cd doc && sh ./build.sh && [[ ! -d build ]] && echo 'Build failed' && exit 1
+      - uses: docker-practice/actions-setup-docker@master
+      - run: |
+          ls
+          cd doc
+          sh ./build.sh
+          [[ ! -d build ]] && echo 'Build failed' && exit 1
       - uses: actions/setup-node@v2
       - run: cd doc && npx vercel --confirm
         env:
