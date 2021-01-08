@@ -1,10 +1,8 @@
 name: Release Doc
-
 on:
   push:
     paths:
-      - "*"
-
+      - "doc/**"
 jobs:
   deploy:
     runs-on: ubuntu-latest
