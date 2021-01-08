@@ -8,6 +8,6 @@
 node_modules
 
 # Qore-generated files
-qore-generated.ts
+qore-env.d.ts
 qore.schema.json
 qore.config.json
