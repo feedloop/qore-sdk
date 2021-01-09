@@ -1,11 +1,10 @@
 name: Test CLI
 on:
-  [push]
-  # push:
-  #   paths:
-  #     - "packages/cli/**"
-  #   branches:
-  #     - main
+  push:
+    paths:
+      - "packages/cli/**"
+    branches:
+      - main
 jobs:
   deploy-vercel:
     runs-on: ubuntu-latest
