@@ -7,8 +7,10 @@ import {
   RowActions,
   QoreViewSchema
 } from "@feedloop/qore-client";
+import { ConditionalPick } from "type-fest";
 
 type QoreRequestStatus = "idle" | "loading" | "success" | "error";
+type RelationActions = "addRelation" | "removeRelation";
 
 export declare type RowActionsHooks<T extends QoreViewSchema["actions"]> = {
   [K in keyof T]: {
@@ -66,6 +68,18 @@ type QoreHooks<T extends QoreSchema[string]> = {
     statuses: Record<keyof RowActions<T["actions"]>, QoreRequestStatus>;
     errors: Record<keyof RowActions<T["actions"]>, Error | null>;
   };
+
+  useRelation: (
+    rowId: string
+  ) => {
+    statuses: Record<RelationActions, QoreRequestStatus>;
+    errors: Record<RelationActions, Error | null>;
+  } & Record<
+    RelationActions,
+    (
+      relations: Partial<ConditionalPick<T["write"], string[]>>
+    ) => Promise<boolean>
+  >;
 };
 
 type QoreContextViews<ProjectSchema extends QoreSchema> = {
@@ -272,6 +286,72 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             statuses,
             errors,
             rowActions
+          };
+        },
+        useRelation: rowId => {
+          const [statuses, setStatuses] = React.useState<
+            Record<RelationActions, QoreRequestStatus>
+          >({ addRelation: "idle", removeRelation: "idle" });
+
+          const [errors, setErrors] = React.useState<
+            Record<RelationActions, Error | null>
+          >({ removeRelation: null, addRelation: null });
+
+          return {
+            statuses,
+            errors,
+            addRelation: async relations => {
+              setStatuses(statuses => ({
+                ...statuses,
+                addRelation: "loading"
+              }));
+              try {
+                await qoreClient.views[currentViewId].addRelation(
+                  rowId,
+                  relations
+                );
+
+                setStatuses(statuses => ({
+                  ...statuses,
+                  addRelation: "success"
+                }));
+                setErrors(errors => ({ ...errors, addRelation: null }));
+                return true;
+              } catch (error) {
+                setStatuses(statuses => ({
+                  ...statuses,
+                  addRelation: "error"
+                }));
+                setErrors(errors => ({ ...errors, addRelation: error }));
+                return false;
+              }
+            },
+            removeRelation: async relations => {
+              setStatuses(statuses => ({
+                ...statuses,
+                removeRelation: "loading"
+              }));
+              try {
+                await qoreClient.views[currentViewId].removeRelation(
+                  rowId,
+                  relations
+                );
+
+                setStatuses(statuses => ({
+                  ...statuses,
+                  removeRelation: "success"
+                }));
+                setErrors(errors => ({ ...errors, removeRelation: null }));
+                return true;
+              } catch (error) {
+                setStatuses(statuses => ({
+                  ...statuses,
+                  removeRelation: "error"
+                }));
+                setErrors(errors => ({ ...errors, removeRelation: error }));
+                return false;
+              }
+            }
           };
         }
       }

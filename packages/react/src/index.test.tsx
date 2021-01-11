@@ -7,7 +7,7 @@ const createNewQoreContext = () => {
   const qoreClient = new QoreClient<{
     allTasks: {
       read: { id: string; title: string };
-      write: { title: string };
+      write: { title: string; person: string[] };
       params: { slug?: string };
       actions: {
         finishTask: { notes?: string };
@@ -410,5 +410,41 @@ describe("useActions", () => {
     expect(result.current.errors.finishTask?.message).toEqual(
       "Request failed with status code 500"
     );
+  });
+});
+
+describe("useRelation", () => {
+  it("should add & remove relation", async () => {
+    scope = scope
+      .post(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/relation/person",
+        { value: "some-person-id" }
+      )
+      .reply(200, { isExecuted: true })
+      .delete(
+        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/relation/person/some-person-id"
+      )
+      .reply(200, { isExecuted: true });
+
+    const qoreContext = createNewQoreContext();
+
+    const { result } = renderHook(() =>
+      qoreContext.views.allTasks.useRelation(
+        "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
+      )
+    );
+
+    expect(result.current.statuses.addRelation).toEqual("idle");
+    expect(result.current.statuses.removeRelation).toEqual("idle");
+    await act(async () => {
+      await expect(
+        result.current.addRelation({ person: ["some-person-id"] })
+      ).resolves.toEqual(true);
+      await expect(
+        result.current.removeRelation({ person: ["some-person-id"] })
+      ).resolves.toEqual(true);
+    });
+    expect(result.current.statuses.addRelation).toEqual("success");
+    expect(result.current.statuses.removeRelation).toEqual("success");
   });
 });

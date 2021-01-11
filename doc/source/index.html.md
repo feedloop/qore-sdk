@@ -527,13 +527,16 @@ await client.views.allTasks.removeRelation(taskId, {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [removeRelation, status] = qoreContext.views.allTasks.removeRelation(
-    taskId
-  );
-  const [addRelation, status] = qoreContext.views.allTasks.addRelation(taskId);
+  const {
+    addRelation,
+    removeRelation,
+    statuses,
+    errors
+  } = qoreContext.views.allTasks.useRelation(taskId);
   return (
     <div>
       <button
+        disabled={statuses.addRelation === "loading"}
         onClick={async () => {
           await addRelation({
             person: [member.id],
@@ -544,6 +547,7 @@ const Component = () => {
         add relation
       </button>
       <button
+        disabled={statuses.removeRelation === "loading"}
         onClick={async () => {
           await removeRelation({ person: [member.id] });
         }}
