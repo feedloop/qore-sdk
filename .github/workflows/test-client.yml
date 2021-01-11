@@ -3,8 +3,6 @@ on:
   push:
     paths:
       - "packages/client/**"
-    branches:
-      - main
 jobs:
   test:
     runs-on: ubuntu-latest

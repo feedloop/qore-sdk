@@ -3,8 +3,6 @@ on:
   push:
     paths:
       - "packages/sdk/**"
-    branches:
-      - main
 jobs:
   test:
     runs-on: ubuntu-latest

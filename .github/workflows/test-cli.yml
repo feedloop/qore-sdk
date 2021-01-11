@@ -3,8 +3,6 @@ on:
   push:
     paths:
       - "packages/cli/**"
-    branches:
-      - main
 jobs:
   deploy-vercel:
     runs-on: ubuntu-latest
