@@ -1,6 +1,6 @@
 {
   "name": "qore-sdk",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "main": "index.js",
   "repository": "git@gitlab.com:feedloop_io/qore-sdk.git",
   "author": "Rizki Romadhoni <rrmdn@pm.me>",
