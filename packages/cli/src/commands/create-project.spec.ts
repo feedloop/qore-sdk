@@ -42,7 +42,7 @@ describe("create-project", () => {
         projectName
       ])
     ).rejects.toThrowError(
-      'Cant find "some-unknown-template" from project templates, may want to choose from the following available templates: todo-list-typescript'
+      '"some-unknown-template" is not a valid template, please check if it is a qore project or choose from the following available templates: todo-list-typescript'
     );
     completeRecording();
   });
