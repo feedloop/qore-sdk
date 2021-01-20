@@ -223,19 +223,13 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     return result.data.url;
   }
   async upload(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append("file", file);
     const [ext] = file.name.split(".").reverse();
     const uploadUrl = await this.generateFileUrl(`${nanoid()}.${ext}`);
-    const axiosConfig: AxiosRequestConfig = {
-      url: uploadUrl,
-      method: "PUT",
+    await Axios.put(uploadUrl, file, {
       headers: {
         "Content-Type": file.type
-      },
-      data: formData
-    };
-    await Axios.request(axiosConfig);
+      }
+    });
     const [url] = uploadUrl.split("?");
     return url;
   }
