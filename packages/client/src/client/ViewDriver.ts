@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import Axios, { AxiosRequestConfig } from "axios";
 import { nanoid } from "nanoid";
 import { APIField } from "@feedloop/qore-sdk";
 import {
@@ -232,7 +232,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       method: "PUT",
       data: formData
     };
-    await this.project.axios(axiosConfig);
+    await Axios.request(axiosConfig);
     const [url] = uploadUrl.split("?");
     return url;
   }
