@@ -230,6 +230,9 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const axiosConfig: AxiosRequestConfig = {
       url: uploadUrl,
       method: "PUT",
+      headers: {
+        "Content-Type": file.type
+      },
       data: formData
     };
     await Axios.request(axiosConfig);
