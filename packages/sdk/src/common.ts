@@ -9,7 +9,7 @@ Axios.interceptors.response.use(
 
 Axios.interceptors.request.use(config => {
   config.baseURL =
-    process.env.QORE_SERVER || "https://stg-qore-app.qorebase.io";
+    process.env.QORE_SERVER || "https://prod-qore-app.qorebase.io";
   return config;
 });
 
