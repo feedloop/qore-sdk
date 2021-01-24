@@ -247,7 +247,7 @@ import qoreContext from "./qoreContext";
 const Component = () => {
   const [
     { data: allTasks, stale, error }
-  ] = qoreContext.views.allTasks.useListRows({
+  ] = qoreContext.views.allTasks.useListRow({
     offset: 10,
     limit: 10,
     order: "asc"
@@ -312,7 +312,7 @@ import qoreContext from "./qoreContext";
 const Component = () => {
   const [
     { data: allTasks, stale, error }
-  ] = qoreContext.views.allTasks.useListRows(
+  ] = qoreContext.views.allTasks.useListRow(
     {
       offset: 10,
       limit: 10,
@@ -383,7 +383,7 @@ operation.revalidate();
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRows(
+  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRow(
     {
       offset: 10,
       limit: 10,
@@ -425,7 +425,7 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRows(
+  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRow(
     {
       offset: 10,
       limit: 10,
