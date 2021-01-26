@@ -1,3 +1,4 @@
+import React from "react";
 import { renderHook, act } from "@testing-library/react-hooks";
 import createQoreContext from ".";
 import { QoreClient } from "@feedloop/qore-client";
@@ -77,6 +78,24 @@ beforeEach(() => {
       "Access-Control-Allow-Origin": "*",
       "Content-Type": "application:json"
     });
+});
+
+describe("Provider", () => {
+  it("should work with provider", () => {
+    const qoreContext = createNewQoreContext();
+    const otherQoreContext = createNewQoreContext();
+    const { result } = renderHook(() => qoreContext.useClient(), {
+      wrapper: (props: { children: React.ReactNode }) => (
+        <qoreContext.context.Provider
+          value={{ client: otherQoreContext.client }}
+        >
+          {props.children}
+        </qoreContext.context.Provider>
+      )
+    });
+    expect(result.current).not.toEqual(qoreContext.client);
+    expect(result.current).toEqual(otherQoreContext.client);
+  });
 });
 
 describe("useListRow", () => {

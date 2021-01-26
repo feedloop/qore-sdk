@@ -398,6 +398,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
   return {
     views,
+    client,
     context,
     useClient
   };
