@@ -44,7 +44,7 @@ const recorder = setupRecorder();
 
 describe("Qore SDK", () => {
   process.env.QORE_SERVER = "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
-  const userToken = "3960f3b8-a139-42eb-8295-3d669e4da4c9";
+  const userToken = "d5a1c695-7961-4098-97c6-915da7d909c9";
   let projectToken: string | undefined;
   let schema: QoreProjectSchema;
   let authenticationId: string | undefined;
@@ -62,8 +62,10 @@ describe("Qore SDK", () => {
     const authConfig = await project.authConfig();
     authenticationId = authConfig.password?.id;
     schema = await project.exportSchema();
+    schema.views = [];
     completeRecording();
   });
+
   it("initialize sdk", async () => {
     const { completeRecording } = await recorder("initialize sdk");
     const qore = new QoreClient(config);
@@ -89,6 +91,36 @@ describe("Qore SDK", () => {
       };
     }>(config);
     qore.init(schema);
+    const alltasks = await qore.views.undone.readRows({ limit: 2 }).toPromise();
+    const cachedTask = await qore.views.undone
+      .readRows({ limit: 2 }, { networkPolicy: "cache-only" })
+      .toPromise();
+    expect(alltasks.data).toEqual(cachedTask.data);
+    expect(alltasks.operation.meta.cacheHit).toBeFalsy();
+    expect(cachedTask.operation.meta.cacheHit).toEqual(true);
+    const fewerTasks = await qore.views.undone
+      .readRows({ limit: 1, undone: "true", order: "asc" })
+      .toPromise();
+    expect(alltasks).not.toEqual(fewerTasks);
+    completeRecording();
+  });
+
+  it("views accesible without calling init method", async () => {
+    const { completeRecording } = await recorder(
+      "views accesible without calling init method"
+    );
+    const qore = new QoreClient<{
+      undone: {
+        read: { id: string; name: string; doneTasks: number };
+        write: { id: string; name: string };
+        params: {
+          undone?: string;
+          "$by.name"?: "asc" | "desc";
+          "$by.description"?: "asc";
+        };
+        actions: {};
+      };
+    }>(config);
     const alltasks = await qore.views.undone.readRows({ limit: 2 }).toPromise();
     const cachedTask = await qore.views.undone
       .readRows({ limit: 2 }, { networkPolicy: "cache-only" })
@@ -202,7 +234,7 @@ describe("Qore SDK", () => {
     qore.init(schema);
     await expect(
       qore.views.toDoDefaultView.deleteRow("this id does not exist")
-    ).rejects.toThrow("Request failed with status code 404");
+    ).rejects.toThrow("Request failed with status code 400");
     completeRecording();
   });
 
