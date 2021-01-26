@@ -62,7 +62,6 @@ describe("Qore SDK", () => {
     const authConfig = await project.authConfig();
     authenticationId = authConfig.password?.id;
     schema = await project.exportSchema();
-    schema.views = [];
     completeRecording();
   });
 
