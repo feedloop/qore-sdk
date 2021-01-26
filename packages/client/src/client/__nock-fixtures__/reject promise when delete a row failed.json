@@ -8,7 +8,7 @@
         "response": "",
         "rawHeaders": [
             "Date",
-            "Wed, 23 Dec 2020 09:06:49 GMT",
+            "Tue, 26 Jan 2021 01:55:42 GMT",
             "Content-Length",
             "0",
             "X-Powered-By",
@@ -33,49 +33,34 @@
         "method": "DELETE",
         "path": "/I0D3NimZQ9GKEDP/toDoDefaultView/rows/this%20id%20does%20not%20exist",
         "body": "",
-        "status": 404,
-        "response": [
-            "1f",
-            "8b",
-            "08",
-            "00",
-            "00",
-            "00",
-            "00",
-            "00",
-            "00",
-            "03",
-            "ab",
-            "56",
-            "4a",
-            "2d",
-            "2a",
-            "ca",
-            "2f",
-            "2a",
-            "56b28a560aca2f57c84c51c8cb2f5148cb2fcd4b518ad5512a2e492c2905ca2af9e597b881045d41ca956a01a893490538000000"
-        ],
+        "status": 400,
+        "response": {
+            "errorStatus": true,
+            "errorType": "General Error",
+            "errors": [
+                {
+                    "message": "Row ID 'this id does not exist' not found",
+                    "code": 801
+                }
+            ]
+        },
         "rawHeaders": [
             "Date",
-            "Wed, 23 Dec 2020 09:06:50 GMT",
+            "Tue, 26 Jan 2021 01:55:42 GMT",
             "Content-Type",
             "application/json; charset=utf-8",
-            "Vary",
-            "Accept-Encoding",
+            "Content-Length",
+            "126",
             "X-Powered-By",
             "Express",
             "Access-Control-Allow-Origin",
             "*",
             "ETag",
-            "W/\"38-APj8krDzdNOnTR1XqeUugig+bIk\"",
-            "Content-Encoding",
-            "gzip",
+            "W/\"7e-9eOVDy0EDher5SKzLY/y3X1J8mc\"",
             "Via",
             "1.1 google",
             "Alt-Svc",
-            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
-            "Transfer-Encoding",
-            "chunked"
+            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
         ],
         "responseIsBinary": false
     }

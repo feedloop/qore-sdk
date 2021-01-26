@@ -38,37 +38,46 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       (map, field) => ({ ...map, [field.id]: field }),
       {}
     );
-    this.actions = Object.entries(this.fields)
-      .filter(([_, field]) => field.type === "action")
-      .reduce(
-        (prev, [fieldId]): RowActions<T["actions"]> => ({
-          ...prev,
-          [fieldId]: {
-            trigger: async (rowId, params) => {
-              const axiosConfig: AxiosRequestConfig = {
-                url: `/${this.id}/rows/${rowId}/${fieldId}`,
-                data: params,
-                method: "POST"
-              };
-              const operation: QoreOperation = {
-                key: JSON.stringify(axiosConfig),
-                request: axiosConfig,
-                type: axiosConfig.method,
-                meta: {},
-                pollInterval: 0,
-                networkPolicy: "network-only"
-              };
-              const res = await this.client
-                .execute<{ isExecuted: false }>(operation)
-                .toPromise();
-              if (res.data?.isExecuted) return true;
-              if (res.error) throw res.error;
-              throw new Error("Trigger has failed");
-            }
-          }
-        }),
-        {} as RowActions<T["actions"]>
-      );
+    this.actions = new Proxy({} as RowActions<T["actions"]>, {
+      get: (actions, key: string): RowActions<T["actions"]>[string] => {
+        if (!actions[key]) {
+          // @ts-ignore
+          actions[key] = this.createAction(key);
+        }
+        return actions[key];
+      }
+    });
+    for (const [key] of Object.entries(this.fields).filter(
+      ([_, field]) => field.type === "action"
+    )) {
+      // @ts-ignore
+      this.actions[key] = this.createAction(key);
+    }
+  }
+  createAction(fieldID: string): RowActions<T["actions"]>[string] {
+    return {
+      trigger: async (rowId, params) => {
+        const axiosConfig: AxiosRequestConfig = {
+          url: `/${this.id}/rows/${rowId}/${fieldID}`,
+          data: params,
+          method: "POST"
+        };
+        const operation: QoreOperation = {
+          key: JSON.stringify(axiosConfig),
+          request: axiosConfig,
+          type: axiosConfig.method,
+          meta: {},
+          pollInterval: 0,
+          networkPolicy: "network-only"
+        };
+        const res = await this.client
+          .execute<{ isExecuted: false }>(operation)
+          .toPromise();
+        if (res.data?.isExecuted) return true;
+        if (res.error) throw res.error;
+        throw new Error("Trigger has failed");
+      }
+    };
   }
   readRows(
     opts: Partial<{ offset: number; limit: number; order: "asc" | "desc" }> &
@@ -181,13 +190,12 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     relations: Partial<ConditionalPick<T["write"], string[]>>
   ): Promise<boolean> {
     await Promise.all(
-      Object.entries(relations).flatMap(([field, values]) => {
-        return (values as string[]).map(value => {
+      Object.entries(relations).flatMap(([field, refs]) => {
+        return (refs as string[]).map(ref => {
           const axiosConfig: AxiosRequestConfig = {
             baseURL: this.project.config.endpoint,
-            url: `/orgs/${this.project.config.organizationId}/projects/${this.project.config.projectId}/tables/${this.tableId}/rows/${rowId}/relation/${field}`,
-            method: "POST",
-            data: { value }
+            url: `/${this.project.config.projectId}/${this.id}/rows/${rowId}/${field}/${ref}`,
+            method: "POST"
           };
           return this.project.axios(axiosConfig);
         });
@@ -201,13 +209,15 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     relations: Partial<ConditionalPick<T["write"], string[]>>
   ): Promise<boolean> {
     await Promise.all(
-      Object.entries(relations).map(([field, relationId]) => {
-        const axiosConfig: AxiosRequestConfig = {
-          baseURL: this.project.config.endpoint,
-          url: `/orgs/${this.project.config.organizationId}/projects/${this.project.config.projectId}/tables/${this.tableId}/rows/${rowId}/relation/${field}/${relationId}`,
-          method: "DELETE"
-        };
-        return this.project.axios(axiosConfig);
+      Object.entries(relations).flatMap(([field, refs]) => {
+        return (refs as string[]).map(ref => {
+          const axiosConfig: AxiosRequestConfig = {
+            baseURL: this.project.config.endpoint,
+            url: `/${this.project.config.projectId}/${this.id}/rows/${rowId}/${field}/${ref}`,
+            method: "DELETE"
+          };
+          return this.project.axios(axiosConfig);
+        });
       })
     );
     return true;

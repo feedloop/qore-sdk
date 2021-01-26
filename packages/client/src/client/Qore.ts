@@ -119,8 +119,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   nextOperation: (operation: QoreOperation<AxiosRequestConfig>) => void;
   activeOperations: Record<string, number> = {};
   project: QoreProject;
-  // @ts-ignore
-  views: { [K in keyof T]: ViewDriver<T[K]> } = {};
+  views: { [K in keyof T]: ViewDriver<T[K]> };
   constructor(config: QoreConfig) {
     this.project = new QoreProject(config);
     const { next, source } = Wonka.makeSubject<
@@ -135,6 +134,22 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         this.operations
       )
     );
+    this.views = new Proxy({} as { [K in keyof T]: ViewDriver<T[K]> }, {
+      get: (views, key: string): ViewDriver<T[string]> => {
+        if (!views[key]) {
+          const currentView: ViewDriver<T[string]> = new ViewDriver<T[string]>(
+            this,
+            this.project,
+            key,
+            "UNKNOWN",
+            []
+          );
+          // @ts-ignore
+          views[key] = currentView;
+        }
+        return views[key];
+      }
+    });
     // Keep the stream open
     Wonka.publish(this.results);
   }
@@ -148,14 +163,10 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         view.fields
       );
     });
-    // @ts-ignore
-    this.views = views.reduce(
-      (map, driver) => ({
-        ...map,
-        [driver.id]: driver
-      }),
-      {}
-    );
+    for (const view of views) {
+      // @ts-ignore
+      this.views[view.id] = view;
+    }
   }
   async authenticate(email: string, password: string): Promise<string> {
     const config: AxiosRequestConfig = {
