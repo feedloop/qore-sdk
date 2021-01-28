@@ -236,7 +236,8 @@ To ensure that you will have your configuration files on your root project, run 
 Once initialized, your project views will be accessible via the client instance. You can start reading the data of your view.
 
 ```javascript
-const { data, error } = await client.views.allTasks
+const { data, error } = await client
+  .view("allTasks")
   .readRows({ offset: 10, limit: 10, order: "desc" })
   .toPromise();
 ```
@@ -245,13 +246,13 @@ const { data, error } = await client.views.allTasks
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [
-    { data: allTasks, stale, error }
-  ] = qoreContext.views.allTasks.useListRow({
-    offset: 10,
-    limit: 10,
-    order: "asc"
-  });
+  const [{ data: allTasks, stale, error }] = qoreContext
+    .view("allTasks")
+    .useListRow({
+      offset: 10,
+      limit: 10,
+      order: "asc"
+    });
   return (
     <ul>
       {allTasks.map(task => (
@@ -269,7 +270,8 @@ You can also specify `offset`, `limit` and `order` when performing a read view o
 ## Reading individual row
 
 ```javascript
-const { data, error } = await client.views.allTasks
+const { data, error } = await client
+  .view("allTasks")
   .readRow("some-task-id")
   .toPromise();
 ```
@@ -278,9 +280,9 @@ const { data, error } = await client.views.allTasks
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [
-    { data: someTask, stale, error }
-  ] = qoreContext.views.allTasks.useGetRow("some-task-id");
+  const [{ data: someTask, stale, error }] = qoreContext
+    .view("allTasks")
+    .useGetRow("some-task-id");
   return (
     <ul>
       {allTasks.map(task => (
@@ -298,7 +300,8 @@ Oftentimes we want to get the detail of a specific row by the ID. Assuming the i
 ## Caching data
 
 ```javascript
-const { data, error } = await client.views.allTasks
+const { data, error } = await client
+  .view("allTasks")
   .readRows(
     { offset: 10, limit: 10, order: "desc" },
     { networkPolicy: "cache-only" }
@@ -310,16 +313,16 @@ const { data, error } = await client.views.allTasks
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [
-    { data: allTasks, stale, error }
-  ] = qoreContext.views.allTasks.useListRow(
-    {
-      offset: 10,
-      limit: 10,
-      order: "asc"
-    },
-    { networkPolicy: "cache-only" }
-  );
+  const [{ data: allTasks, stale, error }] = qoreContext
+    .view("allTasks")
+    .useListRow(
+      {
+        offset: 10,
+        limit: 10,
+        order: "asc"
+      },
+      { networkPolicy: "cache-only" }
+    );
   return (
     <ul>
       {allTasks.map(task => (
@@ -349,10 +352,12 @@ You don't need to subscribe to anything if you use the React Hooks as it does th
 </aside>
 
 ```javascript
-const operation = client.views.allTasks.readRows(
-  { offset: 10, limit: 10, order: "desc" },
-  { networkPolicy: "network-and-cache" }
-);
+const operation = client
+  .view("allTasks")
+  .readRows(
+    { offset: 10, limit: 10, order: "desc" },
+    { networkPolicy: "network-and-cache" }
+  );
 
 const subscription = operation.subscribe(({ data, error, stale }) => {
   if (data && !stale) {
@@ -367,10 +372,12 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 ## Revalidating data
 
 ```javascript
-const operation = client.views.allTasks.readRows(
-  { offset: 10, limit: 10, order: "desc" },
-  { networkPolicy: "network-and-cache" }
-);
+const operation = client
+  .view("allTasks")
+  .readRows(
+    { offset: 10, limit: 10, order: "desc" },
+    { networkPolicy: "network-and-cache" }
+  );
 
 const subscription = operation.subscribe(({ data, error, stale }) => {
   doSomething(data);
@@ -383,7 +390,7 @@ operation.revalidate();
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRow(
+  const [{ data: allTasks }, revalidate] = qoreContext.view("allTasks").useListRow(
     {
       offset: 10,
       limit: 10,
@@ -411,10 +418,12 @@ By calling `revalidate()`, you are asking qore client to send a `network-only` m
 ## Polling interval
 
 ```javascript
-const operation = client.views.allTasks.readRows(
-  { offset: 10, limit: 10, order: "desc" },
-  { networkPolicy: "network-and-cache", pollInterval: 5000 }
-);
+const operation = client
+  .view("allTasks")
+  .readRows(
+    { offset: 10, limit: 10, order: "desc" },
+    { networkPolicy: "network-and-cache", pollInterval: 5000 }
+  );
 
 const subscription = operation.subscribe(({ data, error, stale }) => {
   doSomething(data);
@@ -425,7 +434,7 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.views.allTasks.useListRow(
+  const [{ data: allTasks }, revalidate] = qoreContext.view("allTasks").useListRow(
     {
       offset: 10,
       limit: 10,
@@ -457,14 +466,14 @@ Similar to reading data, writing data is accessible from each view object.
 ## Insert a new row
 
 ```javascript
-const newRow = await client.views.allTasks.insertRow({ ...data });
+const newRow = await client.view("allTasks").insertRow({ ...data });
 ```
 
 ```jsx
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [insertRow, status] = qoreContext.views.allTasks.useInsertRow();
+  const [insertRow, status] = qoreContext.view("allTasks").useInsertRow();
   return (
     <button
       onClick={async () => {
@@ -484,7 +493,7 @@ Insert a data to `allTasks` view.
 ## Update a row
 
 ```javascript
-await client.views.allTasks.updateRow("some-task-id", {
+await client.view("allTasks").updateRow("some-task-id", {
   ...data
 });
 ```
@@ -493,7 +502,7 @@ await client.views.allTasks.updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.views.allTasks.useUpdateRow();
+  const [updateRow, status] = qoreContext.view("allTasks").useUpdateRow();
   return (
     <button
       onClick={async () => {
@@ -513,12 +522,12 @@ Update a data of `allTasks` view with an id of _some-task-id_.
 ## Add & remove relationships
 
 ```javascript
-await client.views.allTasks.addRelation(taskId, {
+await client.view("allTasks").addRelation(taskId, {
   person: [member.id],
   links: links.map(link => link.id)
 });
 
-await client.views.allTasks.removeRelation(taskId, {
+await client.view("allTasks").removeRelation(taskId, {
   person: [member.id]
 });
 ```
@@ -527,12 +536,9 @@ await client.views.allTasks.removeRelation(taskId, {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const {
-    addRelation,
-    removeRelation,
-    statuses,
-    errors
-  } = qoreContext.views.allTasks.useRelation(taskId);
+  const { addRelation, removeRelation, statuses, errors } = qoreContext
+    .view("allTasks")
+    .useRelation(taskId);
   return (
     <div>
       <button
@@ -566,7 +572,7 @@ In this example we are adding `member.id` to the relationship of a specific row 
 ## Update a row
 
 ```javascript
-await client.views.allTasks.updateRow("some-task-id", {
+await client.view("allTasks").updateRow("some-task-id", {
   ...data
 });
 ```
@@ -575,7 +581,7 @@ await client.views.allTasks.updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.views.allTasks.useUpdateRow();
+  const [updateRow, status] = qoreContext.view("allTasks").useUpdateRow();
   return (
     <button
       onClick={async () => {
@@ -595,8 +601,8 @@ Update a data of `allTasks` view with an id of _some-task-id_.
 ## Upload a file
 
 ```javascript
-const files = await client.views.allTasks.upload(event.target.files);
-await client.views.allTasks.updateRow("some-task-id", {
+const files = await client.view("allTasks").upload(event.target.files);
+await client.view("allTasks").updateRow("some-task-id", {
   ...data
   avatar: files
 });
@@ -606,7 +612,7 @@ await client.views.allTasks.updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.views.allTasks.useUpdateRow();
+  const [updateRow, status] = qoreContext.view("allTasks").useUpdateRow();
   const handleUpload = async event => {
     const files = await client.upload(event.target.files);
     await updateRow("some-task-id", { ...data, avatar: files });
@@ -620,14 +626,14 @@ Adding files to a row requires you to upload the file first. The file type of th
 ## Delete a row
 
 ```javascript
-await client.views.allTasks.deleteRow("some-task-id");
+await client.view("allTasks").deleteRow("some-task-id");
 ```
 
 ```jsx
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [deleteRow, status] = qoreContext.views.allTasks.useDeleteRow();
+  const [deleteRow, status] = qoreContext.view("allTasks").useDeleteRow();
   return (
     <button
       onClick={async () => {
@@ -645,9 +651,7 @@ Remove a data of `allTasks` view with an id of _some-task-id_.
 ## Trigger actions
 
 ```javascript
-const rowActions = client.views.allTasks.rowActions("some-task-id");
-
-await rowActions.archiveTask.trigger({
+await client.view("allTasks").action("archiveTask").trigger("some-task-id", {
   someParams: "someValue"
 });
 ```
@@ -656,13 +660,13 @@ await rowActions.archiveTask.trigger({
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [rowActions, status] = qoreContext.views.allTasks.useActions(
-    "some-task-id"
-  );
+  const [action, status] = qoreContext
+    .view("allTasks")
+    .useActions("some-task-id");
   return (
     <button
       onClick={async () => {
-        await rowActions.archiveTask.trigger({
+        await action("archiveTask").trigger({
           someParams: "someValue"
         });
       }}
@@ -678,7 +682,7 @@ Each qore row can have one or more action triggers, an action trigger may requir
 ## Send form inputs
 
 ```javascript
-await client.views.allTasks.forms.newTaskForm.send({
+await client.view("allTasks").forms.newTaskForm.send({
   someParams: "someValue"
 });
 ```
@@ -687,7 +691,7 @@ await client.views.allTasks.forms.newTaskForm.send({
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [forms, status] = qoreContext.views.allTasks.useForms();
+  const [forms, status] = qoreContext.view("allTasks").useForms();
   return (
     <button
       onClick={async () => {
