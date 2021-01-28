@@ -186,9 +186,13 @@ export default qoreContext;
 
 const Root = () => {
   return (
-    <qoreContext.Provider>
+    <qoreContext.context.Provider
+      value={{
+        client: otherQoreContext.client
+      }}
+    >
       <YourApp />
-    </qoreContext.Provider>
+    </qoreContext.context.Provider>
   );
 };
 ```
