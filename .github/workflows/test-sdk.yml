@@ -11,8 +11,8 @@ jobs:
       - uses: actions/setup-node@v2
       - run: |
           yarn
-          yarn lerna run build
           yarn lerna bootstrap
+          yarn lerna run build
           cd packages/sdk
           yarn
           yarn tsc --noEmit
