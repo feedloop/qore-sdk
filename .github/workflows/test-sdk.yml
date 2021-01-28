@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-node@v2
       - run: |
           yarn
-          yarn lerna bootstrap
+          yarn lerna bootstrap --npm-client yarn
           yarn lerna run build
           cd packages/sdk
           yarn
