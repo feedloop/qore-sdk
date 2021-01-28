@@ -14,5 +14,4 @@ jobs:
           yarn lerna bootstrap --npm-client yarn
           yarn lerna run build
           cd packages/client
-          yarn
           yarn test
