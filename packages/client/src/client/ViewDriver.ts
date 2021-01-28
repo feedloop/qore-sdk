@@ -54,7 +54,18 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       this.actions[key] = this.createAction(key);
     }
   }
-  createAction(fieldID: string): RowActions<T["actions"]>[string] {
+  action(
+    actionId: keyof RowActions<T["actions"]>
+  ): RowActions<T["actions"]>[typeof actionId] {
+    if (!this.actions[actionId]) {
+      // @ts-ignore
+      this.actions[actionId] = this.createAction(actionId as string);
+    }
+    return this.actions[actionId];
+  }
+  createAction<FieldID = string>(
+    fieldID: FieldID
+  ): RowActions<T["actions"]>[string] {
     return {
       trigger: async (rowId, params) => {
         const axiosConfig: AxiosRequestConfig = {

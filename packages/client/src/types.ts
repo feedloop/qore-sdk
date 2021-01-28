@@ -50,7 +50,7 @@ export type QoreOperationResult<Params = AxiosRequestConfig, Data = any> = {
 
 /** Input parameters for to an Exchange factory function. */
 export interface ExchangeInput {
-  client: QoreClient<{}>;
+  client: QoreClient<QoreSchema>;
   forward: ExchangeIO;
 }
 

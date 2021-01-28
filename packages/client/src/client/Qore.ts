@@ -153,6 +153,19 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     // Keep the stream open
     Wonka.publish(this.results);
   }
+  view<K extends keyof T>(viewId: K): ViewDriver<T[K]> {
+    if (!this.views[viewId]) {
+      const currentView: ViewDriver<T[K]> = new ViewDriver<T[K]>(
+        this,
+        this.project,
+        viewId as string,
+        "UNKNOWN",
+        []
+      );
+      this.views[viewId] = currentView;
+    }
+    return this.views[viewId];
+  }
   init(schema: QoreProjectSchema) {
     const views = schema.views.map(view => {
       return new ViewDriver(

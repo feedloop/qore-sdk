@@ -120,7 +120,10 @@ describe("Qore SDK", () => {
         actions: {};
       };
     }>(config);
-    const alltasks = await qore.views.undone.readRows({ limit: 2 }).toPromise();
+    const alltasks = await qore
+      .view("undone")
+      .readRows({ limit: 2 })
+      .toPromise();
     const cachedTask = await qore.views.undone
       .readRows({ limit: 2 }, { networkPolicy: "cache-only" })
       .toPromise();
@@ -291,10 +294,13 @@ describe("Qore SDK", () => {
     qore.init(schema);
 
     await expect(
-      qore.views.memberDefaultView.actions.addTask.trigger(
-        "this id does not exist",
-        { task: "new task", description: "new task desc" }
-      )
+      qore
+        .view("memberDefaultView")
+        .action("addTask")
+        .trigger("this id does not exist", {
+          task: "new task",
+          description: "new task desc"
+        })
     ).rejects.toThrow("Trigger has failed");
     completeRecording();
   });

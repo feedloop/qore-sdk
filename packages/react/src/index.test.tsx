@@ -175,9 +175,9 @@ describe("useGetRow", () => {
     const qoreContext = createNewQoreContext();
 
     const { result, waitForNextUpdate } = renderHook(() =>
-      qoreContext.views.allTasks.useGetRow(
-        "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      qoreContext
+        .view("allTasks")
+        .useGetRow("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
     );
 
     expect(result.current.status).toEqual("loading");
@@ -392,15 +392,15 @@ describe("useActions", () => {
     const qoreContext = createNewQoreContext();
 
     const { result } = renderHook(() =>
-      qoreContext.views.allTasks.useActions(
-        "beba4104-44ee-46b2-9ddc-e6bfd0a1570f"
-      )
+      qoreContext
+        .view("allTasks")
+        .useActions("beba4104-44ee-46b2-9ddc-e6bfd0a1570f")
     );
 
     expect(result.current.statuses.finishTask).toEqual("idle");
     await act(async () => {
       await expect(
-        result.current.rowActions.finishTask.trigger({ notes: "some notes" })
+        result.current.action("finishTask").trigger({ notes: "some notes" })
       ).resolves.toEqual(true);
     });
     expect(result.current.statuses.finishTask).toEqual("success");
@@ -436,12 +436,11 @@ describe("useRelation", () => {
   it("should add & remove relation", async () => {
     scope = scope
       .post(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/relation/person",
-        { value: "some-person-id" }
+        "/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/person/some-person-id"
       )
       .reply(200, { isExecuted: true })
       .delete(
-        "/orgs/FAKE_ORG/projects/FAKE_PROJECT/tables/tasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/relation/person/some-person-id"
+        "/FAKE_PROJECT/allTasks/rows/beba4104-44ee-46b2-9ddc-e6bfd0a1570f/person/some-person-id"
       )
       .reply(200, { isExecuted: true });
 
