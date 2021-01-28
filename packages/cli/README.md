@@ -19,7 +19,7 @@ $ npm install -g @feedloop/qore-cli
 $ qore COMMAND
 running command...
 $ qore (-v|--version|version)
-@feedloop/qore-cli/0.1.20 linux-x64 node-v14.8.0
+@feedloop/qore-cli/0.1.21 linux-x64 node-v14.8.0
 $ qore --help [COMMAND]
 USAGE
   $ qore COMMAND
@@ -43,14 +43,14 @@ USAGE
 
 OPTIONS
   --org=org          [default: pr2UO4So1UtZp42] organization id
-  --project=project  [default: E5ZqFW5ynflTTrk] project id
-  --token=token      [default: 15644b56-f9b2-4060-8f11-1accfca386b1] organization id
+  --project=project  [default: bqOIRbLMuOcFITE] project id
+  --token=token      [default: 0ef74faf-6721-4dff-b397-d15bf6299d5f] organization id
 
 EXAMPLE
   $ qore codegen --project projectId --org orgId
 ```
 
-_See code: [src/commands/codegen.ts](https://github.com/rrmdn/cli/blob/v0.1.20/src/commands/codegen.ts)_
+_See code: [src/commands/codegen.ts](https://github.com/rrmdn/cli/blob/v0.1.21/src/commands/codegen.ts)_
 
 ## `qore create-project [NAME]`
 
@@ -61,13 +61,13 @@ USAGE
 OPTIONS
   -t, --template=template  [default: todo-list-typescript] qore project template
   --org=org                [default: pr2UO4So1UtZp42] organization id
-  --token=token            [default: 15644b56-f9b2-4060-8f11-1accfca386b1] organization id
+  --token=token            [default: 0ef74faf-6721-4dff-b397-d15bf6299d5f] organization id
 
 EXAMPLE
   $ qore create-project --template todo-list-typescript your-project-name
 ```
 
-_See code: [src/commands/create-project.ts](https://github.com/rrmdn/cli/blob/v0.1.20/src/commands/create-project.ts)_
+_See code: [src/commands/create-project.ts](https://github.com/rrmdn/cli/blob/v0.1.21/src/commands/create-project.ts)_
 
 ## `qore export-schema [FILE]`
 
@@ -77,14 +77,14 @@ USAGE
 
 OPTIONS
   --org=org          [default: pr2UO4So1UtZp42] organization id
-  --project=project  [default: E5ZqFW5ynflTTrk] project id
-  --token=token      [default: 15644b56-f9b2-4060-8f11-1accfca386b1] organization id
+  --project=project  [default: bqOIRbLMuOcFITE] project id
+  --token=token      [default: 0ef74faf-6721-4dff-b397-d15bf6299d5f] organization id
 
 EXAMPLE
   $ qore export-schema
 ```
 
-_See code: [src/commands/export-schema.ts](https://github.com/rrmdn/cli/blob/v0.1.20/src/commands/export-schema.ts)_
+_See code: [src/commands/export-schema.ts](https://github.com/rrmdn/cli/blob/v0.1.21/src/commands/export-schema.ts)_
 
 ## `qore help [COMMAND]`
 
@@ -114,7 +114,7 @@ EXAMPLE
   $ qore login
 ```
 
-_See code: [src/commands/login.ts](https://github.com/rrmdn/cli/blob/v0.1.20/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/rrmdn/cli/blob/v0.1.21/src/commands/login.ts)_
 
 ## `qore set-project`
 
@@ -123,11 +123,11 @@ USAGE
   $ qore set-project
 
 OPTIONS
-  --token=token  [default: 15644b56-f9b2-4060-8f11-1accfca386b1] organization id
+  --token=token  [default: 0ef74faf-6721-4dff-b397-d15bf6299d5f] organization id
 
 EXAMPLE
   $ qore set-project
 ```
 
-_See code: [src/commands/set-project.ts](https://github.com/rrmdn/cli/blob/v0.1.20/src/commands/set-project.ts)_
+_See code: [src/commands/set-project.ts](https://github.com/rrmdn/cli/blob/v0.1.21/src/commands/set-project.ts)_
 <!-- commandsstop -->
