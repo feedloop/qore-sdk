@@ -188,7 +188,7 @@ const Root = () => {
   return (
     <qoreContext.context.Provider
       value={{
-        client: otherQoreContext.client
+        client: qoreContext.client
       }}
     >
       <YourApp />
