@@ -4,7 +4,7 @@ import { setupRecorder } from "nock-record";
 import { QoreSchema } from "../types";
 import QoreClient, { QoreConfig } from "./Qore";
 
-interface TestSchema extends QoreSchema {
+type TestSchema = {
   memberDefaultView: {
     read: { id: string; email: string };
     write: {};
@@ -38,7 +38,7 @@ interface TestSchema extends QoreSchema {
     params: { slug?: string };
     actions: {};
   };
-}
+};
 
 const recorder = setupRecorder();
 
@@ -179,7 +179,7 @@ describe("Qore SDK", () => {
     );
     const qore = new QoreClient<TestSchema>(config);
     qore.init(schema);
-    const newTask = await qore.views.toDoDefaultView.insertRow({
+    const newTask = await qore.view("memberDefaultView").insertRow({
       task: "New task",
       difficulty: "Easy",
       done: false,
@@ -298,8 +298,8 @@ describe("Qore SDK", () => {
         .view("memberDefaultView")
         .action("addTask")
         .trigger("this id does not exist", {
-          task: "new task",
-          description: "new task desc"
+          description: "sdsd",
+          task: "asdsds"
         })
     ).rejects.toThrow("Trigger has failed");
     completeRecording();

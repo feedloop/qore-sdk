@@ -216,7 +216,7 @@ export default class Codegen extends Command {
           )
           .join("\n")}
 
-        interface ProjectSchema extends QoreSchema {
+        type ProjectSchema = {
           ${schema.views
             .map(view => `${view.id}: ${voca.capitalize(view.id)}ViewRow;`)
             .join("")}
