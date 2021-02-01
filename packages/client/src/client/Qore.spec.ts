@@ -169,7 +169,7 @@ describe("Qore SDK", () => {
     });
 
     setTimeout(() => {
-      readStream.revalidate();
+      readStream.revalidate().toPromise();
     }, 1000);
   });
 
@@ -179,7 +179,7 @@ describe("Qore SDK", () => {
     );
     const qore = new QoreClient<TestSchema>(config);
     qore.init(schema);
-    const newTask = await qore.view("memberDefaultView").insertRow({
+    const newTask = await qore.view("toDoDefaultView").insertRow({
       task: "New task",
       difficulty: "Easy",
       done: false,
@@ -205,6 +205,29 @@ describe("Qore SDK", () => {
       done: !rows?.nodes[0].done
     });
     expect(updatedTask).toHaveProperty("done", !rows?.nodes[0].done);
+    completeRecording();
+  });
+
+  it("revalidate a row with optimistic response", async () => {
+    const { completeRecording } = await recorder(
+      "revalidate a row with optimistic response"
+    );
+    const qore = new QoreClient<TestSchema>(config);
+    qore.init(schema);
+    const { data: rows } = await qore.views.toDoDefaultView
+      .readRows({ limit: 1 })
+      .toPromise();
+
+    const id = rows?.nodes[0].id || "";
+    const rowStream = qore.views.toDoDefaultView.readRow(id);
+    const selectedRow = await rowStream.toPromise();
+    const updatedRow = await rowStream
+      .revalidate({
+        networkPolicy: "cache-only",
+        optimisticResponse: { done: !selectedRow.data?.done }
+      })
+      .toPromise();
+    expect(updatedRow.data).not.toEqual(selectedRow.data);
     completeRecording();
   });
 
@@ -298,8 +321,8 @@ describe("Qore SDK", () => {
         .view("memberDefaultView")
         .action("addTask")
         .trigger("this id does not exist", {
-          description: "sdsd",
-          task: "asdsds"
+          task: "new task",
+          description: "new task desc"
         })
     ).rejects.toThrow("Trigger has failed");
     completeRecording();

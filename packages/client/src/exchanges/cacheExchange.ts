@@ -22,14 +22,19 @@ const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
   };
   const cachedStream = Wonka.pipe(
     sharedOpsStream,
-    Wonka.filter(operation => hasCache(operation)),
+    Wonka.filter(
+      operation => hasCache(operation) || !!operation.optimisticResponse
+    ),
     Wonka.map(
       (operation): QoreOperationResult => {
         const cached = resultCache.get(operation.key);
+        const optimisticResponse = operation.optimisticResponse;
+        const merged = { ...(cached || {}), ...(optimisticResponse || {}) };
+
         const result: QoreOperationResult = {
           operation,
           stale: false,
-          data: cached
+          data: cached || optimisticResponse ? merged : undefined
         };
         // send revalidation command
         if (operation.networkPolicy === "network-and-cache") {
@@ -37,6 +42,7 @@ const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
           result.stale = true;
         }
         result.operation.meta["cacheHit"] = true;
+        result.operation.meta["optimistic"] = !!optimisticResponse;
         return result;
       }
     )

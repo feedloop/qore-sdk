@@ -86,7 +86,9 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
 
 export type PromisifiedSource<T = any> = Wonka.Source<T> & {
   toPromise: () => Promise<T>;
-  revalidate: (config?: Partial<QoreOperationConfig>) => void;
+  revalidate: (
+    config?: Partial<QoreOperationConfig>
+  ) => PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T>>;
   subscribe: (callback: (data: T) => void) => Wonka.Subscription;
 };
 
@@ -101,12 +103,12 @@ export function withHelpers<T>(
     Wonka.subscribe(callback)(source$);
   (source$ as PromisifiedSource<T>).revalidate = (
     config = defaultOperationConfig
-  ) => {
-    client.revalidate({
+  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T>> => {
+    return client.execute<T>({
       ...defaultOperationConfig,
       ...operation,
-      ...config,
-      networkPolicy: "network-only"
+      networkPolicy: "network-only",
+      ...config
     });
   };
 

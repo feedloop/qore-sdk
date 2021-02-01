@@ -20,16 +20,20 @@ export type QoreSchema = Record<string, QoreViewSchema>;
 
 export type NetworkPolicy = "network-only" | "network-and-cache" | "cache-only";
 
-export type QoreOperationConfig = {
+export type OptimisticResponse = Record<string, any>;
+
+export declare type QoreOperationConfig<T extends OptimisticResponse = {}> = {
   networkPolicy: NetworkPolicy;
   pollInterval: number;
+  optimisticResponse?: T;
 };
 
 export type QoreOperation<
-  Params extends AxiosRequestConfig = AxiosRequestConfig
-> = QoreOperationConfig & {
-  request: Params;
-  type: Params["method"] | "teardown";
+  TParams extends AxiosRequestConfig = AxiosRequestConfig,
+  TOpimisticResponse extends OptimisticResponse = {}
+> = QoreOperationConfig<TOpimisticResponse> & {
+  request: TParams;
+  type: TParams["method"] | "teardown";
   key: string;
   meta: Record<string, any>;
 };

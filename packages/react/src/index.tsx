@@ -4,8 +4,10 @@ import {
   QoreClient,
   QoreOperationConfig,
   RowActions,
-  QoreViewSchema
+  QoreViewSchema,
+  QoreOperationResult
 } from "@feedloop/qore-client";
+import { AxiosRequestConfig } from "axios";
 import { ConditionalPick } from "type-fest";
 
 type QoreRequestStatus = "idle" | "loading" | "success" | "error";
@@ -29,7 +31,19 @@ type QoreHooks<T extends QoreSchema[string]> = {
     data: T["read"][];
     status: QoreRequestStatus;
     error: Error | null;
-    revalidate: () => void;
+    revalidate: (
+      config?: Partial<QoreOperationConfig>
+    ) => Promise<
+      QoreOperationResult<
+        AxiosRequestConfig,
+        QoreOperationResult<
+          AxiosRequestConfig,
+          {
+            nodes: T["read"][];
+          }
+        >
+      >
+    >;
   };
 
   useGetRow: (
@@ -39,7 +53,14 @@ type QoreHooks<T extends QoreSchema[string]> = {
     data: T["read"] | null;
     status: QoreRequestStatus;
     error: Error | null;
-    revalidate: () => void;
+    revalidate: (
+      config?: Partial<QoreOperationConfig>
+    ) => Promise<
+      QoreOperationResult<
+        AxiosRequestConfig,
+        QoreOperationResult<AxiosRequestConfig, T["read"]>
+      >
+    >;
   };
 
   useInsertRow: () => {
@@ -134,7 +155,14 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           };
         }, [stream]);
 
-        return { data, error, status, revalidate: stream.revalidate };
+        const revalidate = React.useCallback(
+          async (config?: Partial<QoreOperationConfig>) => {
+            const result = await stream.revalidate(config).toPromise();
+            return result;
+          },
+          [stream.revalidate]
+        );
+        return { data, error, status, revalidate };
       },
 
       useGetRow: (rowId, config = {}) => {
@@ -168,7 +196,15 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           };
         }, [stream]);
 
-        return { data, error, status, revalidate: stream.revalidate };
+        const revalidate = React.useCallback(
+          async (config?: Partial<QoreOperationConfig>) => {
+            const result = await stream.revalidate(config).toPromise();
+            return result;
+          },
+          [stream.revalidate]
+        );
+
+        return { data, error, status, revalidate };
       },
 
       useInsertRow: () => {
@@ -286,7 +322,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               }
             }
           }),
-          []
+          [rowId]
         );
 
         const action = React.useCallback(
