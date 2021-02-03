@@ -18,13 +18,14 @@ const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
   const resultCache = new Map<string, QoreOperationResult["data"]>();
   const sharedOpsStream = Wonka.share(operationStream);
   const hasCache = (operation: QoreOperation) => {
-    return shouldCacheOperation(operation) && resultCache.has(operation.key);
+    return (
+      (shouldCacheOperation(operation) && resultCache.has(operation.key)) ||
+      !!operation.optimisticResponse
+    );
   };
   const cachedStream = Wonka.pipe(
     sharedOpsStream,
-    Wonka.filter(
-      operation => hasCache(operation) || !!operation.optimisticResponse
-    ),
+    Wonka.filter(operation => hasCache(operation)),
     Wonka.map(
       (operation): QoreOperationResult => {
         const cached = resultCache.get(operation.key);
