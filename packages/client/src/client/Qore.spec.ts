@@ -208,7 +208,7 @@ describe("Qore SDK", () => {
     completeRecording();
   });
 
-  it("revalidate a row with optimistic response", async () => {
+  it("revalidate a row with optimistic response", async done => {
     const { completeRecording } = await recorder(
       "revalidate a row with optimistic response"
     );
@@ -220,15 +220,31 @@ describe("Qore SDK", () => {
 
     const id = rows?.nodes[0].id || "";
     const rowStream = qore.views.toDoDefaultView.readRow(id);
-    const selectedRow = await rowStream.toPromise();
-    const updatedRow = await rowStream
-      .revalidate({
-        networkPolicy: "cache-only",
-        optimisticResponse: { done: !selectedRow.data?.done }
-      })
-      .toPromise();
-    expect(updatedRow.data).not.toEqual(selectedRow.data);
-    completeRecording();
+    const results: any[] = [];
+    const subs = rowStream.subscribe(async result => {
+      try {
+        results.push(result.data);
+        // revalidate first result with an optimistic response
+        if (results.length === 1) {
+          const firstResult = results[0];
+          rowStream
+            .revalidate({
+              networkPolicy: "cache-only",
+              optimisticResponse: { done: !firstResult?.done }
+            })
+            .toPromise();
+        }
+        // optimistic response should take effect on the next result
+        if (results.length === 2) {
+          expect(results[0]).not.toEqual(results[1]);
+          subs.unsubscribe();
+          done();
+          completeRecording();
+        }
+      } catch (error) {
+        done(error);
+      }
+    });
   });
 
   it("delete a row", async () => {
