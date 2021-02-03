@@ -250,13 +250,11 @@ const { data, error } = await client
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks, stale, error }] = qoreContext
-    .view("allTasks")
-    .useListRow({
-      offset: 10,
-      limit: 10,
-      order: "asc"
-    });
+  const { data: allTasks, status } = qoreContext.view("allTasks").useListRow({
+    offset: 10,
+    limit: 10,
+    order: "asc"
+  });
   return (
     <ul>
       {allTasks.map(task => (
@@ -284,7 +282,7 @@ const { data, error } = await client
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: someTask, stale, error }] = qoreContext
+  const { data: someTask, status, error } = qoreContext
     .view("allTasks")
     .useGetRow("some-task-id");
   return (
@@ -317,7 +315,7 @@ const { data, error } = await client
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks, stale, error }] = qoreContext
+  const { data: allTasks, status, error } = qoreContext
     .view("allTasks")
     .useListRow(
       {
@@ -394,7 +392,7 @@ operation.revalidate();
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.view("allTasks").useListRow(
+  const { data: allTasks, revalidate } = qoreContext.view("allTasks").useListRow(
     {
       offset: 10,
       limit: 10,
@@ -438,7 +436,7 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [{ data: allTasks }, revalidate] = qoreContext.view("allTasks").useListRow(
+  const { data: allTasks, revalidate } = qoreContext.view("allTasks").useListRow(
     {
       offset: 10,
       limit: 10,
@@ -477,7 +475,7 @@ const newRow = await client.view("allTasks").insertRow({ ...data });
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [insertRow, status] = qoreContext.view("allTasks").useInsertRow();
+  const { insertRow, status } = qoreContext.view("allTasks").useInsertRow();
   return (
     <button
       onClick={async () => {
@@ -506,7 +504,7 @@ await client.view("allTasks").updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.view("allTasks").useUpdateRow();
+  const { updateRow, status } = qoreContext.view("allTasks").useUpdateRow();
   return (
     <button
       onClick={async () => {
@@ -585,7 +583,7 @@ await client.view("allTasks").updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.view("allTasks").useUpdateRow();
+  const { updateRow, status } = qoreContext.view("allTasks").useUpdateRow();
   return (
     <button
       onClick={async () => {
@@ -616,7 +614,7 @@ await client.view("allTasks").updateRow("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [updateRow, status] = qoreContext.view("allTasks").useUpdateRow();
+  const { updateRow, status } = qoreContext.view("allTasks").useUpdateRow();
   const handleUpload = async event => {
     const files = await client.upload(event.target.files);
     await updateRow("some-task-id", { ...data, avatar: files });
@@ -637,7 +635,7 @@ await client.view("allTasks").deleteRow("some-task-id");
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [deleteRow, status] = qoreContext.view("allTasks").useDeleteRow();
+  const { deleteRow, status } = qoreContext.view("allTasks").useDeleteRow();
   return (
     <button
       onClick={async () => {
@@ -664,7 +662,7 @@ await client.view("allTasks").action("archiveTask").trigger("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [action, status] = qoreContext
+  const { action, statuses } = qoreContext
     .view("allTasks")
     .useActions("some-task-id");
   return (
@@ -695,7 +693,7 @@ await client.view("allTasks").forms.newTaskForm.send({
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const [forms, status] = qoreContext.view("allTasks").useForms();
+  const { forms, status } = qoreContext.view("allTasks").useForms();
   return (
     <button
       onClick={async () => {
