@@ -470,7 +470,7 @@ describe("useRelation", () => {
   });
 });
 
-describe.only("useForm", () => {
+describe("useForm", () => {
   it("should send form", async () => {
     scope = scope
       .post("/FAKE_PROJECT/allTasks/forms/newTask")

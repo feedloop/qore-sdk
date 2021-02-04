@@ -8,12 +8,14 @@ const qoreClient = new QoreClient<{
     write: { name: string };
     params: { slug?: string };
     actions: {};
+    forms: {};
   };
   allTasks: {
     read: { id: string; title: string };
     write: { title: string };
     params: { slug?: string };
     actions: {};
+    forms: {};
   };
 }>({
   endpoint: "http://localhost:8080",
