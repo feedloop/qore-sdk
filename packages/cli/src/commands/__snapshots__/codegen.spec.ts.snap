@@ -51,6 +51,15 @@ declare module \\"@feedloop/qore-client\\" {
     };
     params: {};
     actions: {};
+    forms: {
+      newForm3MuYd8OVj6FdlgEnmUv: {
+        task?: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 
   type MemberDefaultViewViewRow = {
@@ -79,6 +88,7 @@ declare module \\"@feedloop/qore-client\\" {
         task?: string;
       };
     };
+    forms: {};
   };
 
   type MemberMetricViewRow = {
@@ -98,6 +108,7 @@ declare module \\"@feedloop/qore-client\\" {
       email: string;
     };
     actions: {};
+    forms: {};
   };
 
   type RamasTaskViewRow = {
@@ -126,6 +137,15 @@ declare module \\"@feedloop/qore-client\\" {
     };
     params: {};
     actions: {};
+    forms: {
+      newForm3MuYd8OVj6FdlgEnmUv: {
+        task?: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 
   type ReisTaskViewRow = {
@@ -156,6 +176,15 @@ declare module \\"@feedloop/qore-client\\" {
       timeAllocation?: string;
     };
     actions: {};
+    forms: {
+      newForm3MuYd8OVj6FdlgEnmUv: {
+        task?: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 
   type TestViewRow = {
@@ -170,6 +199,15 @@ declare module \\"@feedloop/qore-client\\" {
     };
     params: {};
     actions: {};
+    forms: {
+      newForm3MuYd8OVj6FdlgEnmUv: {
+        task?: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 
   type ToDoViewRow = {
@@ -190,6 +228,15 @@ declare module \\"@feedloop/qore-client\\" {
     };
     params: {};
     actions: {};
+    forms: {
+      newForm3MuYd8OVj6FdlgEnmUv: {
+        task?: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 
   type ToDoDefaultViewViewRow = {
@@ -220,6 +267,15 @@ declare module \\"@feedloop/qore-client\\" {
       \\"$by.points\\"?: \\"desc\\";
     };
     actions: {};
+    forms: {
+      newForm3MuYd8OVj6FdlgEnmUv: {
+        task?: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 
   type UndoneViewRow = {
@@ -250,6 +306,15 @@ declare module \\"@feedloop/qore-client\\" {
       undone?: string;
     };
     actions: {};
+    forms: {
+      newForm3MuYd8OVj6FdlgEnmUv: {
+        task?: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 
   type ProjectSchema = {

@@ -2,6 +2,7 @@ import Axios, { AxiosRequestConfig } from "axios";
 import { nanoid } from "nanoid";
 import { APIField } from "@feedloop/qore-sdk";
 import {
+  FormDrivers,
   QoreOperation,
   QoreOperationConfig,
   QoreOperationResult,
@@ -16,6 +17,24 @@ import QoreClient, {
 } from "./Qore";
 import { ConditionalPick, ConditionalExcept } from "type-fest";
 
+export class FormDriver<T extends QoreViewSchema["forms"][string]> {
+  project: QoreProject;
+  viewId: string;
+  formId: string;
+  constructor(project: QoreProject, viewId: string, formId: string) {
+    this.project = project;
+    this.viewId = viewId;
+    this.formId = formId;
+  }
+  async sendForm(params: T): Promise<{ id: string }> {
+    const resp = await this.project.axios.post<{ id: string }>(
+      `/${this.viewId}/forms/${this.formId}`,
+      params
+    );
+    return resp.data;
+  }
+}
+
 export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   id: string;
   tableId: string;
@@ -23,6 +42,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   project: QoreProject;
   client: QoreClient;
   actions: RowActions<T["actions"]>;
+  forms: FormDrivers<T["forms"]>;
   constructor(
     client: QoreClient,
     project: QoreProject,
@@ -34,6 +54,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     this.id = id;
     this.tableId = tableId;
     this.project = project;
+    // @ts-ignore
+    this.forms = {};
     this.fields = fields.reduce(
       (map, field) => ({ ...map, [field.id]: field }),
       {}
@@ -89,6 +111,18 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         throw new Error("Trigger has failed");
       }
     };
+  }
+  form<K extends keyof FormDrivers<T["forms"]>>(
+    formId: K
+  ): FormDriver<T["forms"][K]> {
+    if (!this.forms[formId]) {
+      this.forms[formId] = new FormDriver<T["forms"][K]>(
+        this.project,
+        this.id,
+        formId as string
+      );
+    }
+    return this.forms[formId];
   }
   readRows(
     opts: Partial<{ offset: number; limit: number; order: "asc" | "desc" }> &

@@ -125,6 +125,7 @@ export default class Codegen extends Command {
         configs.token
       ]);
       const idField = { id: "id", type: "text", name: "id" } as Field<"text">;
+
       const typeDef = `
       // ${Codegen.warningMessage}
 
@@ -146,8 +147,14 @@ export default class Codegen extends Command {
           .join("\n")}
 
         ${schema.views
-          .map(
-            ({ id, parameters, sorts, fields }) => `
+          .map(({ id, parameters, sorts, fields, tableId }) => {
+            const table = schema.tables.find(t => t.id === tableId);
+            const getFieldType = (fieldId: string): APIField => {
+              const field = table?.fields.find(field => field.id === fieldId);
+              if (!field) throw new Error(`Field not found from ${table?.id}`);
+              return field;
+            };
+            return `
               type ${voca.capitalize(id)}ViewRow = {
                 read: {${[idField, ...fields]
                   .filter(field => field.type !== "action")
@@ -212,8 +219,21 @@ export default class Codegen extends Command {
                   }`
                   )}
                 }
-              }`
-          )
+                forms: {${schema.forms
+                  .filter(f => f.tableId === tableId)
+                  .map(
+                    form => `
+                  ${form.id}: {${form.fields.map(
+                      field => `
+                        ${field.id}${
+                        field.required ? "" : "?"
+                      }: ${this.writeFieldType(getFieldType(field.id))}
+                      `
+                    )}}
+                `
+                  )}}
+              }`;
+          })
           .join("\n")}
 
         type ProjectSchema = {

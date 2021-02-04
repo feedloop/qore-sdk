@@ -5,13 +5,31 @@ import {
   QoreOperationConfig,
   RowActions,
   QoreViewSchema,
-  QoreOperationResult
+  QoreOperationResult,
+  FormDriver
 } from "@feedloop/qore-client";
 import { AxiosRequestConfig } from "axios";
 import { ConditionalPick } from "type-fest";
 
 type QoreRequestStatus = "idle" | "loading" | "success" | "error";
 type RelationActions = "addRelation" | "removeRelation";
+
+function interceptPromise<T = any>(
+  p: Promise<T>,
+  handleResponse: (res: T) => void,
+  handleError: (e: Error) => void
+): Promise<T> {
+  p.then(resp => {
+    handleResponse(resp);
+    return resp;
+  })
+    .catch(err => {
+      handleError(err);
+      throw err;
+    })
+    .finally(() => {});
+  return p;
+}
 
 export declare type RowActionsHooks<T extends QoreViewSchema["actions"]> = {
   [K in keyof T]: {
@@ -106,6 +124,14 @@ type QoreHooks<T extends QoreSchema[string]> = {
       relations: Partial<ConditionalPick<T["write"], string[]>>
     ) => Promise<boolean>
   >;
+
+  useForm: <K extends keyof T["forms"]>(
+    formId: K
+  ) => {
+    send: (params: T["forms"][K]) => Promise<{ id: string }>;
+    status: QoreRequestStatus;
+    error: Error | null;
+  };
 };
 
 type QoreContextViews<ProjectSchema extends QoreSchema> = {
@@ -413,6 +439,29 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             }
           }
         };
+      },
+      useForm: <F extends keyof ProjectSchema[K]["forms"]>(formId: F) => {
+        const qoreClient = useClient();
+        const form = qoreClient.view(currentViewId).form(formId);
+        const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
+        const [error, setError] = React.useState<Error | null>(null);
+        const send = React.useCallback(
+          async (params: ProjectSchema[K]["forms"][F]) => {
+            try {
+              setStatus("loading");
+              const resp = await form.sendForm(params);
+              setError(null);
+              setStatus("success");
+              return resp;
+            } catch (error) {
+              setStatus("error");
+              setError(error);
+              throw error;
+            }
+          },
+          []
+        );
+        return { send, error, status };
       }
     };
   }
