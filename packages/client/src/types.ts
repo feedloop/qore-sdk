@@ -1,19 +1,24 @@
 import { AxiosRequestConfig } from "axios";
 import * as Wonka from "wonka";
 import QoreClient from "./client/Qore";
-import { APIField } from "@feedloop/qore-sdk";
+import { FormDriver } from "./client";
 
 export type QoreViewSchema = {
   read: Record<string, any>;
   write: Record<string, any>;
   params: Record<string, any>;
   actions: Record<string, any>;
+  forms: Record<string, Record<string, any>>;
 };
 
 export type RowActions<T extends QoreViewSchema["actions"]> = {
   [K in keyof T]: {
     trigger: (rowId: string, params: T[K]) => Promise<boolean>;
   };
+};
+
+export type FormDrivers<T extends QoreViewSchema["forms"]> = {
+  [K in keyof T]: FormDriver<T[K]>;
 };
 
 export type QoreSchema = Record<string, QoreViewSchema>;

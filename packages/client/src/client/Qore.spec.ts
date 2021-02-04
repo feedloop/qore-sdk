@@ -15,6 +15,7 @@ type TestSchema = {
       };
     };
     params: {};
+    forms: {};
   };
   toDoDefaultView: {
     read: {
@@ -37,6 +38,15 @@ type TestSchema = {
     };
     params: { slug?: string };
     actions: {};
+    forms: {
+      todoForm: {
+        task: string;
+        description?: string;
+        done?: boolean;
+        points?: number;
+        deadline?: Date;
+      };
+    };
   };
 };
 
@@ -87,6 +97,7 @@ describe("Qore SDK", () => {
           "$by.description"?: "asc";
         };
         actions: {};
+        forms: {};
       };
     }>(config);
     qore.init(schema);
@@ -118,6 +129,7 @@ describe("Qore SDK", () => {
           "$by.description"?: "asc";
         };
         actions: {};
+        forms: {};
       };
     }>(config);
     const alltasks = await qore
@@ -145,6 +157,7 @@ describe("Qore SDK", () => {
         write: { id: string; name: string };
         params: { slug?: string };
         actions: {};
+        forms: {};
       };
     }>(config);
     qore.init(schema);
@@ -401,6 +414,17 @@ describe("Qore SDK", () => {
 
     expect(taskWithoutPerson?.person.nodes).toEqual([]);
 
+    completeRecording();
+  });
+
+  it.only("send form inputs", async () => {
+    const { completeRecording } = await recorder("send form inputs");
+    const qore = new QoreClient<TestSchema>(config);
+    const newRow = await qore
+      .view("toDoDefaultView")
+      .form("todoForm")
+      .sendForm({ task: "Some task", done: true });
+    expect(newRow).toHaveProperty("id");
     completeRecording();
   });
 });
