@@ -6,7 +6,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
   - javascript: JavaScript
 
 toc_footers:
-  - <a href='#'>Sign up to get started hacking with Qore</a>
+  - <a href='https://dashboard.qorebase.io' target='_blank'>Sign up to get started hacking with Qore</a>
 
 search: true
 
@@ -19,7 +19,8 @@ Welcome to Qore Client SDK documentation page, this document will guide you to s
 
 ## Prerequisites
 
-1. Node.js 12+
+1. Node.js 12+.
+1. `npx` and `npm` executable.
 1. Qore account, signup [here](https://dashboard.qorebase.io) & don't forget to verify your account.
 
 ## Features
@@ -63,34 +64,26 @@ npx @feedloop/qore-cli login
 
 You will be asked to input your email & password. Choose your default project afterwards.
 
-<p>
-<script id="asciicast-382473" src="https://asciinema.org/a/382473.js" async></script>
-</p>
+```shell
+npx @feedloop/qore-cli login
+```
 
 ## Setup
 
 ```shell
-qore create-project --template todo-list-typescript <your-new-project-name>
+npx @feedloop/qore-cli create-project --template https://github.com/feedloop/qore-next-template.git <your-new-project-name>
 ```
 
 If you start a new project, this is the recommended way to setup a qore project.
 
-This command will create a new project for you, including a starter-kit project selected (in this case, todo-list-typescript -- a todo list app based on **Nextjs** written in TypeScript) on your current working directory. This starter project includes common SDK implementations that should get you started.
+This command will create a new project for you, including a starter-kit project selected (in this case, [feedloop/qore-next-template](https://github.com/feedloop/qore-next-template.git)) on your current working directory. This starter project includes common SDK initialization that should get you started.
 
-Once created, navigate to your project from your terminal to install the dependencies using `$ yarn install` or `$ npm install`.
-Hit `$ yarn dev` or `$ npm run dev` to start running your project locally.
+Once created, navigate to your project from your terminal to install the dependencies using `$ npm install`.
+Hit `$ npx next dev` to start running your project locally.
 
-<p>
-<script id="asciicast-382474" src="https://asciinema.org/a/382474.js" async></script>
-</p>
+Open this url from your browser and you should see your email being printed [http://localhost:3000](http://localhost:3000). Browse the template code to see how it is done.
 
-Open this url from your browser and start exploring `http://localhost:3000`.
-
-<p>
-<iframe src="https://drive.google.com/file/d/1DIWv6slG4I3YE4-aj8_eMukkC1xIua2g/preview" width="100%" height="320"></iframe>
-</p>
-
-Add some tasks to the app and then open your project on admin.qorebase.io to verify that your data is actually being persisted there.
+![](/images/localhost-3000.png)
 
 Now you are ready to:
 
@@ -100,7 +93,7 @@ Now you are ready to:
 
 ## Setup manually
 
-If you prefer to setup qore manually, please follow this guide all the way through.
+If you prefer to setup qore manually to an existing project, please follow this guide all the way through.
 
 **1)** Create a new qore project from your [qore dashboard](https://dashboard.qorebase.io).
 
@@ -115,28 +108,14 @@ mkdir my-new-project
 cd ./my-new-project
 ```
 
-**3)** Set your newly-created project as the current project.
-
-```shell
-qore set-project
-```
-
-**4)** On your root project directory, run the codegen command to generate required config files. [See codegen](#codegen)
-
-```shell
-qore codegen
-```
-
-Watch this video to see how step 3-4 is done.
-
-<p>
-<script id="asciicast-383016" src="https://asciinema.org/a/383016.js" async></script>
-</p>
-
-**5)** Initialize `package.json` file on your root project directory by triggering `npm init -y`, followed by installing required dependencies.
+**3)** Initialize `package.json` file on your root project directory by triggering `npm init -y`, followed by installing required dependencies.
 
 ```shell
 npm install --save @feedloop/qore-client
+```
+
+```shell
+npm install --save-dev @feedloop/qore-cli
 ```
 
 > React users: install @feedloop/qore-react to your project.
@@ -145,11 +124,17 @@ npm install --save @feedloop/qore-client
 npm install --save @feedloop/qore-react
 ```
 
-Watch this video to see how step 5 is done.
+**4)** Set your newly-created project as the current project.
 
-<p>
-<script id="asciicast-383017" src="https://asciinema.org/a/383017.js" async></script>
-</p>
+```shell
+npx qore set-project
+```
+
+**5)** On your root project directory, run the codegen command to generate required config files. [See codegen](#codegen)
+
+```shell
+npx qore codegen
+```
 
 **6)** Initialize qore client by creating the following file.
 
