@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Qore SDK fetches current user 1`] = `
+Object {
+  "data": Object {
+    "email": "rama@feedloop.io",
+    "id": "39c10fda-e1d1-43b5-af55-de6f01e2825f",
+    "password": "******",
+    "role": Object {
+      "displayField": "admin",
+      "id": "6Hc0YGiQGoc3Huf",
+    },
+    "taskDone": 0,
+    "toDo": Object {
+      "nodes": Array [],
+      "totalCount": 0,
+    },
+    "totalHardTask": 0,
+    "totalPoint": null,
+    "totalTask": 0,
+    "undoneTask": 0,
+  },
+  "email": "rama@feedloop.io",
+  "id": "rama@feedloop.io",
+  "type": "project",
+}
+`;

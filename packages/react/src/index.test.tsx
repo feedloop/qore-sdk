@@ -491,3 +491,27 @@ describe("useForm", () => {
     expect(result.current.status).toEqual("success");
   });
 });
+
+describe("useCurrentUser", () => {
+  it("should fetch current user", async () => {
+    scope = scope.get("/FAKE_PROJECT/me").reply(200, {
+      email: "rama@feedloop.io",
+      id: "39c10fda-e1d1-43b5-af55-de6f01e2825f",
+      password: "******",
+      role: {
+        displayField: "admin",
+        id: "6Hc0YGiQGoc3Huf"
+      }
+    });
+
+    const qoreContext = createNewQoreContext();
+
+    const { result, waitForValueToChange } = renderHook(() =>
+      qoreContext.useCurrentUser()
+    );
+    await waitForValueToChange(() => result.current.user);
+
+    expect(result.current.status).toEqual("success");
+    expect(result.current.user).toHaveProperty("email", "rama@feedloop.io");
+  });
+});

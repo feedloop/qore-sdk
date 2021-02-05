@@ -417,7 +417,7 @@ describe("Qore SDK", () => {
     completeRecording();
   });
 
-  it.only("send form inputs", async () => {
+  it("send form inputs", async () => {
     const { completeRecording } = await recorder("send form inputs");
     const qore = new QoreClient<TestSchema>(config);
     const newRow = await qore
@@ -425,6 +425,14 @@ describe("Qore SDK", () => {
       .form("todoForm")
       .sendForm({ task: "Some task", done: true });
     expect(newRow).toHaveProperty("id");
+    completeRecording();
+  });
+
+  it("fetches current user", async () => {
+    const { completeRecording } = await recorder("fetches current user");
+    const qore = new QoreClient<TestSchema>(config);
+    const currentUser = await qore.currentUser();
+    expect(currentUser).toMatchSnapshot();
     completeRecording();
   });
 });
