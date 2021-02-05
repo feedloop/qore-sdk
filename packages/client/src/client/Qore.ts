@@ -183,6 +183,10 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
       this.views[view.id] = view;
     }
   }
+  async currentUser(): Promise<any> {
+    const currentUser = await this.project.axios.get("/me");
+    return currentUser.data;
+  }
   async authenticate(email: string, password: string): Promise<string> {
     const config: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,

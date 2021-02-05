@@ -145,6 +145,28 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     client: QoreClient<ProjectSchema>;
   }>({ client });
 
+  const useCurrentUser = () => {
+    const qoreClient = useClient();
+    const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
+    const [error, setError] = React.useState<Error | null>(null);
+    const [user, setUser] = React.useState<Record<string, any> | null>(null);
+    React.useEffect(() => {
+      (async () => {
+        setStatus("loading");
+        try {
+          const user = await qoreClient.currentUser();
+          setUser(user);
+          setStatus("success");
+        } catch (error) {
+          setUser(null);
+          setError(error);
+          setStatus("error");
+        }
+      })();
+    }, []);
+    return { status, error, user };
+  };
+
   function createViewHooks<K extends keyof ProjectSchema>(
     currentViewId: K
   ): QoreHooks<ProjectSchema[K]> {
@@ -499,7 +521,8 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     view,
     client,
     context,
-    useClient
+    useClient,
+    useCurrentUser
   };
 };
 
