@@ -696,7 +696,7 @@ Each qore view has one or more forms, sending forms may require parameters.
 
 # Authenticating your user
 
-```typescript
+```javascript
 
 // give qore client a way to access user token
 const client = new QoreClient({..config, getToken: () => cookies.get("token")})
@@ -713,7 +713,49 @@ cookies.set("token", token);
 cookies.remove("token");
 ```
 
+```jsx
+
+// qoreContext.js
+// give qore client a way to access user token
+const client = new QoreClient({..config, getToken: () => cookies.get("token")})
+
+// YourComponent.js
+const YourComponent = () => {
+  const client = qoreContext.useClient();
+  const handleLogout = () => {
+    // log a user out by removing the token from your storage
+    cookies.remove("token");
+  }
+  const handleLogin = async (email, password) => {
+    const token = await client.authenticate(
+      "email@yourcompany.com",
+      "plain password"
+    );
+
+    // save token to somewhere safe
+    cookies.set("token", token);
+  };
+  // call handleLogin whenever your form is ready
+  return <form onSubmit={handleLogin}>Some form</form>;
+};
+```
+
 As you can register new users to qore, you might need to log them in to your application.
+
+## Get current user
+
+```jsx
+const Component = () => {
+  const { user } = qoreContext.useCurrentUser();
+  return <div>{user ? user.email : "Loading..."}</div>;
+};
+```
+
+```javascript
+const currentUser = await client.currentUser();
+```
+
+If the token is valid, an object that describes the current user will be returned from this call.
 
 # Error handling
 
