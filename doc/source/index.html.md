@@ -669,22 +669,21 @@ Each qore row can have one or more action triggers, an action trigger may requir
 ## Send form inputs
 
 ```javascript
-await client.view("allTasks").forms.newTaskForm.send({
-  someParams: "someValue"
-});
+await client
+  .view("allTasks")
+  .form("newTask")
+  .sendForm({ task: "Some task", done: true });
 ```
 
 ```jsx
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const { forms, status } = qoreContext.view("allTasks").useForms();
+  const { send, status } = qoreContext.view("allTasks").useForm("newTask");
   return (
     <button
       onClick={async () => {
-        await forms.newTaskForm.send({
-          someParams: "someValue"
-        });
+        await send({ task: "Some task", done: true });
       }}
     >
       Add new task
