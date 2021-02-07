@@ -209,7 +209,13 @@ client.init(schema as any);
 qore codegen
 ```
 
-To ensure that you will have your configuration files on your root project, run this command when:
+> Generate configuration files to src directory
+
+```shell
+qore codegen --path src
+```
+
+To ensure that you will have your configuration files on your project, run this command when:
 
 1. **The following files doesn't exist** on your root project directory.
 2. **Everytime there are changes** on your project structure (includes views, fields, tables and forms).
@@ -219,6 +225,21 @@ To ensure that you will have your configuration files on your root project, run 
 | `qore.schema.json` | Contains the schema required to run qore client.         |
 | `qore.config.json` | Contains the config required to connect to your project. |
 | `qore-env.d.ts`    | TypeScript type definitions of your project schema.      |
+
+<aside class="notice">
+  This command will look for an existing config to infer from it. If you want to reset the config, simply remove the files mentioned above.
+</aside>
+
+Tips: Add a dedicated script to your package.json file to only store your configuration files to your desired path (.i.e `src`);
+
+```json
+{
+  "scripts": {
+    // between your scripts,
+    "codegen": "npx qore codegen --path src"
+  }
+}
+```
 
 # Reading data
 

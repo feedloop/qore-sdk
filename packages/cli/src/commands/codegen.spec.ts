@@ -21,16 +21,18 @@ describe("codegen", () => {
       "--org",
       "lIdfC42DJCN2XzQ",
       "--token",
-      "3960f3b8-a139-42eb-8295-3d669e4da4c9"
+      "3960f3b8-a139-42eb-8295-3d669e4da4c9",
+      "--path",
+      "dest"
     ]);
     completeRecording();
-    const qoreGenerated = path.resolve(process.cwd(), "qore-env.d.ts");
+    const qoreGenerated = path.resolve(process.cwd(), "dest", "qore-env.d.ts");
     expect(
       fse.readFileSync(qoreGenerated, { encoding: "utf-8" })
     ).toMatchSnapshot();
-    const qoreConfig = path.resolve(process.cwd(), "qore.config.json");
+    const qoreConfig = path.resolve(process.cwd(), "dest", "qore.config.json");
     expect(await fse.readJSON(qoreConfig)).toMatchSnapshot();
-    const qoreSchema = path.resolve(process.cwd(), "qore.schema.json");
+    const qoreSchema = path.resolve(process.cwd(), "dest", "qore.schema.json");
     expect(await fse.readJSON(qoreSchema)).toMatchSnapshot();
   });
 });

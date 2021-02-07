@@ -13,6 +13,15 @@ import makeProject, {
 import config, { CLIConfig } from "../config";
 import ExportSchema from "./export-schema";
 import { configFlags, promptFlags } from "../flags";
+import { string } from "@oclif/command/lib/flags";
+
+export type QoreRC = {
+  version: string;
+  endpoint: string;
+  projectId: string;
+  organizationId: string;
+  authenticationId?: string;
+};
 
 export default class Codegen extends Command {
   static warningMessage =
@@ -22,7 +31,29 @@ export default class Codegen extends Command {
   static examples = [`$ qore codegen --project projectId --org orgId`];
 
   static flags = {
-    ...configFlags
+    ...configFlags,
+    path: flags.string({
+      name: "path",
+      description: "path",
+      default: () => "./"
+    })
+  };
+
+  static loadRc = async (destination: string) => {
+    try {
+      const qoreConfig: QoreRC = await fse.readJSON(destination);
+      return qoreConfig;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  static loadConfigFromRc = async (
+    destination: string
+  ): Promise<{ project: string; org: string } | null> => {
+    const rc = await Codegen.loadRc(destination);
+    if (!rc) return null;
+    return { project: rc.projectId, org: rc.organizationId };
   };
 
   static writeConfigFile = async (configs: CLIConfig, destination?: string) => {
@@ -114,7 +145,15 @@ export default class Codegen extends Command {
   async run() {
     try {
       const { args, flags } = this.parse(Codegen);
-      const configs = await promptFlags(flags, Codegen.flags);
+      const destination = path.resolve(process.cwd(), flags.path);
+      const loadedConfig = await Codegen.loadConfigFromRc(destination);
+      const configs = await promptFlags(
+        {
+          ...(loadedConfig || {}),
+          ...flags
+        },
+        Codegen.flags
+      );
       const schema = await ExportSchema.getSchema(configs);
       await ExportSchema.run([
         "--project",
@@ -122,7 +161,9 @@ export default class Codegen extends Command {
         "--org",
         configs.org,
         "--token",
-        configs.token
+        configs.token,
+        "--path",
+        flags.path
       ]);
       const idField = { id: "id", type: "text", name: "id" } as Field<"text">;
 
@@ -244,13 +285,13 @@ export default class Codegen extends Command {
       }
     `;
       fs.writeFileSync(
-        path.resolve(process.cwd() + "/qore-env.d.ts"),
+        path.resolve(destination, "qore-env.d.ts"),
         prettier.format(typeDef, { parser: "babel-ts" }),
         {
           encoding: "utf8"
         }
       );
-      await Codegen.writeConfigFile(configs);
+      await Codegen.writeConfigFile(configs, destination);
     } catch (error) {
       console.error(error.message);
       throw error;
