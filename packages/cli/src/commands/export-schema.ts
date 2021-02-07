@@ -1,4 +1,4 @@
-import { Command } from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import prettier from "prettier";
 import makeProject, {
   QoreProjectSchema
@@ -15,7 +15,12 @@ export default class ExportSchema extends Command {
   static examples = [`$ qore export-schema`];
 
   static flags = {
-    ...configFlags
+    ...configFlags,
+    path: flags.string({
+      name: "path",
+      description: "path",
+      default: () => "./"
+    })
   };
 
   static args = [{ name: "file" }];
@@ -32,10 +37,15 @@ export default class ExportSchema extends Command {
 
   async run() {
     const { args, flags } = this.parse(ExportSchema);
-    const configs = await promptFlags(flags, ExportSchema.flags);
+    const destination = path.resolve(process.cwd(), flags.path);
+    const loadedConfig = await Codegen.loadConfigFromRc(destination);
+    const configs = await promptFlags(
+      { ...(loadedConfig || {}), ...flags },
+      ExportSchema.flags
+    );
     const schema = await ExportSchema.getSchema(configs);
     await fse.writeFile(
-      path.resolve(process.cwd() + "/qore.schema.json"),
+      path.resolve(destination, "qore.schema.json"),
       prettier.format(
         JSON.stringify({ WARNING: Codegen.warningMessage, ...schema }),
         { parser: "json" }
