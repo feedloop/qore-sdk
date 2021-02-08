@@ -15,7 +15,7 @@ describe("create-project", () => {
   afterAll(() => {
     fse.removeSync(path.resolve(process.cwd(), projectName));
   });
-  it("should be able to export schema", async () => {
+  it("should be able to create a new project", async () => {
     process.env.QORE_SERVER =
       "https://p-qore-dot-pti-feedloop.et.r.appspot.com";
     const { completeRecording } = await record("create-project");

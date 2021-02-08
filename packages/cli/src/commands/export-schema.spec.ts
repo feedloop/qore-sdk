@@ -23,7 +23,11 @@ describe("export-schema", () => {
       "3960f3b8-a139-42eb-8295-3d669e4da4c9"
     ]);
     completeRecording();
-    const filename = path.resolve(process.cwd() + "/qore.schema.json");
+    const filename = path.resolve(
+      process.cwd(),
+      "export-dest",
+      "qore.schema.json"
+    );
     expect(
       fs.readFileSync(filename, {
         encoding: "utf8"
