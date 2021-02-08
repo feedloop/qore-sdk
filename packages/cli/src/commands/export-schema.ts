@@ -43,7 +43,7 @@ export default class ExportSchema extends Command {
     const destination = path.resolve(process.cwd(), configPath);
     const loadedConfig = await Codegen.loadConfigFromRc(destination);
     const configs = await promptFlags(
-      { ...(loadedConfig || {}), ...{ path: configPath }, ...flags },
+      { ...flags, ...(loadedConfig || {}), ...{ path: configPath } },
       ExportSchema.flags
     );
     const schema = await ExportSchema.getSchema(configs);

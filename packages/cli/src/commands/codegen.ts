@@ -40,7 +40,9 @@ export default class Codegen extends Command {
 
   static loadRc = async (destination: string) => {
     try {
-      const qoreConfig: QoreRC = await fse.readJSON(destination);
+      const qoreConfig: QoreRC = await fse.readJSON(
+        path.resolve(destination, "qore.config.json")
+      );
       return qoreConfig;
     } catch (error) {
       return null;
@@ -153,9 +155,9 @@ export default class Codegen extends Command {
       const loadedConfig = await Codegen.loadConfigFromRc(destination);
       const configs = await promptFlags(
         {
+          ...flags,
           ...(loadedConfig || {}),
-          ...{ path: configPath },
-          ...flags
+          ...{ path: configPath }
         },
         Codegen.flags
       );
