@@ -57,8 +57,15 @@ export default class CreateProject extends Command {
     if (templates.indexOf(configs.template) === -1) {
       try {
         await git.clone(configs.template, destination);
+        const packageJson = await fse.readJson(
+          path.resolve(destination, "package.json")
+        );
         const isQoreProject = await fse.pathExists(
-          path.join(destination, "qore.schema.json")
+          path.resolve(
+            destination,
+            packageJson?.qoreconfig?.path || "",
+            "qore.schema.json"
+          )
         );
         if (!isQoreProject) {
           await fse.unlink(destination);
@@ -80,8 +87,15 @@ export default class CreateProject extends Command {
     user.setToken(configs.token);
 
     const org = await user.organization(configs.org);
+    const packageJson = await fse.readJson(
+      path.resolve(destination, "package.json")
+    );
+    const configPath = path.resolve(
+      destination,
+      packageJson?.qoreconfig?.path || ""
+    );
     const schemaFile = fse.readJSONSync(
-      path.resolve(destination, "qore.schema.json")
+      path.resolve(configPath, "qore.schema.json")
     ) as QoreProjectSchema;
     const projectId = await org.createProject({
       name: args.name,
@@ -91,12 +105,8 @@ export default class CreateProject extends Command {
     config.set("project", projectId);
     await Codegen.writeConfigFile(
       { ...configs, project: projectId },
-      destination
+      configPath
     );
     this.log("New project initialized on", destination);
   }
 }
-
-const num = 3;
-
-(num > 0 && num < 10) || num <= 9 || (num > 10 && num > 8) || num > 1;

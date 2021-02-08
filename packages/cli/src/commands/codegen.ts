@@ -34,8 +34,7 @@ export default class Codegen extends Command {
     ...configFlags,
     path: flags.string({
       name: "path",
-      description: "path",
-      default: () => "./"
+      description: "path"
     })
   };
 
@@ -145,7 +144,12 @@ export default class Codegen extends Command {
   async run() {
     try {
       const { args, flags } = this.parse(Codegen);
-      const destination = path.resolve(process.cwd(), flags.path);
+      const packageJson = await fse.readJson(
+        path.resolve(process.cwd(), "package.json")
+      );
+      const configPath = flags.path || packageJson?.qoreconfig?.path || "";
+      const destination = path.resolve(process.cwd(), configPath);
+
       const loadedConfig = await Codegen.loadConfigFromRc(destination);
       const configs = await promptFlags(
         {
@@ -163,7 +167,7 @@ export default class Codegen extends Command {
         "--token",
         configs.token,
         "--path",
-        flags.path
+        configPath
       ]);
       const idField = { id: "id", type: "text", name: "id" } as Field<"text">;
 
