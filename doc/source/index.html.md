@@ -206,16 +206,16 @@ client.init(schema as any);
 > Generate configuration files
 
 ```shell
-qore codegen
+npx @feedloop/qore-cli codegen
 ```
 
 > Generate configuration files to src directory
 
 ```shell
-qore codegen --path src
+npx @feedloop/qore-cli codegen --path src
 ```
 
-To ensure that you will have your configuration files on your project, run this command when:
+To ensure that you will have the latest version of your configuration files on your project, run this command when:
 
 1. **The following files doesn't exist** on your root project directory.
 2. **Everytime there are changes** on your project structure (includes views, fields, tables and forms).
@@ -230,13 +230,12 @@ To ensure that you will have your configuration files on your project, run this 
   This command will look for an existing config to infer from it. If you want to reset the config, simply remove the files mentioned above.
 </aside>
 
-Tips: Add a dedicated script to your package.json file to only store your configuration files to your desired path (.i.e `src`);
+Tips: Add `qoreconfig` to your package.json file to only store your configuration files to your desired path (.i.e `src`);
 
 ```json
 {
-  "scripts": {
-    // between your scripts,
-    "codegen": "npx qore codegen --path src"
+  "qoreconfig": {
+    "path": "src"
   }
 }
 ```
