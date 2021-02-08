@@ -154,6 +154,7 @@ export default class Codegen extends Command {
       const configs = await promptFlags(
         {
           ...(loadedConfig || {}),
+          ...{ path: configPath },
           ...flags
         },
         Codegen.flags
