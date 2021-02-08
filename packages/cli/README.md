@@ -19,7 +19,7 @@ $ npm install -g @feedloop/qore-cli
 $ qore COMMAND
 running command...
 $ qore (-v|--version|version)
-@feedloop/qore-cli/0.1.26 linux-x64 node-v14.8.0
+@feedloop/qore-cli/0.1.27 linux-x64 node-v14.8.0
 $ qore --help [COMMAND]
 USAGE
   $ qore COMMAND
@@ -51,7 +51,7 @@ EXAMPLE
   $ qore codegen --project projectId --org orgId
 ```
 
-_See code: [src/commands/codegen.ts](https://github.com/rrmdn/cli/blob/v0.1.26/src/commands/codegen.ts)_
+_See code: [src/commands/codegen.ts](https://github.com/rrmdn/cli/blob/v0.1.27/src/commands/codegen.ts)_
 
 ## `qore create-project [NAME]`
 
@@ -68,7 +68,7 @@ EXAMPLE
   $ qore create-project --template todo-list-typescript your-project-name
 ```
 
-_See code: [src/commands/create-project.ts](https://github.com/rrmdn/cli/blob/v0.1.26/src/commands/create-project.ts)_
+_See code: [src/commands/create-project.ts](https://github.com/rrmdn/cli/blob/v0.1.27/src/commands/create-project.ts)_
 
 ## `qore export-schema [FILE]`
 
@@ -86,7 +86,7 @@ EXAMPLE
   $ qore export-schema
 ```
 
-_See code: [src/commands/export-schema.ts](https://github.com/rrmdn/cli/blob/v0.1.26/src/commands/export-schema.ts)_
+_See code: [src/commands/export-schema.ts](https://github.com/rrmdn/cli/blob/v0.1.27/src/commands/export-schema.ts)_
 
 ## `qore help [COMMAND]`
 
@@ -116,7 +116,7 @@ EXAMPLE
   $ qore login
 ```
 
-_See code: [src/commands/login.ts](https://github.com/rrmdn/cli/blob/v0.1.26/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/rrmdn/cli/blob/v0.1.27/src/commands/login.ts)_
 
 ## `qore set-project`
 
@@ -131,5 +131,5 @@ EXAMPLE
   $ qore set-project
 ```
 
-_See code: [src/commands/set-project.ts](https://github.com/rrmdn/cli/blob/v0.1.26/src/commands/set-project.ts)_
+_See code: [src/commands/set-project.ts](https://github.com/rrmdn/cli/blob/v0.1.27/src/commands/set-project.ts)_
 <!-- commandsstop -->
