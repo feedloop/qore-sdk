@@ -621,7 +621,7 @@ import qoreContext from "./qoreContext";
 const Component = () => {
   const { updateRow, status } = qoreContext.view("allTasks").useUpdateRow();
   const handleUpload = async event => {
-    const files = await client.upload(event.target.files);
+    const files = await client.view("allTasks").upload(event.target.files);
     await updateRow("some-task-id", { ...data, avatar: files });
   };
   return <input type="file" onChange={handleUpload} />;
