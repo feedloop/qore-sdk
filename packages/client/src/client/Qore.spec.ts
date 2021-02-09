@@ -435,4 +435,20 @@ describe("Qore SDK", () => {
     expect(currentUser).toMatchSnapshot();
     completeRecording();
   });
+
+  it("dedupes duplicate reads", async () => {
+    const { completeRecording, scopes } = await recorder(
+      "dedupes duplicate reads"
+    );
+    const qore = new QoreClient<TestSchema>(config);
+    const readStream = qore.views.memberDefaultView.readRows({ limit: 1 });
+    const responses = await Promise.all([
+      readStream.toPromise(),
+      readStream.toPromise()
+    ]);
+    expect(responses[0].data).toEqual(responses[1].data);
+    completeRecording();
+    // 1st scope is OPTIONS, 2nd scope is GET
+    expect(scopes.length).toEqual(2);
+  });
 });

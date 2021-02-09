@@ -12,6 +12,7 @@ import debugExchange from "../exchanges/debugExchange";
 import networkExchange from "../exchanges/networkExchange";
 import { ViewDriver } from "./ViewDriver";
 import cacheExchange from "../exchanges/cacheExchange";
+import dedupeExchange from "../exchanges/dedupeExchange";
 import { QoreProjectSchema } from "@feedloop/qore-sdk";
 
 export type RelationValue = { id: string } | Array<{ id: string }>;
@@ -129,7 +130,11 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     >();
     this.operations = source;
     this.nextOperation = next;
-    const composedExchange = composeExchanges([cacheExchange, networkExchange]);
+    const composedExchange = composeExchanges([
+      cacheExchange,
+      dedupeExchange,
+      networkExchange
+    ]);
 
     this.results = Wonka.share(
       composedExchange({ client: this, forward: debugExchange })(

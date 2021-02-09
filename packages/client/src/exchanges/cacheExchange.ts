@@ -37,6 +37,9 @@ const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
           stale: false,
           data: cached || optimisticResponse ? merged : undefined
         };
+        if (optimisticResponse) {
+          resultCache.set(operation.key, result.data);
+        }
         // send revalidation command
         if (operation.networkPolicy === "network-and-cache") {
           client.nextOperation({ ...operation, networkPolicy: "network-only" });
