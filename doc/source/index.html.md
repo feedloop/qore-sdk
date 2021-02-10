@@ -608,10 +608,11 @@ Update a data of `allTasks` view with an id of _some-task-id_.
 ## Upload a file
 
 ```javascript
-const files = await client.view("allTasks").upload(event.target.files);
+const file =  document.getElementById('fileInput').files[0];
+const url = await client.view("allTasks").upload(file);
 await client.view("allTasks").updateRow("some-task-id", {
   ...data
-  avatar: files
+  avatar: url
 });
 ```
 
@@ -621,14 +622,22 @@ import qoreContext from "./qoreContext";
 const Component = () => {
   const { updateRow, status } = qoreContext.view("allTasks").useUpdateRow();
   const handleUpload = async event => {
-    const files = await client.view("allTasks").upload(event.target.files);
-    await updateRow("some-task-id", { ...data, avatar: files });
+    const file = e.currentTarget.files?.item(0);
+    if (!file) return;
+    const url = await client.view("allTasks").upload(file);
+    await updateRow("some-task-id", { ...data, avatar: url });
   };
   return <input type="file" onChange={handleUpload} />;
 };
 ```
 
 Adding files to a row requires you to upload the file first. The file type of the uploaded files must match with the field target, unwanted file types will be ignored.
+
+The `upload()` method accepts a `file` variable that is a [File](https://developer.mozilla.org/en-US/docs/Web/API/File) item of a [FileList](https://developer.mozilla.org/en-US/docs/Web/API/FileList) object from a file input html element.
+
+```html
+<input type="file" id="fileInput" />
+```
 
 ## Delete a row
 
