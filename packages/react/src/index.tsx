@@ -49,17 +49,15 @@ type QoreHooks<T extends QoreSchema[string]> = {
     data: T["read"][];
     status: QoreRequestStatus;
     error: Error | null;
+    fetchMore(fetchMoreOpts: typeof opts): Promise<void>;
     revalidate: (
       config?: Partial<QoreOperationConfig>
     ) => Promise<
       QoreOperationResult<
         AxiosRequestConfig,
-        QoreOperationResult<
-          AxiosRequestConfig,
-          {
-            nodes: T["read"][];
-          }
-        >
+        {
+          nodes: T["read"][];
+        }
       >
     >;
   };
@@ -73,12 +71,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
     error: Error | null;
     revalidate: (
       config?: Partial<QoreOperationConfig>
-    ) => Promise<
-      QoreOperationResult<
-        AxiosRequestConfig,
-        QoreOperationResult<AxiosRequestConfig, T["read"]>
-      >
-    >;
+    ) => Promise<QoreOperationResult<AxiosRequestConfig, T["read"]>>;
   };
 
   useInsertRow: () => {
@@ -205,12 +198,12 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
         const revalidate = React.useCallback(
           async (config?: Partial<QoreOperationConfig>) => {
-            const result = await stream.revalidate(config).toPromise();
+            const result = await stream.revalidate(config);
             return result;
           },
           [stream.revalidate]
         );
-        return { data, error, status, revalidate };
+        return { data, error, status, revalidate, fetchMore: stream.fetchMore };
       },
 
       useGetRow: (rowId, config = {}) => {
@@ -246,7 +239,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
         const revalidate = React.useCallback(
           async (config?: Partial<QoreOperationConfig>) => {
-            const result = await stream.revalidate(config).toPromise();
+            const result = await stream.revalidate(config);
             return result;
           },
           [stream.revalidate]

@@ -85,15 +85,15 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
     forward
   );
 
-export type PromisifiedSource<T = any> = Wonka.Source<T> & {
+export type PromisifiedSource<
+  T extends QoreOperationResult
+> = Wonka.Source<T> & {
   toPromise: () => Promise<T>;
-  revalidate: (
-    config?: Partial<QoreOperationConfig>
-  ) => PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T>>;
+  revalidate: (config?: Partial<QoreOperationConfig>) => Promise<T>;
   subscribe: (callback: (data: T) => void) => Wonka.Subscription;
 };
 
-export function withHelpers<T>(
+export function withHelpers<T extends QoreOperationResult>(
   source$: Wonka.Source<T>,
   client: QoreClient,
   operation: QoreOperation
@@ -102,15 +102,18 @@ export function withHelpers<T>(
     Wonka.pipe(source$, Wonka.take(1), Wonka.toPromise);
   (source$ as PromisifiedSource<T>).subscribe = callback =>
     Wonka.subscribe(callback)(source$);
-  (source$ as PromisifiedSource<T>).revalidate = (
+  (source$ as PromisifiedSource<T>).revalidate = async (
     config = defaultOperationConfig
-  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T>> => {
-    return client.execute<T>({
-      ...defaultOperationConfig,
-      ...operation,
-      networkPolicy: "network-only",
-      ...config
-    });
+  ): Promise<T> => {
+    // @ts-ignore
+    return client
+      .execute<T>({
+        ...defaultOperationConfig,
+        ...operation,
+        networkPolicy: "network-only",
+        ...config
+      })
+      .toPromise();
   };
 
   return source$ as PromisifiedSource<T>;

@@ -9,6 +9,8 @@
   "devDependencies": {
     "@types/jest": "^26.0.15",
     "jest": "^26.6.3",
+    "nock": "^13.0.7",
+    "nock-record": "^0.3.9",
     "ts-jest": "^26.4.4",
     "tslib": "^2.0.3",
     "typescript": "^4.1.2"
@@ -20,14 +22,8 @@
   },
   "dependencies": {
     "@feedloop/qore-sdk": "^0.1.8",
-    "@types/nock": "^11.1.0",
     "axios": "^0.21.0",
-    "immer": "^8.0.0",
     "nanoid": "^3.1.20",
-    "nock": "^13.0.5",
-    "nock-record": "^0.3.9",
-    "normalizr": "^3.6.1",
-    "sequency": "^0.19.2",
     "type-fest": "^0.20.1",
     "wonka": "^4.0.15"
   },

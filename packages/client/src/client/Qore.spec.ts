@@ -182,7 +182,7 @@ describe("Qore SDK", () => {
     });
 
     setTimeout(() => {
-      readStream.revalidate().toPromise();
+      readStream.revalidate();
     }, 1000);
   });
 
@@ -240,12 +240,10 @@ describe("Qore SDK", () => {
         // revalidate first result with an optimistic response
         if (results.length === 1) {
           const firstResult = results[0];
-          rowStream
-            .revalidate({
-              networkPolicy: "cache-only",
-              optimisticResponse: { done: !firstResult?.done }
-            })
-            .toPromise();
+          rowStream.revalidate({
+            networkPolicy: "cache-only",
+            optimisticResponse: { done: !firstResult?.done }
+          });
         }
         // optimistic response should take effect on the next result
         if (results.length === 2) {
@@ -450,5 +448,16 @@ describe("Qore SDK", () => {
     completeRecording();
     // 1st scope is OPTIONS, 2nd scope is GET
     expect(scopes.length).toEqual(2);
+  });
+
+  it("fetches more rows", async () => {
+    const { completeRecording } = await recorder("fetches more rows");
+    const qore = new QoreClient<TestSchema>(config);
+    const stream = qore.view("toDoDefaultView").readRows({ limit: 1 });
+    const items = await stream.toPromise();
+    await stream.fetchMore({ offset: items.data?.nodes.length, limit: 1 });
+    const moreItems = await stream.revalidate({ networkPolicy: "cache-only" });
+    expect(items.data?.nodes.length).not.toEqual(moreItems.data?.nodes.length);
+    completeRecording();
   });
 });

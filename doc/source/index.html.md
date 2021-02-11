@@ -274,6 +274,50 @@ const Component = () => {
 
 You can also specify `offset`, `limit` and `order` when performing a read view operation.
 
+## Pagination
+
+```javascript
+const operation = client.view("allTasks").readRows({ offset: 10, limit: 10 });
+
+let allTasks = [];
+operation.subscribe(({ data }) => {
+  allTasks = data;
+});
+
+await operation.fetchMore({ offset: data.nodes.length, limit: 10 });
+// new items are being pushed to allTasks
+```
+
+```jsx
+import qoreContext from "./qoreContext";
+
+const Component = () => {
+  const { data: allTasks, status, fetchMore } = qoreContext
+    .view("allTasks")
+    .useListRow({
+      offset: 10,
+      limit: 10
+    });
+  return (
+    <ul>
+      {allTasks.map(task => (
+        <li>{task.name}</li>
+      ))}
+      <button
+        onClick={() => {
+          // new items are being pushed to allTasks
+          fetchMore({ offset: allTasks.length, limit: 10 });
+        }}
+      >
+        Load more
+      </button>
+    </ul>
+  );
+};
+```
+
+Fetching more rows can be done by calling the `fetchMore` method as demonstrated above. It accepts a pagination config to match your desired items size of the next page data to be fetched.
+
 ## Reading individual row
 
 ```javascript

@@ -1,4 +1,4 @@
-import produce from "immer";
+// import produce from "immer";
 import { ViewDriver } from "./ViewDriver";
 import { CacheRef, ViewDriverObject, QoreRow } from "./Qore";
 
@@ -9,7 +9,7 @@ export class NormalizedCache {
     Record<string, boolean | number | string | CacheRef>
   > = {};
   modify(modifier: (data: NormalizedCache["data"]) => void) {
-    this.data = produce(this.data, modifier);
+    // this.data = produce(this.data, modifier);
   }
   identify(table: string, id: string) {
     return `${table}:${id}`;

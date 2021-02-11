@@ -11,7 +11,6 @@ import {
 } from "../types";
 import QoreClient, {
   QoreProject,
-  RelationValue,
   PromisifiedSource,
   defaultOperationConfig
 } from "./Qore";
@@ -130,7 +129,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<
     QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
-  > {
+  > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> } {
     const axiosConfig: AxiosRequestConfig = {
       url: `/${this.id}/rows`,
       params: opts,
@@ -143,7 +142,25 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       meta: {},
       ...{ ...defaultOperationConfig, ...config }
     };
-    return this.client.execute(operation);
+    const stream = this.client.execute(operation) as PromisifiedSource<
+      QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
+    > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> };
+    stream.fetchMore = async fetchMoreOpts => {
+      const existingItems = await stream.revalidate({
+        networkPolicy: "cache-only"
+      });
+      const moreItems = await this.readRows(fetchMoreOpts, config).toPromise();
+      await stream.revalidate({
+        networkPolicy: "cache-only",
+        optimisticResponse: {
+          nodes: [
+            ...(existingItems.data?.nodes || []),
+            ...(moreItems.data?.nodes || [])
+          ]
+        }
+      });
+    };
+    return stream;
   }
 
   readRow(

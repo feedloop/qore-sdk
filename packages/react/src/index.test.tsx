@@ -103,24 +103,41 @@ describe("Provider", () => {
 
 describe("useListRow", () => {
   it("should fetch data successfully", async () => {
-    scope = scope.get("/FAKE_PROJECT/allTasks/rows").reply(200, {
-      nodes: [
-        {
-          id: "25b0cccf-4851-43e2-80c7-f68e7883dbd6",
-          user: {
-            id: "9275e876-fd95-45a0-ad67-b947a1296c32",
-            displayField: "rrmdn@pm.me"
-          },
-          name: "Meeting 1",
-          done: true
-        }
-      ],
-      totalCount: "1"
-    });
+    scope = scope
+      .get("/FAKE_PROJECT/allTasks/rows")
+      .reply(200, {
+        nodes: [
+          {
+            id: "25b0cccf-4851-43e2-80c7-f68e7883dbd6",
+            user: {
+              id: "9275e876-fd95-45a0-ad67-b947a1296c32",
+              displayField: "rrmdn@pm.me"
+            },
+            name: "Meeting 1",
+            done: true
+          }
+        ],
+        totalCount: "2"
+      })
+      .get("/FAKE_PROJECT/allTasks/rows?limit=1&offset=1")
+      .reply(200, {
+        nodes: [
+          {
+            id: "25b0cccf-4851-43e2-80c7-f68e7883dbd6",
+            user: {
+              id: "9275e876-fd95-45a0-ad67-b947a1296c32",
+              displayField: "rrmdn@pm.me"
+            },
+            name: "Meeting 2",
+            done: true
+          }
+        ],
+        totalCount: "2"
+      });
 
     const qoreContext = createNewQoreContext();
 
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result, waitForNextUpdate, waitForValueToChange } = renderHook(() =>
       qoreContext.views.allTasks.useListRow()
     );
 
@@ -141,6 +158,13 @@ describe("useListRow", () => {
         done: true
       }
     ]);
+    act(() => {
+      result.current.fetchMore({ limit: 1, offset: 1 });
+    });
+
+    await waitForValueToChange(() => result.current.data.length);
+
+    expect(result.current.data.length).toEqual(2);
   });
 
   it("should get error message if network failed", async () => {
