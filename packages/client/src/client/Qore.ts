@@ -27,7 +27,7 @@ export type QoreConfig = {
   projectId: string;
   organizationId: string;
   authenticationId?: string;
-  getToken?: () => string | undefined;
+  getToken?: () => Promise<string | undefined> | string | undefined;
   onError?: (error: Error) => void;
 };
 
@@ -46,9 +46,17 @@ export class QoreProject {
         this.config.projectId
       }`
     });
-    this.axios.interceptors.request.use(req => {
-      const token = this.config.getToken && this.config.getToken();
-      if (token) req.headers["Authorization"] = `Bearer ${token}`;
+    this.axios.interceptors.request.use(async req => {
+      const getTokenResult = this.config.getToken && this.config.getToken();
+      let token: string | undefined;
+      if (typeof token !== "string" && typeof token !== "undefined") {
+        token = await getTokenResult;
+      } else if (typeof getTokenResult === "string") {
+        token = getTokenResult;
+      }
+      if (typeof token === "string") {
+        req.headers["Authorization"] = `Bearer ${token}`;
+      }
       return req;
     });
     this.axios.interceptors.response.use(

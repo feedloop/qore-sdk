@@ -302,7 +302,7 @@ describe("Qore SDK", () => {
   it("authenticate a user", async () => {
     const { completeRecording } = await recorder("authenticate a user");
     let token: string | undefined = undefined;
-    const mockGetToken = jest.fn(() => token);
+    const mockGetToken = jest.fn(async () => token);
     const mockOnError = jest.fn(error => {});
     const qore = new QoreClient<TestSchema>({
       ...config,
