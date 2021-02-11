@@ -31,6 +31,7 @@ export declare type QoreOperationConfig<T extends OptimisticResponse = {}> = {
   networkPolicy: NetworkPolicy;
   pollInterval: number;
   optimisticResponse?: T;
+  optimisticStrategy?: "cache-first" | "optimistic-first";
 };
 
 export type QoreOperation<

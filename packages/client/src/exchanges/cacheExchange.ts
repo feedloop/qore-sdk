@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from "axios";
 import * as Wonka from "wonka";
 import { Exchange, QoreOperation, QoreOperationResult } from "../types";
 
@@ -30,7 +29,10 @@ const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
       (operation): QoreOperationResult => {
         const cached = resultCache.get(operation.key);
         const optimisticResponse = operation.optimisticResponse;
-        const merged = { ...(cached || {}), ...(optimisticResponse || {}) };
+        const merged =
+          operation.optimisticStrategy === "cache-first"
+            ? { ...(optimisticResponse || {}), ...(cached || {}) }
+            : { ...(cached || {}), ...(optimisticResponse || {}) };
 
         const result: QoreOperationResult = {
           operation,

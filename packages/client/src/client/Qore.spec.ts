@@ -248,6 +248,15 @@ describe("Qore SDK", () => {
         // optimistic response should take effect on the next result
         if (results.length === 2) {
           expect(results[0]).not.toEqual(results[1]);
+          rowStream.revalidate({
+            networkPolicy: "cache-only",
+            optimisticStrategy: "cache-first",
+            optimisticResponse: { task: "optimistic task name" }
+          });
+        }
+        // cache values are more superior than optimistic response on cache-first strategy
+        if (results.length === 3) {
+          expect(results[1]).toEqual(results[2]);
           subs.unsubscribe();
           done();
           completeRecording();
