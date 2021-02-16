@@ -49,7 +49,7 @@ export class QoreProject {
     this.axios.interceptors.request.use(async req => {
       const getTokenResult = this.config.getToken && this.config.getToken();
       let token: string | undefined;
-      if (typeof token !== "string" && typeof token !== "undefined") {
+      if (typeof token !== "string" && typeof getTokenResult !== "undefined") {
         token = await getTokenResult;
       } else if (typeof getTokenResult === "string") {
         token = getTokenResult;
