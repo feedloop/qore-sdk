@@ -834,11 +834,11 @@ If the token is valid, an object that describes the current user will be returne
 
 ```typescript
 const client = new QoreClient({..config, onError: (error) => {
-  switch(error.code) {
-    case 500:
+  switch (error.message) {
+    case "Request failed with status code 500":
       modal.message("An error has occured");
       break;
-    case 401:
+    case "Request failed with status code 401":
       router.push("/login");
       break;
   }
