@@ -12,6 +12,7 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
+    "@sentry/integrations": "^6.2.5",
     "@sentry/node": "^5.29.2",
     "@sentry/tracing": "^5.29.2",
     "@types/conf": "^3.0.0",

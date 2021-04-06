@@ -1,20 +1,13 @@
 #!/usr/bin/env node
 
 const Sentry = require("@sentry/node");
-// or use es6 import statements
-// import * as Sentry from '@sentry/node';
-
-const Tracing = require("@sentry/tracing");
-// or use es6 import statements
-// import * as Tracing from '@sentry/tracing';
+const { ExtraErrorData } = require("@sentry/integrations");
 
 Sentry.init({
   dsn:
     "https://ce94a8fbae444197bd57ffcc976c2b7b@o428445.ingest.sentry.io/5572271",
-
-  // We recommend adjusting this value in production, or using tracesSampler
-  // for finer control
-  tracesSampleRate: 1.0
+  integrations: [new ExtraErrorData({ depth: 10 })],
+  normalizeDepth: 11
 });
 
 require("@oclif/command")
