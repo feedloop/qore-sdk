@@ -175,7 +175,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
         const stream = React.useMemo(
           () => qoreClient.view(currentViewId).readRows(opts, config),
-          [...Object.entries(opts).flat(), ...Object.entries(config).flat()]
+          [
+            ...Object.entries(opts).flat(),
+            ...Object.entries(config).flat(),
+            currentViewId
+          ]
         );
 
         React.useEffect(() => {
@@ -216,7 +220,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
         const stream = React.useMemo(
           () => qoreClient.view(currentViewId).readRow(rowId, config),
-          [rowId, ...Object.entries(config).flat()]
+          [rowId, ...Object.entries(config).flat(), currentViewId]
         );
 
         React.useEffect(() => {
@@ -253,20 +257,23 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
 
-        const insertRow = async (
-          data: Partial<ProjectSchema[string]["write"]>
-        ) => {
-          try {
-            setStatus("loading");
-            const result = await qoreClient.view(currentViewId).insertRow(data);
-            setError(null);
-            setStatus("success");
-            return result;
-          } catch (error) {
-            setStatus("error");
-            setError(error);
-          }
-        };
+        const insertRow = React.useCallback(
+          async (data: Partial<ProjectSchema[string]["write"]>) => {
+            try {
+              setStatus("loading");
+              const result = await qoreClient
+                .view(currentViewId)
+                .insertRow(data);
+              setError(null);
+              setStatus("success");
+              return result;
+            } catch (error) {
+              setStatus("error");
+              setError(error);
+            }
+          },
+          [currentViewId]
+        );
 
         return { insertRow, status, error };
       },
@@ -276,23 +283,26 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
 
-        const updateRow = async (
-          rowId: string,
-          data: Partial<ProjectSchema[string]["write"]>
-        ) => {
-          try {
-            setStatus("loading");
-            const result = await qoreClient
-              .view(currentViewId)
-              .updateRow(rowId, data);
-            setError(null);
-            setStatus("success");
-            return result;
-          } catch (error) {
-            setStatus("error");
-            setError(error);
-          }
-        };
+        const updateRow = React.useCallback(
+          async (
+            rowId: string,
+            data: Partial<ProjectSchema[string]["write"]>
+          ) => {
+            try {
+              setStatus("loading");
+              const result = await qoreClient
+                .view(currentViewId)
+                .updateRow(rowId, data);
+              setError(null);
+              setStatus("success");
+              return result;
+            } catch (error) {
+              setStatus("error");
+              setError(error);
+            }
+          },
+          [currentViewId]
+        );
 
         return { updateRow, status, error };
       },
@@ -302,20 +312,23 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
 
-        const deleteRow = async (rowId: string) => {
-          try {
-            setStatus("loading");
-            const result = await qoreClient
-              .view(currentViewId)
-              .deleteRow(rowId);
-            setError(null);
-            setStatus("success");
-            return result;
-          } catch (error) {
-            setStatus("error");
-            setError(error);
-          }
-        };
+        const deleteRow = React.useCallback(
+          async (rowId: string) => {
+            try {
+              setStatus("loading");
+              const result = await qoreClient
+                .view(currentViewId)
+                .deleteRow(rowId);
+              setError(null);
+              setStatus("success");
+              return result;
+            } catch (error) {
+              setStatus("error");
+              setError(error);
+            }
+          },
+          [currentViewId]
+        );
 
         return { deleteRow, status, error };
       },
@@ -363,7 +376,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               }
             }
           }),
-          [rowId]
+          [rowId, currentViewId]
         );
 
         const action = React.useCallback(
@@ -381,7 +394,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           ) as Array<keyof typeof rowActions>) {
             rowActions[actionId] = createAction(actionId);
           }
-        }, [createAction]);
+        }, [createAction, currentViewId]);
 
         return {
           statuses,
@@ -400,10 +413,8 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           Record<RelationActions, Error | null>
         >({ removeRelation: null, addRelation: null });
 
-        return {
-          statuses,
-          errors,
-          addRelation: async relations => {
+        const addRelation = React.useCallback(
+          async relations => {
             setStatuses(statuses => ({
               ...statuses,
               addRelation: "loading"
@@ -428,7 +439,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               return false;
             }
           },
-          removeRelation: async relations => {
+          [currentViewId, rowId]
+        );
+
+        const removeRelation = React.useCallback(
+          async relations => {
             setStatuses(statuses => ({
               ...statuses,
               removeRelation: "loading"
@@ -452,7 +467,15 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               setErrors(errors => ({ ...errors, removeRelation: error }));
               return false;
             }
-          }
+          },
+          [currentViewId, rowId]
+        );
+
+        return {
+          statuses,
+          errors,
+          addRelation,
+          removeRelation
         };
       },
       useForm: <F extends keyof ProjectSchema[K]["forms"]>(formId: F) => {
@@ -488,6 +511,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
   const views = new Proxy<QoreContextViews<ProjectSchema>>(
     {} as QoreContextViews<ProjectSchema>,
     {
+      // @ts-ignore
       get: <K extends keyof ProjectSchema>(
         views: QoreContextViews<ProjectSchema>,
         currentViewId: K
