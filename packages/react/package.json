@@ -1,6 +1,6 @@
 {
   "name": "@feedloop/qore-react",
-  "version": "0.1.35",
+  "version": "0.1.36",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
