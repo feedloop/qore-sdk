@@ -75,7 +75,10 @@ type QoreHooks<T extends QoreSchema[string]> = {
   };
 
   useInsertRow: () => {
-    insertRow: (data: Partial<T["write"]>) => Promise<T["read"] | undefined>;
+    insertRow: (
+      data: Partial<T["write"]>,
+      config?: Partial<QoreOperationConfig>
+    ) => Promise<T["read"] | undefined>;
     status: QoreRequestStatus;
     error: Error | null;
   };
@@ -83,14 +86,18 @@ type QoreHooks<T extends QoreSchema[string]> = {
   useUpdateRow: () => {
     updateRow: (
       rowId: string,
-      data: Partial<T["write"]>
+      data: Partial<T["write"]>,
+      config?: Partial<QoreOperationConfig>
     ) => Promise<T["read"] | undefined>;
     status: QoreRequestStatus;
     error: Error | null;
   };
 
   useDeleteRow: () => {
-    deleteRow: (rowId: string) => Promise<boolean | undefined>;
+    deleteRow: (
+      rowId: string,
+      config?: Partial<QoreOperationConfig>
+    ) => Promise<boolean | undefined>;
     status: QoreRequestStatus;
     error: Error | null;
   };
@@ -150,7 +157,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           const user = await qoreClient.currentUser();
           setUser(user);
           setStatus("success");
-        } catch (error) {
+        } catch (error: any) {
           setUser(null);
           setError(error);
           setStatus("error");
@@ -252,7 +259,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         return { data, error, status, revalidate };
       },
 
-      useInsertRow: () => {
+      useInsertRow: (config?: Partial<QoreOperationConfig>) => {
         const qoreClient = useClient();
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
@@ -263,11 +270,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               setStatus("loading");
               const result = await qoreClient
                 .view(currentViewId)
-                .insertRow(data);
+                .insertRow(data, config);
               setError(null);
               setStatus("success");
               return result;
-            } catch (error) {
+            } catch (error: any) {
               setStatus("error");
               setError(error);
             }
@@ -278,7 +285,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         return { insertRow, status, error };
       },
 
-      useUpdateRow: () => {
+      useUpdateRow: (config?: Partial<QoreOperationConfig>) => {
         const qoreClient = useClient();
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
@@ -292,11 +299,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               setStatus("loading");
               const result = await qoreClient
                 .view(currentViewId)
-                .updateRow(rowId, data);
+                .updateRow(rowId, data, config);
               setError(null);
               setStatus("success");
               return result;
-            } catch (error) {
+            } catch (error: any) {
               setStatus("error");
               setError(error);
             }
@@ -307,10 +314,10 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         return { updateRow, status, error };
       },
 
-      useDeleteRow: () => {
+      useDeleteRow: (config?: Partial<QoreOperationConfig>) => {
         const qoreClient = useClient();
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
-        const [error, setError] = React.useState<Error | null>(null);
+        const [error, setError] = React.useState<Error | null | any>(null);
 
         const deleteRow = React.useCallback(
           async (rowId: string) => {
@@ -318,11 +325,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               setStatus("loading");
               const result = await qoreClient
                 .view(currentViewId)
-                .deleteRow(rowId);
+                .deleteRow(rowId, config);
               setError(null);
               setStatus("success");
               return result;
-            } catch (error) {
+            } catch (error: any) {
               setStatus("error");
               setError(error);
             }
@@ -430,7 +437,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               }));
               setErrors(errors => ({ ...errors, addRelation: null }));
               return true;
-            } catch (error) {
+            } catch (error: any) {
               setStatuses(statuses => ({
                 ...statuses,
                 addRelation: "error"
@@ -459,7 +466,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               }));
               setErrors(errors => ({ ...errors, removeRelation: null }));
               return true;
-            } catch (error) {
+            } catch (error: any) {
               setStatuses(statuses => ({
                 ...statuses,
                 removeRelation: "error"
@@ -491,7 +498,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               setError(null);
               setStatus("success");
               return resp;
-            } catch (error) {
+            } catch (error: any) {
               setStatus("error");
               setError(error);
               throw error;
