@@ -189,7 +189,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       url: `/${this.id}/rows/${id}`,
       data: input,
       method: "PATCH",
-      headers: { Sync: config.mode === "Sync" ? "true" : undefined }
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -214,7 +214,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/${this.id}/rows/${id}`,
       method: "DELETE",
-      headers: { Sync: config.mode === "Sync" ? "true" : undefined }
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -236,7 +236,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       url: `/${this.id}/rows`,
       data: input,
       method: "POST",
-      headers: { Sync: config.mode === "Sync" ? "true" : undefined }
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
