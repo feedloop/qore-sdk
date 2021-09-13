@@ -4,6 +4,16 @@ import createQoreContext from ".";
 import { QoreClient } from "@feedloop/qore-client";
 import nock from "nock";
 
+const actionPrintTemplate = `<!DOCTYPE html>
+<html>
+<body>
+    <hr>
+    <h1>Experiences</h1>
+    <hr>
+</body>
+</html>
+`;
+
 const createNewQoreContext = () => {
   const qoreClient = new QoreClient<{
     allTasks: {
@@ -55,7 +65,7 @@ const createNewQoreContext = () => {
             name: "finishTask",
             type: "action",
             linked: true,
-            tasks: [{ update: { done: "true" }, type: "update" }],
+            tasks: [{ template: actionPrintTemplate, type: "print" }],
             parameters: [],
             deletionProtection: false
           }
@@ -79,7 +89,7 @@ beforeEach(() => {
     .options(() => true)
     .reply(200, undefined, {
       "Access-Control-Allow-Origin": "*",
-      "Content-Type": "application:json"
+      "Content-Type": "application:json" || "application:pdf"
     });
 });
 

@@ -102,10 +102,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           pollInterval: 0,
           networkPolicy: "network-only"
         };
-        const res = await this.client
-          .execute<{ isExecuted: false }>(operation)
-          .toPromise();
-        if (res.data?.isExecuted) return true;
+        const res = await this.client.execute(operation).toPromise();
+        if (res.data?.isExecuted) return res;
         if (res.error) throw res.error;
         throw new Error("Trigger has failed");
       }

@@ -13,7 +13,7 @@ export type QoreViewSchema = {
 
 export type RowActions<T extends QoreViewSchema["actions"]> = {
   [K in keyof T]: {
-    trigger: (rowId: string, params: T[K]) => Promise<boolean>;
+    trigger: (rowId: string, params: T[K]) => Promise<boolean | object>;
   };
 };
 
