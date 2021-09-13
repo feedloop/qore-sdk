@@ -182,12 +182,14 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   }
   async updateRow(
     id: string,
-    input: Partial<ConditionalExcept<T["write"], string[]>>
+    input: Partial<ConditionalExcept<T["write"], string[]>>,
+    config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/${this.id}/rows/${id}`,
       data: input,
-      method: "PATCH"
+      method: "PATCH",
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -205,10 +207,14 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     if (!row.data) throw row.error;
     return row.data;
   }
-  async deleteRow(id: string): Promise<boolean> {
+  async deleteRow(
+    id: string,
+    config: Partial<QoreOperationConfig> = defaultOperationConfig
+  ): Promise<boolean> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/${this.id}/rows/${id}`,
-      method: "DELETE"
+      method: "DELETE",
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -223,12 +229,14 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     return true;
   }
   async insertRow(
-    input: Partial<ConditionalExcept<T["write"], string[]>>
+    input: Partial<ConditionalExcept<T["write"], string[]>>,
+    config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/${this.id}/rows`,
       data: input,
-      method: "POST"
+      method: "POST",
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
