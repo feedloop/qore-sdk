@@ -105,7 +105,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         const res = await this.client
           .execute<{ isExecuted: false }>(operation)
           .toPromise();
-        if (res.data?.isExecuted) return true;
+        if (res.data?.isExecuted) return res;
         if (res.error) throw res.error;
         throw new Error("Trigger has failed");
       }

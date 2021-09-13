@@ -341,7 +341,7 @@ describe("Qore SDK", () => {
         task: "new task",
         description: "new task desc"
       })
-    ).resolves.toEqual(true);
+    ).resolves.toBeDefined();
     completeRecording();
   });
 
