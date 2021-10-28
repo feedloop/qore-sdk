@@ -15,13 +15,14 @@ code_clipboard: true
 
 # Introduction
 
-Welcome to Qore Client SDK documentation page, this document will guide you to start hacking with Qore. As of now, Qore Client SDK is only accessible in JavaScript Environment, we will add more soon.
+Welcome to Qore Client SDK documentation page, this document will guide you to start hacking with Qore. As of now, Qore Client SDK is only accessible in JavaScript Environment, React and vanilla JavaScript for now.
 
 ## Prerequisites
 
 1. Node.js 12+.
-1. `npx` and `npm` executable.
-1. Qore account, signup [here](https://dashboard.qorebase.io) & don't forget to verify your account.
+2. `npx` and `npm` executable.
+3. Qore account, signup [here](https://dashboard.qorebase.io) & don't forget to verify your account.
+4. Then login to your account to setup your data.
 
 ## Features
 
@@ -37,7 +38,7 @@ Qore cli can generate the schema of your project in TypeScript, meaning that you
 
 ## Install Qore CLI
 
-Install @feedloop/qore-cli globally via npm or yarn.
+Install `@feedloop/qore-cli` globally via npm or yarn.
 
 > Installing via npm
 
@@ -49,15 +50,6 @@ npm install --global @feedloop/qore-cli
 
 ```shell
 yarn global add @feedloop/qore-cli
-```
-
-You can also run qore-cli via `npx` if you prefer not to pollute your global path.
-
-```shell
-npx @feedloop/qore-cli --help
-
-# example: login to qore via npx
-npx @feedloop/qore-cli login
 ```
 
 ## Authenticate yourself
