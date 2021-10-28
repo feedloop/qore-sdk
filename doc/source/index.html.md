@@ -20,7 +20,7 @@ Welcome to Qore Client SDK documentation page, this document will guide you to s
 ## Prerequisites
 
 1. Node.js 12+.
-2. `npx` and `npm` executable.
+2. `npm` or `yarn` executable.
 3. Qore account, signup [here](https://dashboard.qorebase.io) & don't forget to verify your account.
 4. Then login to your account to setup your data.
 
@@ -104,13 +104,13 @@ npm install --save @feedloop/qore-react
 **4)** Set your newly-created project as the current project.
 
 ```shell
-npx qore set-project
+qore set-project
 ```
 
 **5)** On your root project directory, run the codegen command to generate required config files. [See codegen](#codegen)
 
 ```shell
-npx qore codegen
+qore codegen
 ```
 
 **6)** Initialize qore client by creating the following file.
@@ -185,6 +185,8 @@ client.init(schema as any);
 ```shell
 qore codegen
 ```
+
+Or if your code is in `src/`, then use `--path src` to generate configuration code inside `src/`.
 
 > Generate configuration files to src directory
 
