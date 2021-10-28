@@ -183,13 +183,13 @@ client.init(schema as any);
 > Generate configuration files
 
 ```shell
-npx @feedloop/qore-cli codegen
+qore codegen
 ```
 
 > Generate configuration files to src directory
 
 ```shell
-npx @feedloop/qore-cli codegen --path src
+qore codegen --path src
 ```
 
 To ensure that you will have the latest version of your configuration files on your project, run this command when:
@@ -224,7 +224,7 @@ Once initialized, your project views will be accessible via the client instance.
 ```javascript
 const { data, error } = await client
   .view("allTasks")
-  .readRows({ offset: 10, limit: 10, order: "desc" })
+  .readRows({ offset: 0, limit: 10, order: "desc" })
   .toPromise();
 ```
 
@@ -233,7 +233,7 @@ import qoreContext from "./qoreContext";
 
 const Component = () => {
   const { data: allTasks, status } = qoreContext.view("allTasks").useListRow({
-    offset: 10,
+    offset: 0,
     limit: 10,
     order: "asc"
   });
@@ -254,7 +254,7 @@ You can also specify `offset`, `limit` and `order` when performing a read view o
 ## Pagination
 
 ```javascript
-const operation = client.view("allTasks").readRows({ offset: 10, limit: 10 });
+const operation = client.view("allTasks").readRows({ offset: 0, limit: 10 });
 
 let allTasks = [];
 operation.subscribe(({ data }) => {
@@ -274,7 +274,7 @@ const Component = () => {
     status,
     fetchMore
   } = qoreContext.view("allTasks").useListRow({
-    offset: 10,
+    offset: 0,
     limit: 10
   });
   return (
@@ -335,7 +335,7 @@ Oftentimes we want to get the detail of a specific row by the ID. Assuming the i
 const { data, error } = await client
   .view("allTasks")
   .readRows(
-    { offset: 10, limit: 10, order: "desc" },
+    { offset: 0, limit: 10, order: "desc" },
     { networkPolicy: "cache-only" }
   )
   .toPromise();
@@ -351,7 +351,7 @@ const Component = () => {
     error
   } = qoreContext.view("allTasks").useListRow(
     {
-      offset: 10,
+      offset: 0,
       limit: 10,
       order: "asc"
     },
@@ -389,7 +389,7 @@ You don't need to subscribe to anything if you use the React Hooks as it does th
 const operation = client
   .view("allTasks")
   .readRows(
-    { offset: 10, limit: 10, order: "desc" },
+    { offset: 0, limit: 10, order: "desc" },
     { networkPolicy: "network-and-cache" }
   );
 
@@ -409,7 +409,7 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 const operation = client
   .view("allTasks")
   .readRows(
-    { offset: 10, limit: 10, order: "desc" },
+    { offset: 0, limit: 10, order: "desc" },
     { networkPolicy: "network-and-cache" }
   );
 
@@ -426,7 +426,7 @@ import qoreContext from "./qoreContext";
 const Component = () => {
   const { data: allTasks, revalidate } = qoreContext.view("allTasks").useListRow(
     {
-      offset: 10,
+      offset: 0,
       limit: 10,
       order: "asc",
     },
@@ -455,7 +455,7 @@ By calling `revalidate()`, you are asking qore client to send a `network-only` m
 const operation = client
   .view("allTasks")
   .readRows(
-    { offset: 10, limit: 10, order: "desc" },
+    { offset: 0, limit: 10, order: "desc" },
     { networkPolicy: "network-and-cache", pollInterval: 5000 }
   );
 
@@ -470,7 +470,7 @@ import qoreContext from "./qoreContext";
 const Component = () => {
   const { data: allTasks, revalidate } = qoreContext.view("allTasks").useListRow(
     {
-      offset: 10,
+      offset: 0,
       limit: 10,
       order: "asc",
     },
