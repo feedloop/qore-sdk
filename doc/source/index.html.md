@@ -6,7 +6,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
   - javascript: JavaScript
 
 toc_footers:
-  - <a href='https://dashboard.qorebase.io' target='_blank'>Sign up to get started hacking with Qore</a>
+  - <a href='https://dashboard.qorebase.io' target='_blank'>Sign up to get started.</a>
 
 search: true
 
@@ -292,12 +292,14 @@ await operation.fetchMore({ offset: data.nodes.length, limit: 10 });
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const { data: allTasks, status, fetchMore } = qoreContext
-    .view("allTasks")
-    .useListRow({
-      offset: 10,
-      limit: 10
-    });
+  const {
+    data: allTasks,
+    status,
+    fetchMore
+  } = qoreContext.view("allTasks").useListRow({
+    offset: 10,
+    limit: 10
+  });
   return (
     <ul>
       {allTasks.map(task => (
@@ -331,9 +333,11 @@ const { data, error } = await client
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const { data: someTask, status, error } = qoreContext
-    .view("allTasks")
-    .useGetRow("some-task-id");
+  const {
+    data: someTask,
+    status,
+    error
+  } = qoreContext.view("allTasks").useGetRow("some-task-id");
   return (
     <ul>
       {allTasks.map(task => (
@@ -364,16 +368,18 @@ const { data, error } = await client
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const { data: allTasks, status, error } = qoreContext
-    .view("allTasks")
-    .useListRow(
-      {
-        offset: 10,
-        limit: 10,
-        order: "asc"
-      },
-      { networkPolicy: "cache-only" }
-    );
+  const {
+    data: allTasks,
+    status,
+    error
+  } = qoreContext.view("allTasks").useListRow(
+    {
+      offset: 10,
+      limit: 10,
+      order: "asc"
+    },
+    { networkPolicy: "cache-only" }
+  );
   return (
     <ul>
       {allTasks.map(task => (
