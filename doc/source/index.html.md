@@ -52,40 +52,25 @@ npm install --global @feedloop/qore-cli
 yarn global add @feedloop/qore-cli
 ```
 
+Try run qore-cli.
+
+```shell
+qore --help
+```
+
+If you can see help page, you're good to go!
+
 ## Authenticate yourself
 
 You will be asked to input your email & password. Choose your default project afterwards.
 
 ```shell
-npx @feedloop/qore-cli login
+qore login
 ```
 
 ## Setup
 
-```shell
-npx @feedloop/qore-cli create-project --template https://github.com/feedloop/qore-next-template.git <your-new-project-name>
-```
-
-If you start a new project, this is the recommended way to setup a qore project.
-
-This command will create a new project for you, including a starter-kit project selected (in this case, [feedloop/qore-next-template](https://github.com/feedloop/qore-next-template.git)) on your current working directory. This starter project includes common SDK initialization that should get you started.
-
-Once created, navigate to your project from your terminal to install the dependencies using `$ npm install`.
-Hit `$ npx next dev` to start running your project locally.
-
-Open this url from your browser and you should see your email being printed [http://localhost:3000](http://localhost:3000). Browse the template code to see how it is done.
-
-![](/images/localhost-3000.png)
-
-Now you are ready to:
-
-1. [Reading data](#reading-data)
-2. [Writing data](#writing-data)
-3. [Authenticating your user](#authenticating-your-user)
-
-## Setup manually
-
-If you prefer to setup qore manually to an existing project, please follow this guide all the way through.
+Follow this guide all the way through.
 
 **1)** Create a new qore project from your [qore dashboard](https://dashboard.qorebase.io).
 
@@ -97,7 +82,7 @@ If you prefer to setup qore manually to an existing project, please follow this 
 
 ```shell
 mkdir my-new-project
-cd ./my-new-project
+cd my-new-project
 ```
 
 **3)** Initialize `package.json` file on your root project directory by triggering `npm init -y`, followed by installing required dependencies.
