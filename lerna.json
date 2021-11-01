@@ -2,5 +2,5 @@
   "packages": ["packages/*"],
   "version": "independent",
   "npmClient": "yarn",
-  "npmClientArgs": ["--production", "--no-optional"]
+  "npmClientArgs": ["--no-optional"]
 }
