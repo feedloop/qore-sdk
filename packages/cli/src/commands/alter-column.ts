@@ -6,6 +6,7 @@ import {
 } from "@feedloop/qore-sdk";
 import { Command, flags } from "@oclif/command";
 import cli from "cli-ux";
+import chalk from "chalk";
 
 export default class AlterColumn extends Command {
   static description = "Rename column from a specific table";
@@ -22,7 +23,9 @@ export default class AlterColumn extends Command {
   async run() {
     const { flags, argv } = this.parse(AlterColumn);
     const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
-    cli.action.start("Rename column ....", "initializing", { stdout: true });
+    cli.action.start(`${chalk.yellow("Rename column ....")}`, "initializing", {
+      stdout: true
+    });
     await client.migrate({
       operations: [
         {
@@ -32,6 +35,6 @@ export default class AlterColumn extends Command {
         }
       ]
     });
-    cli.action.stop();
+    cli.action.stop(`${chalk.green("Success")}`);
   }
 }

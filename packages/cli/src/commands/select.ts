@@ -1,14 +1,16 @@
-import { Configuration, DefaultApi } from "@feedloop/qore-sdk";
+import {
+  Configuration,
+  DefaultApi,
+  V1ExecuteOperationsOperationEnum
+} from "@feedloop/qore-sdk";
 import { Command, flags } from "@oclif/command";
 import { cli } from "cli-ux";
 import chalk from "chalk";
 
-function getListCol(input) {
+function getListCol(input: object[]) {
   let result = {};
-  for (let key in input) {
-    if (key.toLocaleLowerCase() !== "id") {
-      result[key] = { minWidth: 7 };
-    }
+  for (let key in input[0]) {
+    result[key] = { minWidth: 7 };
   }
   result.id = {
     header: "ID",
@@ -18,7 +20,7 @@ function getListCol(input) {
 }
 
 export default class Select extends Command {
-  static description = "Get all rows from  a specific table";
+  static description = "Get all rows from a specific table";
   static examples = [`$ qore select tableName`];
   static args = [{ name: "table name" }];
   static flags = {
@@ -31,9 +33,24 @@ export default class Select extends Command {
     const client = new DefaultApi(
       new Configuration({ apiKey: `${flags.apiKey}` })
     );
-    const { data } = await client.getRows(argv[0]);
-    const rowData = data.items;
-    const listCol = getListCol(rowData[0]);
+
+    const table = argv[0];
+    const name = "select" + table.charAt(0).toUpperCase() + table.slice(1);
+    const { data } = await client.execute({
+      operations: [
+        {
+          operation: V1ExecuteOperationsOperationEnum.Select,
+          instruction: {
+            table,
+            name,
+            condition: {},
+            populate: []
+          }
+        }
+      ]
+    });
+    const rowData = data.results[name];
+    const listCol = getListCol(rowData);
     console.log(`${chalk.green("List rows:")}`);
     cli.table(rowData, listCol, {
       printLine: this.log,
