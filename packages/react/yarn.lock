@@ -935,27 +935,21 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@feedloop/qore-client@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-0.1.19.tgz#a69a235957d09760eed14b43b651231131441037"
-  integrity sha512-5ZdS9pOVvys5XvRyOUjeJn+TqP4kHhf1EINwNnEv+R1cJXEFvvgx+rcl04isLE1RM2xXLP6SuJGZZ3Y/DDm98A==
+"@feedloop/qore-client@^0.1.35":
+  version "0.1.35"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-0.1.35.tgz#a1470724420235d99a9dbef4a1fbf7ca66673bc7"
+  integrity sha512-GQc9AxmKiM81sz/QYbPDHNqBkacJHZ8t3e2CFt0UQ9QHuRSFXfNupNqiDIwEi0ucj+Cu72XnaG3eoYJDEcSaLA==
   dependencies:
-    "@feedloop/qore-sdk" "^0.1.6"
-    "@types/nock" "^11.1.0"
+    "@feedloop/qore-sdk" "^0.1.8"
     axios "^0.21.0"
-    immer "^8.0.0"
     nanoid "^3.1.20"
-    nock "^13.0.5"
-    nock-record "^0.3.9"
-    normalizr "^3.6.1"
-    sequency "^0.19.2"
     type-fest "^0.20.1"
     wonka "^4.0.15"
 
-"@feedloop/qore-sdk@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-sdk/-/qore-sdk-0.1.6.tgz#c276299421faa0364ae6cff29d8dbba4c66d3c66"
-  integrity sha512-aBTcs6OrmFWXIW3Y35mFwk4F/9JE+5XJXk/URRC4UeAyvZzA4Po6TwRcP5Lgo0uqFhDrdC9KcUU6YgjLp8WnKA==
+"@feedloop/qore-sdk@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-sdk/-/qore-sdk-0.1.8.tgz#13aa50373e286cf60bd29e9fcc22a9e3d765d115"
+  integrity sha512-izH+4hqJ+qNxcSjhh6RP/t/62zbpIleNgzn4cGogDSS7YPOIodtXE4uf0IA2eaXYnWCcuFMUVYHm39PI9FjywQ==
   dependencies:
     axios "^0.21.0"
 
@@ -2402,11 +2396,6 @@ iconv-lite@0.4.24:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-immer@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/immer/-/immer-8.0.0.tgz#08763549ba9dd7d5e2eb4bec504a8315bd9440c2"
-  integrity sha512-jm87NNBAIG4fHwouilCHIecFXp5rMGkiFrAuhVO685UnMAlOneEAnOyzPt8OnP47TC11q/E7vpzZe0WvwepFTg==
-
 import-local@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/import-local/-/import-local-3.0.2.tgz#a8cfd0431d1de4a2199703d003e3e62364fa6db6"
@@ -3313,9 +3302,9 @@ ms@2.1.2:
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
 nanoid@^3.1.20:
-  version "3.1.20"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.20.tgz#badc263c6b1dcf14b71efaa85f6ab4c1d6cfc788"
-  integrity sha512-a1cQNyczgKbLX9jwbS/+d7W8fX/RfgYR7lVWwWOGIPNgK2m0MWvrGF6/m4kk6U3QcFMnZf3RIhL0v2Jgh/0Uxw==
+  version "3.1.30"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.30.tgz#63f93cc548d2a113dc5dfbc63bfa09e2b9b64362"
+  integrity sha512-zJpuPDwOv8D2zq2WRoMe1HsfZthVewpel9CAvTfc/2mBD1uUT/agc5f7GHGWXlYkFvi1mVxe4IjvP2HNrop7nQ==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -3343,13 +3332,6 @@ nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
-
-nock-record@^0.3.9:
-  version "0.3.9"
-  resolved "https://registry.yarnpkg.com/nock-record/-/nock-record-0.3.9.tgz#783685fa257f1d1a309922ac9475b671dc90220c"
-  integrity sha512-KY6tfaHTGe7cKzIAC0y92IBzQIy1kL1g01EXXjFlXU18VxBS+/VNvin7hDJ2fZQeCYwrcG5ZOxNCy7p4sf2zSQ==
-  dependencies:
-    stack-trace "^0.0.10"
 
 nock@*, nock@^13.0.5:
   version "13.0.5"
@@ -3409,11 +3391,6 @@ normalize-path@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
-
-normalizr@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/normalizr/-/normalizr-3.6.1.tgz#d367ab840e031ff382141b8d81ce279292ff69fe"
-  integrity sha512-8iEmqXmPtll8PwbEFrbPoDxVw7MKnNvt3PZzR2Xvq9nggEEOgBlNICPXYzyZ4w4AkHUzCU998mdatER3n2VaMA==
 
 npm-run-path@^2.0.0:
   version "2.0.2"
@@ -3951,11 +3928,6 @@ semver@^7.3.2:
   dependencies:
     lru-cache "^6.0.0"
 
-sequency@^0.19.2:
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/sequency/-/sequency-0.19.2.tgz#3f64ad1dcfc8cce5c635ed16a889c2de2a7323ef"
-  integrity sha512-iP0psxGsDgMTgyA6wfqVJqYsFp1eDO/WFh9ylJa2sWq/TuUxLrwPrpYN2+hgmIpFLFu1agnUu9t/vRzck1YWrw==
-
 set-blocking@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
@@ -4136,11 +4108,6 @@ sshpk@^1.7.0:
     jsbn "~0.1.0"
     safer-buffer "^2.0.2"
     tweetnacl "~0.14.0"
-
-stack-trace@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/stack-trace/-/stack-trace-0.0.10.tgz#547c70b347e8d32b4e108ea1a2a159e5fdde19c0"
-  integrity sha1-VHxws0fo0ytOEI6hoqFZ5f3eGcA=
 
 stack-utils@^2.0.2:
   version "2.0.3"

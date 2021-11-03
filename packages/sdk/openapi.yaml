@@ -1,0 +1,643 @@
+openapi: 3.0.0
+info:
+  title: Qore Engine
+  description: qore-engine api docs
+  version: 1.0.0
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-qore-engine-admin-secret
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - ApiKeyAuth: []
+  - bearerAuth: []
+servers:
+  - url: 'http://localhost:8080'
+    description: 'localhost:8080'
+  - url: 'https://app.green-pug-403.moonho.me'
+    description: app.green-pug-403.moonho.me
+paths:
+  /v1/health:
+    get:
+      responses:
+        '200':
+          description: default response
+  /v1/inspect:
+    get:
+      responses:
+        '200':
+          description: default response
+  /v1/authorize:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                    type: string
+                type: object
+                required:
+                  - token
+      operationId: authorize
+      requestBody:
+        content:
+          application/json:
+            examples: {}
+            schema:
+              properties:
+                identifier:
+                  type: string
+                role:
+                  type: string
+              required:
+                - identifier
+                - role
+              type: object
+        required: true
+  /v1/migrate:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: number
+                required:
+                  - id
+                type: object
+      operationId: migrate
+      requestBody:
+        content:
+          application/json:
+            examples:
+              'Create user role, picker role, order table, and product table':
+                value:
+                  operations:
+                    - operation: Create
+                      resource: Table
+                      migration:
+                        name: product
+                    - operation: Create
+                      resource: Column
+                      migration:
+                        name: name
+                        table: product
+                        column:
+                          type: text
+                          definition:
+                            textType: text
+                            default: ''
+                            unique: false
+                    - operation: Create
+                      resource: Table
+                      migration:
+                        name: order
+                    - operation: Create
+                      resource: OneToManyRelation
+                      migration:
+                        name: userOrder
+                        nullable: false
+                        one:
+                          table: users
+                        many:
+                          table: order
+                        onUpdate: RESTRICT
+                        onDelete: RESTRICT
+                    - operation: Create
+                      resource: OneToManyRelation
+                      migration:
+                        name: productOrder
+                        nullable: false
+                        one:
+                          table: product
+                        many:
+                          table: order
+                        onUpdate: RESTRICT
+                        onDelete: RESTRICT
+                    - operation: Create
+                      resource: Role
+                      migration:
+                        name: picker
+                    - operation: Create
+                      resource: Role
+                      migration:
+                        name: user
+                        condition:
+                          $and:
+                            - userOrder_users_id:
+                                $eq: '{{user.id}}'
+              'Create todo and person table (m:1)':
+                value:
+                  operations:
+                    - operation: Create
+                      resource: Table
+                      migration:
+                        name: todo
+                    - operation: Create
+                      resource: Table
+                      migration:
+                        name: person
+                    - operation: Create
+                      resource: Column
+                      migration:
+                        table: todo
+                        name: title
+                        column:
+                          type: text
+                          definition:
+                            textType: text
+                            default: ''
+                            unique: false
+                    - operation: Create
+                      resource: Column
+                      migration:
+                        table: person
+                        name: name
+                        column:
+                          type: text
+                          definition:
+                            textType: text
+                            default: ''
+                            unique: false
+                    - operation: Create
+                      resource: OneToManyRelation
+                      migration:
+                        name: personTodo
+                        nullable: true
+                        one:
+                          table: person
+                        many:
+                          table: todo
+                        onDelete: RESTRICT
+                        onUpdate: RESTRICT
+              Create task table:
+                value:
+                  operations:
+                    - operation: Create
+                      resource: Table
+                      migration:
+                        name: task
+                    - operation: Create
+                      resource: Column
+                      migration:
+                        table: task
+                        name: title
+                        column:
+                          type: text
+                          definition:
+                            textType: text
+                            default: ''
+                            unique: false
+              Create role maintainer:
+                value:
+                  operations:
+                    - operation: Create
+                      resource: Role
+                      migration:
+                        name: maintainer
+            schema:
+              required:
+                - operations
+              type: object
+              properties:
+                operations:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - operation
+                      - resource
+                      - migration
+                    properties:
+                      operation:
+                        type: string
+                        enum:
+                          - Alter
+                          - Create
+                          - Drop
+                      resource:
+                        type: string
+                        enum:
+                          - Column
+                          - ManyToManyRelation
+                          - OneToManyRelation
+                          - Permission
+                          - Role
+                          - Table
+                      migration:
+                        type: object
+        required: true
+  /v1/rollback:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                required:
+                  - ok
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+      operationId: rollback
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Rollback to previous migration:
+                value:
+                  rollbacks: 1
+            schema:
+              required:
+                - rollbacks
+              properties:
+                rollbacks:
+                  type: number
+              type: object
+        required: true
+  /v1/migrations:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                required:
+                  - items
+                  - pagination
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                        - active
+                        - createdAt
+                        - down
+                        - up
+                        - schema
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        active:
+                          type: boolean
+                        schema:
+                          type: object
+                          additionalProperties: true
+                          required:
+                            - migration
+                            - operation
+                            - resource
+                        up:
+                          type: string
+                        down:
+                          type: string
+                        createdAt:
+                          type: number
+                        description:
+                          type: string
+                          nullable: true
+                  pagination:
+                    type: object
+                    required: []
+                    properties:
+                      limit:
+                        type: number
+                        default: 50
+                      offset:
+                        type: number
+                        default: 0
+                      total:
+                        type: number
+                        default: 0
+      operationId: getMigrations
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: number
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: number
+            default: 0
+  /v1/execute:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - results
+                properties:
+                  results:
+                    type: object
+                    required: []
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        additionalProperties: true
+      operationId: execute
+      requestBody:
+        content:
+          application/json:
+            examples:
+              'Insert user, product, and order':
+                value:
+                  operations:
+                    - operation: Insert
+                      instruction:
+                        table: users
+                        name: insertAyu
+                        data:
+                          external_id: Ayu
+                          roleId: userId
+                    - operation: Insert
+                      instruction:
+                        table: users
+                        name: insertBudi
+                        data:
+                          external_id: Budi
+                          roleId: userId
+                    - operation: Insert
+                      instruction:
+                        table: users
+                        name: insertAdminToko
+                        data:
+                          external_id: Admin Toko
+                          roleId: pickerId
+                    - operation: Insert
+                      instruction:
+                        table: product
+                        name: insertBaju
+                        data:
+                          name: Baju
+                    - operation: Insert
+                      instruction:
+                        table: product
+                        name: insertRok
+                        data:
+                          name: Rok
+                    - operation: Insert
+                      instruction:
+                        table: order
+                        name: insertRokOrder
+                        data:
+                          userOrder: '{{insertAyu[0].id}}'
+                          productOrder: '{{insertRok[0].id}}'
+                    - operation: Insert
+                      instruction:
+                        table: order
+                        name: insertRokOrder
+                        data:
+                          userOrder: '{{insertBudi[0].id}}'
+                          productOrder: '{{insertBaju[0].id}}'
+              Insert a new task:
+                value:
+                  operations:
+                    - operation: Insert
+                      instruction:
+                        table: task
+                        name: insertTask
+                        data:
+                          title: Buy a cup of coffee
+              Insert a new person and todo:
+                value:
+                  operations:
+                    - operation: Insert
+                      instruction:
+                        table: person
+                        name: insertPerson
+                        data:
+                          name: Budi
+                    - operation: Insert
+                      instruction:
+                        table: todo
+                        name: insertCoding
+                        data:
+                          title: Coding
+                          personTodo_person_id: '{{insertPerson[0].id}}'
+                    - operation: Insert
+                      instruction:
+                        table: todo
+                        name: insertLeha
+                        data:
+                          title: Leha - leha
+                          personTodo_person_id: '{{insertPerson[0].id}}'
+              Get all tasks:
+                value:
+                  operations:
+                    - operation: Select
+                      instruction:
+                        table: task
+                        name: selectTask
+                        condition: {}
+                        populate: []
+              Get all todo with person:
+                value:
+                  operations:
+                    - operation: Select
+                      instruction:
+                        table: todo
+                        name: selectPerson
+                        populate:
+                          - personTodo
+                        condition: {}
+              Get all order:
+                value:
+                  operations:
+                    - operation: Select
+                      instruction:
+                        table: order
+                        name: selectPerson
+                        populate:
+                          - productOrder
+                        condition: {}
+            schema:
+              type: object
+              required:
+                - operations
+              properties:
+                operations:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - instruction
+                      - operation
+                    properties:
+                      operation:
+                        type: string
+                        enum:
+                          - Delete
+                          - Insert
+                          - Select
+                          - Update
+                      instruction:
+                        type: object
+                        required: []
+        required: true
+  '/v1/table/{table}':
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - pagination
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  pagination:
+                    type: object
+                    required:
+                      - page
+                      - total
+                    properties:
+                      page:
+                        type: number
+                      total:
+                        type: number
+      operationId: getRows
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: offset
+          in: query
+          schema:
+            type: number
+        - name: populate
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+    post:
+      responses:
+        '200':
+          description: Default Response
+      operationId: createRow
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Insert task:
+                value:
+                  data:
+                    title: Brew a cup of coffee
+            schema:
+              type: object
+              required:
+                - data
+        required: true
+      parameters:
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+  '/v1/table/{table}/row/{rowID}':
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+      operationId: getRow
+      parameters:
+        - name: populate
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowID
+          in: path
+          required: true
+          schema:
+            type: string
+    patch:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+      operationId: updateRow
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Update title:
+                value:
+                  title: Buy PS5
+            schema:
+              type: object
+              additionalProperties: true
+      parameters:
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowID
+          in: path
+          required: true
+          schema:
+            type: string
+    delete:
+      responses:
+        '200':
+          description: Default Response
+      operationId: deleteRow
+      parameters:
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowID
+          in: path
+          required: true
+          schema:
+            type: string
