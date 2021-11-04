@@ -12,30 +12,35 @@ export default class CreateTable extends Command {
   static description = "create a table in this project";
 
   static examples = [`$ qore create-table tableName`];
-  static args = [{ name: "table name" }];
+  static args = [{ name: "tableName" }];
 
   static flags = {
-    apiKey: flags.string({ description: "apiKey" })
+    apiKey: flags.string({ description: "apiKey", required: true })
   };
 
   async run() {
-    const { flags, argv } = this.parse(CreateTable);
+    const { flags, args } = this.parse(CreateTable);
     const client = new DefaultApi(
       new Configuration({ apiKey: `${flags.apiKey}` })
     );
-
-    cli.action.start("Create table ...", "initializing", { stdout: true });
+    cli.action.start(
+      `Create table ${chalk.blue(`"${args.tableName}"`)}`,
+      "initializing",
+      {
+        stdout: true
+      }
+    );
     await client.migrate({
       operations: [
         {
           operation: V1MigrateOperationsOperationEnum.Create,
           resource: V1MigrateOperationsResourceEnum.Table,
           migration: {
-            name: argv[0]
+            name: args.tableName
           }
         }
       ]
     });
-    cli.action.stop(`${chalk.green("Success")}`);
+    cli.action.stop();
   }
 }

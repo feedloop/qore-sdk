@@ -11,26 +11,33 @@ import chalk from "chalk";
 export default class AlterTable extends Command {
   static description = "Rename specific table";
   static examples = [`$ qore alter-table formerName newName`];
-  static args = [{ name: "former table name" }, { name: "new table name" }];
+  static args = [{ name: "formerName" }, { name: "newName" }];
   static flags = {
-    apiKey: flags.string({ description: "apiKey" })
+    apiKey: flags.string({ description: "apiKey", required: true })
   };
 
   async run() {
-    const { argv, flags } = this.parse(AlterTable);
+    const { args, flags } = this.parse(AlterTable);
+    const { formerName, newName } = args;
     const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
-    cli.action.start(`${chalk.yellow("Rename table ...")}`, "initializing", {
-      stdout: true
-    });
+    cli.action.start(
+      `Renaming table ${chalk.blue(`"${formerName}"`)} to ${chalk.blue(
+        `"${newName}"`
+      )}`,
+      "initializing",
+      {
+        stdout: true
+      }
+    );
     await client.migrate({
       operations: [
         {
           operation: V1MigrateOperationsOperationEnum.Alter,
           resource: V1MigrateOperationsResourceEnum.Table,
-          migration: { from: `${argv[0]}`, to: `${argv[1]}` }
+          migration: { from: formerName, to: newName }
         }
       ]
     });
-    cli.action.stop(`${chalk.green("Success")}`);
+    cli.action.stop();
   }
 }

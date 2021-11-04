@@ -12,23 +12,24 @@ export default class CreateColumn extends Command {
   static description = "Create column in specific table";
   static examples = [`$ qore create-column tableName columnName dataType`];
   static args = [
-    { name: "table name" },
-    { name: "column name" },
-    { type: "data type" }
+    { name: "tableName" },
+    { name: "columnName" },
+    { name: "dataType" }
   ];
 
   static flags = {
-    apiKey: flags.string({ description: "apiKey user" })
+    apiKey: flags.string({ description: "apiKey", required: true })
   };
   async run() {
-    const { flags, argv } = this.parse(CreateColumn);
+    const { flags, args } = this.parse(CreateColumn);
+    const { tableName, columnName, dataType } = args;
     const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
     cli.action.start(
-      `${chalk.yellow("Create new column ...")}`,
+      `Create new column ${chalk.blue(`"${columnName}"`)} to ${chalk.blue(
+        `"${tableName}"`
+      )} table `,
       "initializing",
-      {
-        stdout: true
-      }
+      { stdout: true }
     );
     await client.migrate({
       operations: [
@@ -36,12 +37,12 @@ export default class CreateColumn extends Command {
           operation: V1MigrateOperationsOperationEnum.Create,
           resource: V1MigrateOperationsResourceEnum.Column,
           migration: {
-            table: argv[0],
-            name: argv[1],
+            table: tableName,
+            name: columnName,
             column: {
-              type: argv[2],
+              type: dataType,
               definition: {
-                textType: argv[2],
+                textType: dataType,
                 default: "",
                 unique: false
               }
@@ -50,6 +51,6 @@ export default class CreateColumn extends Command {
         }
       ]
     });
-    cli.action.stop(`${chalk.green("Success")}`);
+    cli.action.stop();
   }
 }

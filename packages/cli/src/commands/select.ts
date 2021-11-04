@@ -7,8 +7,14 @@ import { Command, flags } from "@oclif/command";
 import { cli } from "cli-ux";
 import chalk from "chalk";
 
-function getListCol(input: object[]) {
-  let result = {};
+interface Result {
+  [key: string]: {
+    [key: string]: string | number | boolean;
+  };
+}
+
+function getListCol(input: Object[]) {
+  let result: Result = {};
   for (let key in input[0]) {
     result[key] = { minWidth: 7 };
   }
@@ -20,38 +26,40 @@ function getListCol(input: object[]) {
 }
 
 export default class Select extends Command {
-  static description = "Get all rows from a specific table";
+  static description = "Get all rows from specific table";
   static examples = [`$ qore select tableName`];
-  static args = [{ name: "table name" }];
+  static args = [{ name: "tableName" }];
   static flags = {
-    apiKey: flags.string({ description: "apiKey" }),
+    apiKey: flags.string({ description: "apiKey", required: true }),
     ...cli.table.flags()
   };
 
   async run() {
-    const { argv, flags } = this.parse(Select);
+    const { args, flags } = this.parse(Select);
     const client = new DefaultApi(
       new Configuration({ apiKey: `${flags.apiKey}` })
     );
+    const { tableName } = args;
 
-    const table = argv[0];
-    const name = "select" + table.charAt(0).toUpperCase() + table.slice(1);
+    this.log(`Read rows from ${chalk.blue(`"${tableName}"`)} table ...`);
+    const identityName =
+      "select" + tableName.charAt(0).toUpperCase() + tableName.slice(1);
     const { data } = await client.execute({
       operations: [
         {
           operation: V1ExecuteOperationsOperationEnum.Select,
           instruction: {
-            table,
-            name,
+            table: tableName,
+            name: identityName,
             condition: {},
             populate: []
           }
         }
       ]
     });
-    const rowData = data.results[name];
+
+    const rowData = data.results[identityName];
     const listCol = getListCol(rowData);
-    console.log(`${chalk.green("List rows:")}`);
     cli.table(rowData, listCol, {
       printLine: this.log,
       ...flags

@@ -7,36 +7,48 @@ import {
   V1MigrateOperationsResourceEnum
 } from "@feedloop/qore-sdk";
 import chalk from "chalk";
+import inquirer from "inquirer";
 
 export default class DropColumn extends Command {
   static description = "Drop column from specific table";
   static examples = [`$ qore drop-column tableName columnName`];
-  static args = [{ name: "table name" }, { name: "column name" }];
+  static args = [{ name: "tableName" }, { name: "columnName" }];
   static flags = {
-    apiKey: flags.string({ description: "apiKey" })
+    apiKey: flags.string({ description: "apiKey", required: true })
   };
 
   async run() {
-    const { argv, flags } = this.parse(DropColumn);
+    const { args, flags } = this.parse(DropColumn);
+    const { tableName, columnName } = args;
     const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
-    const validation = await cli.prompt("Are you sure? Y|N");
-    const response = validation.toLowerCase();
-    cli.action.start(`${chalk.yellow("Drop column ...")}`, "initializing", {
-      stdout: true
-    });
-    if (response === "y" || response === "yes") {
+    const response = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "dropColumn",
+        message: `Are you sure to delete ${chalk.blue(
+          `"${columnName}"`
+        )} column ?`,
+        default: false
+      }
+    ]);
+    cli.action.start(
+      `Drop column ${chalk.blue(`"${columnName}"`)} from table ${chalk.blue(
+        `"${tableName}"`
+      )}`,
+      "initializing",
+      { stdout: true }
+    );
+    if (response.dropColumn) {
       await client.migrate({
         operations: [
           {
             operation: V1MigrateOperationsOperationEnum.Drop,
             resource: V1MigrateOperationsResourceEnum.Column,
-            migration: { table: argv[0], column: argv[1] }
+            migration: { table: tableName, column: columnName }
           }
         ]
       });
       cli.action.stop(`${chalk.green("Success")}`);
-    } else if (response === "n" || response === "no") {
-      cli.action.stop(`${chalk.red("Cancell")}`);
     } else {
       cli.action.stop(`${chalk.red("Failed")}`);
     }
