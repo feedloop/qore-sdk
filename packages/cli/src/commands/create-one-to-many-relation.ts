@@ -9,7 +9,7 @@ import chalk from "chalk";
 import cli from "cli-ux";
 
 export default class CreateOneToManyRelation extends Command {
-  static description = "Create one to many relation";
+  static description = "Create OneToManyRelation column";
   static examples = [
     `$ qore create-one-to-many-relation tableOrigin tableTarget relationName`
   ];

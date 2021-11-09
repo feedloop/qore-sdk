@@ -9,7 +9,7 @@ import chalk from "chalk";
 import cli from "cli-ux";
 
 export default class CreateManyToManyRelation extends Command {
-  static description = "Create many to many relation";
+  static description = "Create junctionTable ManyTomanyRelation";
   static examples = [
     `$ qore create-many-to-many-relation tableOrigin tableTarget relationName`
   ];
