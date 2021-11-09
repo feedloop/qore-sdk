@@ -1,5 +1,4 @@
 import { Command, flags } from "@oclif/command";
-import cli from "cli-ux";
 import {
   DefaultApi,
   Configuration,
@@ -7,6 +6,7 @@ import {
   V1MigrateOperationsResourceEnum
 } from "@feedloop/qore-sdk";
 import chalk from "chalk";
+import cli from "cli-ux";
 import inquirer from "inquirer";
 
 export default class DropTable extends Command {

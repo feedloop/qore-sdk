@@ -41,6 +41,6 @@ export default class CreateTable extends Command {
         }
       ]
     });
-    cli.action.stop();
+    cli.action.stop(`${chalk.green("success")}`);
   }
 }

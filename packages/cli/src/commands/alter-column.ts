@@ -9,7 +9,7 @@ import cli from "cli-ux";
 import chalk from "chalk";
 
 export default class AlterColumn extends Command {
-  static description = "Rename column from a specific table";
+  static description = "Rename column from specific table";
   static example = `$ qore tableName formerName newName`;
   static args = [
     { name: "tableName" },
@@ -23,7 +23,6 @@ export default class AlterColumn extends Command {
   async run() {
     const { flags, args } = this.parse(AlterColumn);
     const { tableName, formerName, newName } = args;
-    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
     cli.action.start(
       `Renaming column ${chalk.blue(`"${formerName}"`)} to ${chalk.blue(
         `"${newName}"`
@@ -33,6 +32,7 @@ export default class AlterColumn extends Command {
         stdout: true
       }
     );
+    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
     await client.migrate({
       operations: [
         {
