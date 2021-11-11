@@ -80,26 +80,24 @@ export type ViewDriverObject<T> = T extends ViewDriver<infer U> ? U : never;
 
 export type CacheRef = { __ref: string };
 
-export const composeExchanges = (exchanges: Exchange[]) => ({
-  client,
-  forward
-}: ExchangeInput) =>
-  exchanges.reduceRight(
-    (forward, exchange) =>
-      exchange({
-        client,
-        forward
-      }),
-    forward
-  );
+export const composeExchanges =
+  (exchanges: Exchange[]) =>
+  ({ client, forward }: ExchangeInput) =>
+    exchanges.reduceRight(
+      (forward, exchange) =>
+        exchange({
+          client,
+          forward
+        }),
+      forward
+    );
 
-export type PromisifiedSource<
-  T extends QoreOperationResult
-> = Wonka.Source<T> & {
-  toPromise: () => Promise<T>;
-  revalidate: (config?: Partial<QoreOperationConfig>) => Promise<T>;
-  subscribe: (callback: (data: T) => void) => Wonka.Subscription;
-};
+export type PromisifiedSource<T extends QoreOperationResult> =
+  Wonka.Source<T> & {
+    toPromise: () => Promise<T>;
+    revalidate: (config?: Partial<QoreOperationConfig>) => Promise<T>;
+    subscribe: (callback: (data: T) => void) => Wonka.Subscription;
+  };
 
 export function withHelpers<T extends QoreOperationResult>(
   source$: Wonka.Source<T>,
@@ -136,9 +134,8 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   views: { [K in keyof T]: ViewDriver<T[K]> };
   constructor(config: QoreConfig) {
     this.project = new QoreProject(config);
-    const { next, source } = Wonka.makeSubject<
-      QoreOperation<AxiosRequestConfig>
-    >();
+    const { next, source } =
+      Wonka.makeSubject<QoreOperation<AxiosRequestConfig>>();
     this.operations = source;
     this.nextOperation = next;
     const composedExchange = composeExchanges([

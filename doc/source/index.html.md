@@ -63,6 +63,7 @@ qore --help
 If you can see the help page, you're good to go!
 
 ```text
+
 qore cli
 
 VERSION
@@ -78,7 +79,6 @@ COMMANDS
   help            display help for qore
   login           Login to qore cli
   set-project     Set project target
-
 ```
 
 ## Step 2: Authenticate yourself
@@ -121,7 +121,7 @@ Or if you don't have one yet, you can create your project using [React](https://
 Inside your project directory, install the required dependencies below.
 
 ```shell
-npm install --save @feedloop/qore-client
+npm install @feedloop/qore-client
 ```
 
 ```shell
@@ -131,7 +131,7 @@ npm install --save-dev @feedloop/qore-cli
 > For ReactJS/NextJS : install @feedloop/qore-react to your project.
 
 ```shell
-npm install --save @feedloop/qore-react
+npm install @feedloop/qore-react
 ```
 
 ## Step 5: Set your project as the Qore project.
@@ -310,6 +310,7 @@ const Component = () => {
     </ul>
   );
 };
+export default Component;
 ```
 
 Method `readRow()` in JavaScript SDK or `useListRow()` in React SDK will return `data` that contain rows of your `allTasks` view. In case an error occurs, `data` can be null and `error` should contain the cause of the error.
@@ -360,6 +361,8 @@ const Component = () => {
     </ul>
   );
 };
+
+export default Component;
 ```
 
 ## Reading individual row
@@ -376,20 +379,31 @@ const { data, error } = await client
 ```jsx
 import qoreContext from "./qoreContext";
 
-const Component = () => {
+function Detail() {
+  const { id } = useParams();
+
   const {
-    data: someTask,
+    data: task,
     status,
     error
-  } = qoreContext.view("allTasks").useGetRow("some-task-id");
+  } = qoreContext.view("allTasks").useGetRow(id);
+
   return (
-    <ul>
-      {allTasks.map(task => (
-        <li>{task.name}</li>
-      ))}
-    </ul>
+    <>
+      {task && (
+        <>
+          <header>
+            <h1>Detail TODO: {task.name}</h1>
+          </header>
+          <div>Status: {task.done ? `✅` : `❌`}</div>
+        </>
+      )}
+      <Link to="/">Back</Link>
+    </>
   );
-};
+}
+
+export default Detail;
 ```
 
 Both methods will return `data` that contain either a single row or null. If an error has occurred, `error` object will tell you the cause.
@@ -487,27 +501,41 @@ operation.revalidate();
 
 ```jsx
 import qoreContext from "./qoreContext";
+import { Link } from "react-router-dom";
 
 const Component = () => {
-  const { data: allTasks, revalidate } = qoreContext.view("allTasks").useListRow(
-    {
-      offset: 0,
-      limit: 10,
-      order: "asc",
-    },
-    { networkPolicy: "network-and-cache" }
-  );
+  const {
+    data: allTasks,
+    status,
+    fetchMore,
+    revalidate
+  } = qoreContext.view("allTasks").useListRow({
+    offset: 0,
+    limit: 10
+  });
   return (
     <>
-    <button onClick={revalidate}>refresh</button>
-    <ul>
-      {allTasks.map((task) => (
-        <li>{task.name}</li>
-      ))}
-    </ul>
-    <>
+      <button onClick={revalidate}>Refresh</button>
+      <ul>
+        {allTasks.map(task => (
+          <li>
+            <Link to={`/detail/${task.id}`}>{task.name}</Link>
+          </li>
+        ))}
+        <button
+          onClick={() => {
+            // new items are being pushed to allTasks
+            fetchMore({ offset: allTasks.length, limit: 10 });
+          }}
+        >
+          Load more
+        </button>
+      </ul>
+    </>
   );
 };
+
+export default Component;
 ```
 
 Oftentimes you want to get the most up-to-date state of your data from the network.
@@ -533,27 +561,43 @@ const subscription = operation.subscribe(({ data, error, stale }) => {
 
 ```jsx
 import qoreContext from "./qoreContext";
+import { Link } from "react-router-dom";
 
 const Component = () => {
-  const { data: allTasks, revalidate } = qoreContext.view("allTasks").useListRow(
+  const {
+    data: allTasks,
+    status,
+    fetchMore,
+    revalidate
+  } = qoreContext.view("allTasks").useListRow(
     {
       offset: 0,
-      limit: 10,
-      order: "asc",
+      limit: 10
     },
     { networkPolicy: "network-and-cache", pollInterval: 5000 }
   );
   return (
     <>
-    <button onClick={revalidate}>refresh</button>
-    <ul>
-      {allTasks.map((task) => (
-        <li>{task.name}</li>
-      ))}
-    </ul>
-    <>
+      <button onClick={revalidate}>Refresh</button>
+      <ul>
+        {allTasks.map(task => (
+          <li>
+            <Link to={`/detail/${task.id}`}>{task.name}</Link>
+          </li>
+        ))}
+        <button
+          onClick={() => {
+            fetchMore({ offset: allTasks.length, limit: 10 });
+          }}
+        >
+          Load more
+        </button>
+      </ul>
+    </>
   );
 };
+
+export default Component;
 ```
 
 By doing this, the data will refresh every 5 seconds, a nice near-realtime effect to your users.
@@ -572,19 +616,31 @@ const newRow = await client.view("allTasks").insertRow({ ...data });
 
 ```jsx
 import qoreContext from "./qoreContext";
+import { useRef } from "react";
 
-const Component = () => {
+function Form() {
   const { insertRow, status } = qoreContext.view("allTasks").useInsertRow();
+  const name = useRef("");
+
   return (
-    <button
-      onClick={async () => {
-        await insertRow({ ...data });
-      }}
-    >
-      insert
-    </button>
+    <form action="">
+      <input type="text" ref={name} />
+      <button
+        onClick={async e => {
+          e.preventDefault();
+          console.log(name);
+          const data = { name: name.current.value };
+          await insertRow({ ...data });
+          name.current.value = "";
+        }}
+      >
+        Insert
+      </button>
+    </form>
   );
-};
+}
+
+export default Form;
 ```
 
 ## Update a row
@@ -600,20 +656,72 @@ await client.view("allTasks").updateRow("some-task-id", {
 ```
 
 ```jsx
+import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+
 import qoreContext from "./qoreContext";
 
-const Component = () => {
-  const { updateRow, status } = qoreContext.view("allTasks").useUpdateRow();
+function Detail() {
+  const { id } = useParams();
+  const [task, setTask] = useState(null);
+  const [name, setName] = useState("");
+  const [done, setDone] = useState(false);
+
+  const { data } = qoreContext.view("allTasks").useGetRow(id);
+  const { updateRow } = qoreContext.view("allTasks").useUpdateRow();
+
+  useEffect(() => {
+    function fetchData() {
+      setTask(data);
+      if (data) {
+        setName(data.name);
+        setDone(data.done);
+      }
+    }
+    fetchData();
+  }, [data]);
   return (
-    <button
-      onClick={async () => {
-        await updateRow("some-task-id", { ...data });
-      }}
-    >
-      update
-    </button>
+    <>
+      {task && (
+        <>
+          <header>
+            <h1>Detail TODO</h1>
+          </header>
+          <form>
+            <input
+              type="text"
+              placeholder="Something to do..."
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
+            <input
+              type="checkbox"
+              checked={done}
+              onChange={() => setDone(!done)}
+            />
+            <div style={{ paddingTop: 6, paddingBottom: 6 }}>
+              <button
+                onClick={async e => {
+                  e.preventDefault();
+                  const data = {
+                    name,
+                    done
+                  };
+                  await updateRow(task.id, { ...data });
+                }}
+              >
+                Update
+              </button>
+            </div>
+          </form>
+        </>
+      )}
+      <Link to="/">Back</Link>
+    </>
   );
-};
+}
+
+export default Detail;
 ```
 
 ## Add & remove relationships
@@ -667,33 +775,6 @@ const Component = () => {
 ```
 
 In this example we are adding `member.id` to the relationship of a specific row on the `allTasks` view and then removing it.
-
-## Update a row
-
-To update a data of `allTasks` view, we also need an id of _some-task-id_. Similar to other operation, `data` object must be compliant to the schema of the view, excluding the `id` field.
-
-```javascript
-await client.view("allTasks").updateRow("some-task-id", {
-  ...data
-});
-```
-
-```jsx
-import qoreContext from "./qoreContext";
-
-const Component = () => {
-  const { updateRow, status } = qoreContext.view("allTasks").useUpdateRow();
-  return (
-    <button
-      onClick={async () => {
-        await updateRow("some-task-id", { ...data });
-      }}
-    >
-      update
-    </button>
-  );
-};
-```
 
 ## Upload a file
 

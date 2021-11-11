@@ -402,9 +402,7 @@ describe("Qore SDK", () => {
     await qore.views.toDoDefaultView.addRelation(taskId, {
       person: [member.id]
     });
-    const {
-      data: taskWithPerson
-    } = await qore.views.toDoDefaultView
+    const { data: taskWithPerson } = await qore.views.toDoDefaultView
       .readRow(taskId, { networkPolicy: "network-only" })
       .toPromise();
     if (!taskWithPerson) throw new Error("No taskWithPerson");
@@ -413,9 +411,7 @@ describe("Qore SDK", () => {
       person: [taskWithPerson.person.nodes[0].id]
     });
 
-    const {
-      data: taskWithoutPerson
-    } = await qore.views.toDoDefaultView
+    const { data: taskWithoutPerson } = await qore.views.toDoDefaultView
       .readRow(taskId, { networkPolicy: "network-only" })
       .toPromise();
 

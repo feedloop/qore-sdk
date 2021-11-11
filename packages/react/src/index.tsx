@@ -50,9 +50,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
     status: QoreRequestStatus;
     error: Error | null;
     fetchMore(fetchMoreOpts: typeof opts): Promise<void>;
-    revalidate: (
-      config?: Partial<QoreOperationConfig>
-    ) => Promise<
+    revalidate: (config?: Partial<QoreOperationConfig>) => Promise<
       QoreOperationResult<
         AxiosRequestConfig,
         {
@@ -102,9 +100,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
     error: Error | null;
   };
 
-  useActions: (
-    rowId: string
-  ) => {
+  useActions: (rowId: string) => {
     action: <A extends keyof RowActionsHooks<T["actions"]>>(
       actionId: A
     ) => RowActionsHooks<T["actions"]>[A];
@@ -113,9 +109,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
     errors: Record<keyof RowActions<T["actions"]>, Error | null>;
   };
 
-  useRelation: (
-    rowId: string
-  ) => {
+  useRelation: (rowId: string) => {
     statuses: Record<RelationActions, QoreRequestStatus>;
     errors: Record<RelationActions, Error | null>;
   } & Record<

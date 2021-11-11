@@ -43,32 +43,34 @@ const makeNetworkSource = (
 
 const isTeardown = (operation: QoreOperation) => operation.type === "teardown";
 
-const networkExchange: Exchange = ({ forward, client }) => operationStream => {
-  const sharedOpsStream = Wonka.share(operationStream);
-  const resultsStream = Wonka.pipe(
-    sharedOpsStream,
-    Wonka.filter(operation => !isTeardown(operation)),
-    Wonka.mergeMap(operation => {
-      const { key } = operation;
-      const teardownStream = Wonka.pipe(
-        sharedOpsStream,
-        Wonka.filter(op => op.type === "teardown" && op.key === key)
-      );
+const networkExchange: Exchange =
+  ({ forward, client }) =>
+  operationStream => {
+    const sharedOpsStream = Wonka.share(operationStream);
+    const resultsStream = Wonka.pipe(
+      sharedOpsStream,
+      Wonka.filter(operation => !isTeardown(operation)),
+      Wonka.mergeMap(operation => {
+        const { key } = operation;
+        const teardownStream = Wonka.pipe(
+          sharedOpsStream,
+          Wonka.filter(op => op.type === "teardown" && op.key === key)
+        );
 
-      return Wonka.pipe(
-        makeNetworkSource(operation, client),
-        Wonka.takeUntil(teardownStream)
-      );
-    })
-  );
+        return Wonka.pipe(
+          makeNetworkSource(operation, client),
+          Wonka.takeUntil(teardownStream)
+        );
+      })
+    );
 
-  const forwardStream = Wonka.pipe(
-    sharedOpsStream,
-    Wonka.filter(operation => isTeardown(operation)),
-    forward
-  );
+    const forwardStream = Wonka.pipe(
+      sharedOpsStream,
+      Wonka.filter(operation => isTeardown(operation)),
+      forward
+    );
 
-  return Wonka.merge([resultsStream, forwardStream]);
-};
+    return Wonka.merge([resultsStream, forwardStream]);
+  };
 
 export default networkExchange;
