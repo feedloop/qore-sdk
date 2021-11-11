@@ -1,7 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { useState } from "react";
-import Cookies from "js-cookie";
-import qoreContext from "./qoreContext.js";
 
 import Component from "./Component.js";
 import Detail from "./Detail.js";

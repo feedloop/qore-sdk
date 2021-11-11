@@ -10,7 +10,6 @@ const Component = () => {
   const { user } = qoreContext.useCurrentUser();
 
   async function handleLogin() {
-    debugger;
     const token = await client.authenticate("rizafahmi@gmail.com", "rahasia");
     Cookies.set("token", token);
     console.log(token);
