@@ -4,35 +4,37 @@ import {
   V1MigrateOperationsOperationEnum,
   V1MigrateOperationsResourceEnum
 } from "@feedloop/qore-sdk";
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import cli from "cli-ux";
 import chalk from "chalk";
+import config from "../config";
 
 export default class AlterColumn extends Command {
   static description = "Rename column from specific table";
+
   static example = `$ qore tableName formerName newName`;
+
   static args = [
     { name: "tableName" },
     { name: "formerName" },
     { name: "newName" }
   ];
-  static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true })
-  };
 
   async run() {
-    const { flags, args } = this.parse(AlterColumn);
+    const { args } = this.parse(AlterColumn);
     const { tableName, formerName, newName } = args;
     cli.action.start(
       `Renaming column ${chalk.blue(`"${formerName}"`)} to ${chalk.blue(
         `"${newName}"`
-      )} from ${chalk.blue(`"${tableName}"`)} table`,
+      )} in ${chalk.blue(`"${tableName}"`)} table`,
       "initializing",
       {
         stdout: true
       }
     );
-    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
+    );
     await client.migrate({
       operations: [
         {
@@ -42,6 +44,6 @@ export default class AlterColumn extends Command {
         }
       ]
     });
-    cli.action.stop();
+    cli.action.stop(`${chalk.green("Success")}`);
   }
 }

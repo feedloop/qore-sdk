@@ -1,11 +1,9 @@
 import Conf, { Schema } from "conf";
 
-export type CLIConfig = { token: string; project: string; org: string };
+export type CLIConfig = { apiKey: string };
 
 export const schema: Schema<CLIConfig> = {
-  token: { type: "string", description: "Token" },
-  project: { type: "string", description: "Project ID" },
-  org: { type: "string", description: "Organization ID" }
+  apiKey: { type: "string", description: "apiKey" }
 };
 
 const config = new Conf({

@@ -8,18 +8,21 @@ import {
 import chalk from "chalk";
 import cli from "cli-ux";
 import inquirer from "inquirer";
+import config from "../config";
 
 export default class DropTable extends Command {
   static description = "Drop specific table";
+
   static examples = [`$ qore drop-table tableName`];
+
   static args = [{ name: "tableName" }];
-  static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true })
-  };
 
   async run() {
-    const { args, flags } = this.parse(DropTable);
-    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
+    const { args } = this.parse(DropTable);
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
+    );
+
     const response = await inquirer.prompt([
       {
         type: "confirm",
@@ -30,12 +33,11 @@ export default class DropTable extends Command {
         default: false
       }
     ]);
+
     cli.action.start(
       `Drop table ${chalk.blue(`"${args.tableName}"`)}`,
       "initializing",
-      {
-        stdout: true
-      }
+      { stdout: true }
     );
     if (response.dropTable) {
       await client.migrate({
@@ -47,6 +49,7 @@ export default class DropTable extends Command {
           }
         ]
       });
+
       cli.action.stop(`${chalk.green("Success")}`);
     } else {
       cli.action.stop(`${chalk.red("Failed")}`);

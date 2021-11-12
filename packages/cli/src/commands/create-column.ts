@@ -1,4 +1,4 @@
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import {
   DefaultApi,
   Configuration,
@@ -7,25 +7,28 @@ import {
 } from "@feedloop/qore-sdk";
 import cli from "cli-ux";
 import chalk from "chalk";
+import config from "../config";
 
 export default class CreateColumn extends Command {
   static description = "Create column in specific table";
+
   static examples = [`$ qore create-column tableName columnName dataType`];
+
   static args = [
     { name: "tableName" },
     { name: "columnName" },
     { name: "dataType" }
   ];
 
-  static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true })
-  };
   async run() {
-    const { flags, args } = this.parse(CreateColumn);
+    const { args } = this.parse(CreateColumn);
     const { tableName, columnName, dataType } = args;
-    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
+    );
+
     cli.action.start(
-      `Create new column ${chalk.blue(`"${columnName}"`)} to ${chalk.blue(
+      `Create new column ${chalk.blue(`"${columnName}"`)} in ${chalk.blue(
         `"${tableName}"`
       )} table `,
       "initializing",
@@ -51,6 +54,7 @@ export default class CreateColumn extends Command {
         }
       ]
     });
-    cli.action.stop();
+
+    cli.action.stop(`${chalk.green("Success")}`);
   }
 }

@@ -7,23 +7,27 @@ import {
 import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
 import cli from "cli-ux";
+import config from "../config";
 
 export default class CreateRole extends Command {
   static description = "Create new role";
+
   static examples = [`$ qore create-role roleName`];
+
   static args = [{ name: "roleName" }];
-  static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true })
-  };
 
   async run() {
-    const { args, flags } = this.parse(CreateRole);
-    cli.action.start(
-      `Create new role ${chalk.blue(`"${args.roleName}"`, "initializing", {
-        stdout: true
-      })}`
+    const { args } = this.parse(CreateRole);
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
     );
-    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
+
+    cli.action.start(
+      `Create new role ${chalk.blue(`"${args.roleName}"`)}`,
+      "initializing",
+      { stdout: true }
+    );
+
     await client.migrate({
       operations: [
         {
@@ -31,11 +35,12 @@ export default class CreateRole extends Command {
           resource: V1MigrateOperationsResourceEnum.Role,
           migration: {
             name: args.roleName,
-            deletionProtection: true
+            deletionProtection: false
           }
         }
       ]
     });
-    cli.action.stop(`${chalk.green("success")}`);
+
+    cli.action.stop(`${chalk.green("Success")}`);
   }
 }

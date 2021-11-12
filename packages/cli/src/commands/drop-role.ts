@@ -4,27 +4,25 @@ import {
   V1MigrateOperationsOperationEnum,
   V1MigrateOperationsResourceEnum
 } from "@feedloop/qore-sdk";
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import cli from "cli-ux";
+import config from "../config";
 
 export default class DropRole extends Command {
   static description = "Drop specific role";
+
   static examples = [`$ qore drop-role roleName`];
+
   static args = [{ name: "roleName" }];
-  static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true })
-  };
 
   async run() {
-    const { args, flags } = this.parse(DropRole);
-    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
-    cli.action.start(
-      `Drop role ${chalk.blue(`"${args.roleName}"`)}`,
-      "initializing",
-      { stdout: true }
+    const { args } = this.parse(DropRole);
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
     );
+
     const response = await inquirer.prompt([
       {
         type: "confirm",
@@ -35,6 +33,12 @@ export default class DropRole extends Command {
         default: false
       }
     ]);
+
+    cli.action.start(
+      `Drop role ${chalk.blue(`"${args.roleName}"`)}`,
+      "initializing",
+      { stdout: true }
+    );
 
     if (response.dropRole) {
       await client.migrate({

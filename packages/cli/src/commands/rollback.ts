@@ -1,35 +1,34 @@
 import { DefaultApi, Configuration } from "@feedloop/qore-sdk";
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import cli from "cli-ux";
+import config from "../config";
 
 export default class Rollback extends Command {
   static description = "Rollback to previous migration";
+
   static examples = [`$ qore rollback`];
-  static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true })
-  };
 
   async run() {
-    const { flags } = this.parse(Rollback);
-
-    const client = new DefaultApi(new Configuration({ apiKey: flags.apiKey }));
-    cli.action.start(
-      `${chalk.blue("Rollback")} to previous migration ...`,
-      "initializing",
-      {
-        stdout: true
-      }
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
     );
+
     const response = await inquirer.prompt([
       {
         type: "confirm",
         name: "migrateDown",
-        message: `Are you sure want to revert to previous migration?`,
+        message: `Are you sure to revert to previous migration?`,
         default: false
       }
     ]);
+
+    cli.action.start(
+      `${chalk.blue("Rollback")} to previous migration ...`,
+      "initializing",
+      { stdout: true }
+    );
 
     if (response.migrateDown) {
       await client.rollback({

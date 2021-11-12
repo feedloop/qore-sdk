@@ -3,9 +3,10 @@ import {
   DefaultApi,
   V1ExecuteOperationsOperationEnum
 } from "@feedloop/qore-sdk";
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import { cli } from "cli-ux";
 import chalk from "chalk";
+import config from "../config";
 
 interface Result {
   [key: string]: {
@@ -27,21 +28,24 @@ function getListCol(input: Object[]) {
 
 export default class Select extends Command {
   static description = "Get all rows from specific table";
+
   static examples = [`$ qore select tableName`];
+
   static args = [{ name: "tableName" }];
+
   static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true }),
     ...cli.table.flags()
   };
 
   async run() {
     const { args, flags } = this.parse(Select);
-    const client = new DefaultApi(
-      new Configuration({ apiKey: `${flags.apiKey}` })
-    );
     const { tableName } = args;
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
+    );
 
     this.log(`Read rows from ${chalk.blue(`"${tableName}"`)} table ...`);
+
     const identityName =
       "select" + tableName.charAt(0).toUpperCase() + tableName.slice(1);
     const { data } = await client.execute({

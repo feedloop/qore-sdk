@@ -1,4 +1,4 @@
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import {
   DefaultApi,
   Configuration,
@@ -7,29 +7,26 @@ import {
 } from "@feedloop/qore-sdk";
 import cli from "cli-ux";
 import chalk from "chalk";
+import config from "../config";
 
 export default class CreateTable extends Command {
-  static description = "create a table in this project";
+  static description = "Create a table in this project";
 
   static examples = [`$ qore create-table tableName`];
+
   static args = [{ name: "tableName" }];
 
-  static flags = {
-    apiKey: flags.string({ description: "apiKey", required: true })
-  };
-
   async run() {
-    const { flags, args } = this.parse(CreateTable);
+    const { args } = this.parse(CreateTable);
     const client = new DefaultApi(
-      new Configuration({ apiKey: `${flags.apiKey}` })
+      new Configuration({ apiKey: config.get("apiKey") })
     );
     cli.action.start(
       `Create table ${chalk.blue(`"${args.tableName}"`)}`,
       "initializing",
-      {
-        stdout: true
-      }
+      { stdout: true }
     );
+
     await client.migrate({
       operations: [
         {
@@ -41,6 +38,7 @@ export default class CreateTable extends Command {
         }
       ]
     });
-    cli.action.stop(`${chalk.green("success")}`);
+
+    cli.action.stop(`${chalk.green("Success")}`);
   }
 }

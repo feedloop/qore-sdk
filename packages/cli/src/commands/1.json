@@ -1,0 +1,108 @@
+{​​
+  "operations": [
+    {​​
+      "operation": "Create",
+      "resource": "Table",
+      "migration": {​​
+      "name": "product"      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "Column",
+      "migration": {​​
+        "name": "name",
+        "table": "product",
+        "column": {​​
+          "type": "text",
+          "definition": {​​
+            "textType": "text",
+            "default": "",
+            "unique": false          }​​
+        }​​
+      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "Table",
+      "migration": {​​
+        "name": "order"      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "OneToManyRelation",
+      "migration": {​​
+        "name": "userOrder",
+        "nullable": false,
+        "one": {​​
+          "table": "users"        }​​,
+        "many": {​​
+          "table": "order"        }​​,
+        "onUpdate": "RESTRICT",
+        "onDelete": "RESTRICT"      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "OneToManyRelation",
+      "migration": {​​
+        "name": "productOrder",
+        "nullable": false,
+        "one": {​​
+          "table": "product"        }​​,
+        "many": {​​
+          "table": "order"        }​​,
+        "onUpdate": "RESTRICT",
+        "onDelete": "RESTRICT"      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "Role",
+      "migration": {​​
+        "name": "picker",
+        "deletionProtection": true      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "Role",
+      "migration": {​​
+        "name": "user"      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "Permission",
+      "migration": {​​
+        "role": "picker",
+        "tables": [
+          "order",
+          "product"        ],
+        "actions": [
+          "select",
+          "insert",
+          "update",
+          "delete"        ]
+      }​​
+    }​​,
+    {​​
+      "operation": "Create",
+      "resource": "Permission",
+      "migration": {​​
+        "role": "user",
+        "tables": [
+          "order"        ],
+        "actions": [
+          "select",
+          "insert"        ],
+        "condition": {​​
+          "$and": [
+            {​​
+              "userOrder": {​​
+                "external_id": {​​
+                  "$eq": "{​​{​​user.id}​​}​​"                }​​
+              }​​
+            }​​
+          ]
+        }​​
+      }​​
+    }​​
+  ]
+}​​
+
