@@ -13,7 +13,9 @@ import config from "../config";
 export default class DropManyToManyRelation extends Command {
   static description = "Drop junctionTable ManyToManyRelation";
 
-  static examples = [`$ qore drop-relation m:n tableOrigin tableTarget`];
+  static examples = [
+    `$ qore drop-many-to-many-relation m:n tableOrigin tableTarget`
+  ];
 
   static args = [{ name: "tableOrigin" }, { name: "tableTarget" }];
 

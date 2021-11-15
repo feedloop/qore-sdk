@@ -14,7 +14,7 @@ export default class DropOneToManyRelation extends Command {
   static description = "Drop column OneToManyRelation";
 
   static examples = [
-    `$ qore drop-relation 1:m tableOrigin tableTarget relationName`
+    `$ qore drop-one-to-many-relation tableOrigin tableTarget relationName`
   ];
   static args = [
     { name: "tableOrigin" },

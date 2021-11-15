@@ -4,44 +4,49 @@ import {
   V1MigrateOperationsOperationEnum,
   V1MigrateOperationsResourceEnum
 } from "@feedloop/qore-sdk";
-import { Command } from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
 import cli from "cli-ux";
 import config from "../config";
 
 export default class CreatePermission extends Command {
   static description = "Create permission for role in table";
-
-  static examples = [`$ qore create-permission roleName tableName action`];
-  // qore create-permission presiden --tables task person todo project --actions insert delete --condition "{$and : []}"
-  static args = [
-    { name: "roleName" },
-    { name: "tableName" },
-    { name: "action" }
+  static examples = [
+    `$ qore create-permission roleName --tables table,table --actions action,action`
   ];
+  static args = [{ name: "roleName" }];
+
+  static flags = {
+    tables: flags.string({ name: "tables", required: true }),
+    actions: flags.string({ name: "actions", required: true })
+  };
 
   async run() {
-    const { args } = this.parse(CreatePermission);
-    const { roleName, tableName, action } = args;
+    const { args, flags } = this.parse(CreatePermission);
+    const tables = flags.tables.split(",");
+    const actions = flags.actions.split(",");
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
-    // *
+
+    cli.action.start(
+      `Create permission for role ${chalk.blue(`"${args.roleName}"`)}`,
+      "initializing",
+      { stdout: true }
+    );
     await client.migrate({
       operations: [
         {
           operation: V1MigrateOperationsOperationEnum.Create,
           resource: V1MigrateOperationsResourceEnum.Permission,
           migration: {
-            role: roleName,
-            tables: [tableName],
-            condition: { $and: [] },
-            actions: ["insert"]
+            role: args.roleName,
+            tables,
+            actions
           }
         }
       ]
     });
-
-    console.log("masuk nih");
+    cli.action.stop(`${chalk.green("Success")}`);
   }
 }
