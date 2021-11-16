@@ -44,7 +44,7 @@ export default class Select extends Command {
       new Configuration({ apiKey: config.get("apiKey") })
     );
 
-    this.log(`Read rows from ${chalk.blue(`"${tableName}"`)} table ...`);
+    this.log(`\n${chalk.blue(`${tableName.toUpperCase()}`)}\n`);
 
     const identityName =
       "select" + tableName.charAt(0).toUpperCase() + tableName.slice(1);

@@ -9,43 +9,40 @@ import chalk from "chalk";
 import cli from "cli-ux";
 import config from "../config";
 
-export default class CreatePermission extends Command {
-  static description = "Create permission for role in table";
+export default class AlterPermission extends Command {
+  static description = "Change permission condition for specific role";
   static examples = [
-    `$ qore create-permission --role roleName --tables table1,table2 --actions select,delete --conditions '{"$and": []}'`
+    `$ qore alter-permission --role roleName --action select --condition '{"$and": []}' --table tableName`
   ];
 
   static flags = {
     role: flags.string({ description: "roleName", required: true }),
-    tables: flags.string({ description: "tables", required: true }),
-    actions: flags.string({ description: "actions", required: true }),
-    conditions: flags.string({ description: "conditions" })
+    action: flags.string({ description: "action", required: true }),
+    condition: flags.string({ description: "condition", required: true }),
+    table: flags.string({ description: "table" })
   };
 
   async run() {
-    const { flags } = this.parse(CreatePermission);
-    const tables = flags.tables.split(",");
-    const actions = flags.actions.split(",");
-    const conditions = flags.conditions ? flags.conditions : { $and: [] };
+    const { flags } = this.parse(AlterPermission);
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
 
     cli.action.start(
-      `Create permission for role ${chalk.blue(`"${flags.role}"`)}`,
+      `Change permission condition for role ${chalk.blue(`"${flags.role}"`)}`,
       "initializing",
       { stdout: true }
     );
     await client.migrate({
       operations: [
         {
-          operation: V1MigrateOperationsOperationEnum.Create,
+          operation: V1MigrateOperationsOperationEnum.Alter,
           resource: V1MigrateOperationsResourceEnum.Permission,
           migration: {
             role: flags.role,
-            tables,
-            actions,
-            conditions
+            action: flags.action,
+            table: flags.table,
+            condition: flags.action
           }
         }
       ]
