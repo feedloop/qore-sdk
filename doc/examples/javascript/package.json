@@ -1,0 +1,16 @@
+{
+  "name": "javascript",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "@feedloop/qore-cli": "0.1.29",
+    "vite": "^2.6.4"
+  },
+  "dependencies": {
+    "@feedloop/qore-client": "0.1.35"
+  }
+}

@@ -287,10 +287,33 @@ Just make sure your view, "allTasks" in this case has some data in it.
 </aside>
 
 ```javascript
-const { data, error } = await client
-  .view("allTasks")
-  .readRows({ offset: 0, limit: 10, order: "desc" })
-  .toPromise();
+import client from "./qoreContext.js";
+
+let tasks = [];
+
+async function getData() {
+  const { data, error } = await client
+    .view("allTasks")
+    .readRows({ offset: 0, limit: 10, order: "desc" })
+    .toPromise();
+  tasks = data.nodes;
+}
+
+async function render() {
+  await getData();
+  const template = document.querySelector("#tasks");
+  const app = document.querySelector("#app");
+
+  const clonedTemplate = template.content.cloneNode(true);
+  for (let i = 0; i < tasks.length; i++) {
+    const li = document.createElement("li");
+    li.textContent = tasks[i].name;
+    clonedTemplate.appendChild(li);
+  }
+  app.appendChild(clonedTemplate);
+}
+
+render();
 ```
 
 ```jsx
@@ -322,15 +345,17 @@ You can also specify `offset`, `limit`, and `order` when performing a read view 
 Fetching more rows can be done by calling the `fetchMore` method as demonstrated below. It accepts a pagination config to match your desired items size of the next page data to be fetched.
 
 ```javascript
-const operation = client.view("allTasks").readRows({ offset: 0, limit: 10 });
+async function handleLoadMore() {
+  const operation = client.view("allTasks").readRows({ offset: 0, limit: 10 });
 
-let allTasks = [];
-operation.subscribe(({ data }) => {
-  allTasks = data;
-});
+  operation.subscribe(({ data }) => {
+    tasks = data.nodes;
+  });
 
-await operation.fetchMore({ offset: data.nodes.length, limit: 10 });
-// new items are being pushed to allTasks
+  await operation.fetchMore({ offset: tasks.length, limit: 10 });
+  // new items are being pushed to allTasks
+  render();
+}
 ```
 
 ```jsx
@@ -370,10 +395,12 @@ export default Component;
 Some other times we want to get the detail of a specific row by the ID. You can use `readRow()` for JavaScript SDK or `useGetRow()` for React SDK. Assuming the id is _some-task-id_, you can fetch it this way:
 
 ```javascript
-const { data, error } = await client
-  .view("allTasks")
-  .readRow("some-task-id")
-  .toPromise();
+async function getTask(id) {
+  const { data, error } = await client.view("allTasks").readRow(id).toPromise();
+  console.log(data);
+}
+
+getTask("b82234fd-3b10-4831-b9d8-eef3275328a2");
 ```
 
 ```jsx
@@ -415,13 +442,18 @@ A qore client has internal storage that acts as a cache that is turned on by def
 By setting the `networkPolicy` option to `cache-only`, you are telling qore client to only get the data from the cache instead of getting it from the server.
 
 ```javascript
-const { data, error } = await client
-  .view("allTasks")
-  .readRows(
-    { offset: 0, limit: 10, order: "desc" },
-    { networkPolicy: "cache-only" }
-  )
-  .toPromise();
+let tasks = [];
+
+async function getData() {
+  const { data, error } = await client
+    .view("allTasks")
+    .readRows(
+      { offset: 0, limit: 10, order: "desc" },
+      { networkPolicy: "cache-only" }
+    )
+    .toPromise();
+  tasks = data.nodes;
+}
 ```
 
 ```jsx
