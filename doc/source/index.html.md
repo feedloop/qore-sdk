@@ -501,12 +501,12 @@ const operation = client
   .view("allTasks")
   .readRows(
     { offset: 0, limit: 10, order: "desc" },
-    { networkPolicy: "network-and-cache" }
+    { networkPolicy: "cache-only" }
   );
 
 const subscription = operation.subscribe(({ data, error, stale }) => {
   if (data && !stale) {
-    doSomething(data);
+    tasks = data.nodes;
     subscription.unsubscribe();
   }
 });
@@ -524,8 +524,8 @@ const operation = client
     { networkPolicy: "network-and-cache" }
   );
 
-const subscription = operation.subscribe(({ data, error, stale }) => {
-  doSomething(data);
+operation.subscribe(({ data }) => {
+  tasks = data.nodes;
 });
 
 operation.revalidate();
@@ -586,8 +586,8 @@ const operation = client
     { networkPolicy: "network-and-cache", pollInterval: 5000 }
   );
 
-const subscription = operation.subscribe(({ data, error, stale }) => {
-  doSomething(data);
+operation.subscribe(({ data }) => {
+  tasks = data.nodes;
 });
 ```
 
@@ -643,7 +643,7 @@ Similar to reading data, writing data is accessible from each view object.
 To insert data to `allTasks` view, we can use `insertRow()` method followed by `data` as a parameter and must be compliant to the schema of the view, excluding the `id` field.
 
 ```javascript
-const newRow = await client.view("allTasks").insertRow({ ...data });
+const newRow = await client.view("allTasks").insertRow({ ...task });
 ```
 
 ```jsx
@@ -682,9 +682,20 @@ To do an update operation, data parameter of `allTasks` view with an id of _some
 And also `data` object must be compliant with the schema of the view, excluding the `id` field similar to the insert operation above.
 
 ```javascript
-await client.view("allTasks").updateRow("some-task-id", {
-  ...data
-});
+async function updateTask(id, task) {
+  const { data, error } = await client
+    .view("allTasks")
+    .readRows(
+      { offset: 0, limit: 10, order: "desc" },
+      { networkPolicy: "cache-only" }
+    )
+    .toPromise();
+
+  await client.view("allTasks").updateRow(id, {
+    ...task
+  });
+  render();
+}
 ```
 
 ```jsx

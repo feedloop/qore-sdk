@@ -14,7 +14,12 @@
  }
 
  async function handleLoadMore() {
-   const operation = client.view("allTasks").readRows({ offset: 0, limit: 10 });
+   const operation = client
+     .view("allTasks")
+     .readRows(
+       { offset: 0, limit: 10, order: "desc" },
+       { networkPolicy: "network-and-cache", pollInterval: 5000 }
+     );
 
    operation.subscribe(({ data }) => {
      tasks = data.nodes;
@@ -31,13 +36,13 @@
      .view("allTasks")
      .readRows(
        { offset: 0, limit: 10, order: "desc" },
-       { networkPolicy: "cache-only" }
+       { networkPolicy: "cache-only", pollInterval: 5000 }
      );
 
    const subscription = operation.subscribe(({ data, error, stale }) => {
      if (data && !stale) {
        tasks = data.nodes;
-       subscription.unsubscribe();
+       // subscription.unsubscribe();
      }
    });
    render();
@@ -74,3 +79,33 @@
  }
 
  getTask("b82234fd-3b10-4831-b9d8-eef3275328a2");
+
+ async function newTask(task) {
+   const { data, error } = await client
+     .view("allTasks")
+     .readRows(
+       { offset: 0, limit: 10, order: "desc" },
+       { networkPolicy: "cache-only" }
+     )
+     .toPromise();
+
+   const newRow = await client.view("allTasks").insertRow({ ...task });
+   render();
+ }
+ async function updateTask(id, task) {
+   const { data, error } = await client
+     .view("allTasks")
+     .readRows(
+       { offset: 0, limit: 10, order: "desc" },
+       { networkPolicy: "cache-only" }
+     )
+     .toPromise();
+
+   await client.view("allTasks").updateRow(id, {
+     ...task
+   });
+   render();
+ }
+
+ const newTaskButton = document.querySelector("#newTask");
+ newTaskButton.addEventListener("click", newTask({ name: "New Task" }));
