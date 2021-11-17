@@ -504,10 +504,11 @@ const operation = client
     { networkPolicy: "cache-only" }
   );
 
-const subscription = operation.subscribe(({ data, error, stale }) => {
+let subscribe;
+subscription = operation.subscribe(({ data, error, stale }) => {
   if (data && !stale) {
     tasks = data.nodes;
-    subscription.unsubscribe();
+    if (subscribe) subscription.unsubscribe();
   }
 });
 ```
