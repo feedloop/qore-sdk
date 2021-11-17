@@ -24,11 +24,10 @@ export default class AlterRole extends Command {
     );
 
     cli.action.start(
-      `Alter role ${chalk.blue(
-        `"${formerName}"`
-      )} to ${chalk.blue(`"${newName}"`, "initializing", { stdout: true })}`
+      `\n${chalk.grey(`Renaming role "${formerName}" to "${newName}"`)}`,
+      "initializing",
+      { stdout: true }
     );
-
     await client.migrate({
       operations: [
         {
@@ -39,6 +38,6 @@ export default class AlterRole extends Command {
       ]
     });
 
-    cli.action.stop(`${chalk.green("Success")}`);
+    cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

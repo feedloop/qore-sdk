@@ -15,7 +15,7 @@ export default class Login extends Command {
 
     config.set("apiKey", values.apiKey);
 
-    this.log(`Logged in ${chalk.green("success")} ....`);
-    this.log("Welcome to qore-cli");
+    this.log(`\n\n${chalk.grey("Logged in")} ${chalk.green("success")} ...`);
+    this.log(`\n${chalk.grey(`Welcome to qore-cli\n\n`)}`);
   }
 }

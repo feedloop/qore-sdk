@@ -9,7 +9,7 @@ export default class Logout extends Command {
 
   async run() {
     config.clear();
-    // console.log(config, '================= logout config')
-    this.log(`Logout ${chalk.green("success")} ... bye !`);
+    this.log(`\n\n${chalk.grey("Logout")} ${chalk.green("success")} ...`);
+    this.log(`\n${chalk.grey("bye !")}\n\n`);
   }
 }

@@ -14,7 +14,7 @@ export default class CreateRelation extends Command {
     "Create relation 1:m for one-to-many or m:n for many-to-many relation";
 
   static examples = [
-    `$ qore create-relation relationType tableOrigin tableTarget relationName`
+    `$ qore create-relation relationType tableOrigin tableTarget --relation personTodo`
   ];
 
   static args = [
@@ -24,7 +24,7 @@ export default class CreateRelation extends Command {
   ];
 
   static flags = {
-    relationName: flags.string({ description: "relationName" })
+    relation: flags.string({ description: "relationName" })
   };
 
   async run() {
@@ -35,11 +35,11 @@ export default class CreateRelation extends Command {
     const { relationType, tableOrigin, tableTarget } = args;
 
     let relationName = "";
-    if (!flags.relationName) {
+    if (!flags.relation) {
       relationName = `${tableOrigin}${
         tableTarget.charAt(0).toUpperCase() + tableTarget.slice(1)
       }`;
-    } else relationName = flags.relationName;
+    } else relationName = flags.relation;
 
     let statement = "";
     let typeOfRelation: string =
@@ -48,11 +48,11 @@ export default class CreateRelation extends Command {
         : "ManyToManyRelation";
 
     if (typeOfRelation === "OneToManyRelation") {
-      statement = `Create ${typeOfRelation} ${chalk.blue(
-        `"${relationName}`
-      )} from ${chalk.blue(`"${tableOrigin}"`)} table to ${chalk.blue(
-        `"${tableTarget}`
-      )} table`;
+      statement = `${chalk.grey(
+        `\nCreate column-relation ${typeOfRelation}`
+      )} ${chalk.blue(`"${relationName}`)} ${chalk.grey("in")} ${chalk.blue(
+        `"${tableTarget}"`
+      )} ${chalk.grey("table ")}`;
       cli.action.start(`${statement}`, "initializing", { stdout: true });
       await client.migrate({
         operations: [
@@ -71,11 +71,13 @@ export default class CreateRelation extends Command {
         ]
       });
     } else if (typeOfRelation === "ManyToManyRelation") {
-      statement = `Create tableJunction ${chalk.blue(
-        `"${relationName}"`
-      )} ${typeOfRelation} for ${chalk.blue(
+      statement = `${chalk.grey(
+        `\nCreate tableJunction ${typeOfRelation}`
+      )} ${chalk.blue(`"${relationName}"`)} ${chalk.grey("for")} ${chalk.blue(
         `"${tableOrigin}"`
-      )} and ${chalk.blue(`"${tableTarget}`)} table`;
+      )} ${chalk.grey("and")} ${chalk.blue(`"${tableTarget}`)} ${chalk.grey(
+        "table "
+      )}`;
       cli.action.start(`${statement}`, "initializing", { stdout: true });
       await client.migrate({
         operations: [
@@ -94,6 +96,7 @@ export default class CreateRelation extends Command {
         ]
       });
     }
-    cli.action.stop(`${chalk.green("Success")}`);
+
+    cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

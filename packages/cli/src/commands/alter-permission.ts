@@ -10,9 +10,11 @@ import cli from "cli-ux";
 import config from "../config";
 
 export default class AlterPermission extends Command {
-  static description = "Change permission condition for specific role";
+  static description =
+    "Change condition in permissions table for specific role";
+
   static examples = [
-    `$ qore alter-permission --role roleName --action select --condition '{"$and": []}' --table tableName`
+    `$ qore alter-permission --role users --action select --condition '{"$and": [ { "title": { "$eq": "sleeping" } } ]}' --table tableName`
   ];
 
   static flags = {
@@ -29,7 +31,11 @@ export default class AlterPermission extends Command {
     );
 
     cli.action.start(
-      `Change permission condition for role ${chalk.blue(`"${flags.role}"`)}`,
+      `\n${chalk.grey(`Change`)} ${chalk.blue(
+        `"${flags.action}"`
+      )} ${chalk.grey("condition for role")} ${chalk.blue(
+        `"${flags.role}"`
+      )} ${chalk.grey("in table")} ${chalk.blue(`"${flags.table}"`)}`,
       "initializing",
       { stdout: true }
     );
@@ -42,11 +48,12 @@ export default class AlterPermission extends Command {
             role: flags.role,
             action: flags.action,
             table: flags.table,
-            condition: flags.action
+            condition: JSON.parse(flags.condition)
           }
         }
       ]
     });
-    cli.action.stop(`${chalk.green("Success")}`);
+
+    cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

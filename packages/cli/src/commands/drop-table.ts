@@ -1,4 +1,4 @@
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import {
   DefaultApi,
   Configuration,
@@ -23,7 +23,7 @@ export default class DropTable extends Command {
       new Configuration({ apiKey: config.get("apiKey") })
     );
 
-    const response = await inquirer.prompt([
+    const confirmation = await inquirer.prompt([
       {
         type: "confirm",
         name: "dropTable",
@@ -35,11 +35,12 @@ export default class DropTable extends Command {
     ]);
 
     cli.action.start(
-      `Drop table ${chalk.blue(`"${args.tableName}"`)}`,
+      `\n${chalk.grey(`Drop table "${args.tableName}"`)}`,
       "initializing",
       { stdout: true }
     );
-    if (response.dropTable) {
+
+    if (confirmation.dropTable) {
       await client.migrate({
         operations: [
           {
@@ -50,9 +51,9 @@ export default class DropTable extends Command {
         ]
       });
 
-      cli.action.stop(`${chalk.green("Success")}`);
+      cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
     } else {
-      cli.action.stop(`${chalk.red("Failed")}`);
+      cli.action.stop(`${chalk.red("\nFailed\n\n")}`);
     }
   }
 }

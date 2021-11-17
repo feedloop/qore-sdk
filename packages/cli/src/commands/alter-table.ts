@@ -25,9 +25,7 @@ export default class AlterTable extends Command {
     );
 
     cli.action.start(
-      `Renaming table ${chalk.blue(`"${formerName}"`)} to ${chalk.blue(
-        `"${newName}"`
-      )}`,
+      `\n${chalk.grey(`Renaming table "${formerName}" to "${newName}"`)}`,
       "initializing",
       { stdout: true }
     );
@@ -42,6 +40,6 @@ export default class AlterTable extends Command {
       ]
     });
 
-    cli.action.stop(`${chalk.green("Success")}`);
+    cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

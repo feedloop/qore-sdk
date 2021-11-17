@@ -25,7 +25,7 @@ export default class Rollback extends Command {
     ]);
 
     cli.action.start(
-      `${chalk.blue("Rollback")} to previous migration ...`,
+      `\n${chalk.grey("Rollback to previous migration ")}`,
       "initializing",
       { stdout: true }
     );
@@ -34,9 +34,10 @@ export default class Rollback extends Command {
       await client.rollback({
         rollbacks: 1
       });
-      cli.action.stop(`${chalk.green("Success")}`);
+
+      cli.action.stop(`${chalk.green("\nSuccess\n")}`);
     } else {
-      cli.action.stop(`${chalk.green("Failed")}`);
+      cli.action.stop(`${chalk.red("\nFailed\n")}`);
     }
   }
 }

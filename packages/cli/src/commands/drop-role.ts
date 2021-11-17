@@ -35,11 +35,10 @@ export default class DropRole extends Command {
     ]);
 
     cli.action.start(
-      `Drop role ${chalk.blue(`"${args.roleName}"`)}`,
+      `\n${chalk.grey(`Drop role "${args.roleName}"`)}`,
       "initializing",
       { stdout: true }
     );
-
     if (response.dropRole) {
       await client.migrate({
         operations: [
@@ -50,9 +49,9 @@ export default class DropRole extends Command {
           }
         ]
       });
-      cli.action.stop(`${chalk.green("Success")}`);
+      cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
     } else {
-      cli.action.stop(`${chalk.red("Failed")}`);
+      cli.action.stop(`${chalk.red("\nFailed\n\n")}`);
     }
   }
 }

@@ -4,22 +4,26 @@ import {
   V1MigrateOperationsOperationEnum,
   V1MigrateOperationsResourceEnum
 } from "@feedloop/qore-sdk";
-import { Command } from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import cli from "cli-ux";
 import inquirer from "inquirer";
 import config from "../config";
 import chalk from "chalk";
 
 export default class DropPermission extends Command {
-  static description = "Drop permission for specific role";
+  static description =
+    "Drop specific action in permissions table for specific role";
 
-  static examples = [`$ qore drop-permission roleName action`];
+  static examples = [`$ qore drop-permission actionName --role user`];
 
-  static args = [{ name: "roleName" }, { name: "action" }];
+  static args = [{ name: "action" }];
+
+  static flags = {
+    role: flags.string({ description: "roleName", required: true })
+  };
 
   async run() {
-    const { args } = this.parse(DropPermission);
-    const { roleName, action } = args;
+    const { flags, args } = this.parse(DropPermission);
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
@@ -29,16 +33,16 @@ export default class DropPermission extends Command {
         type: "confirm",
         name: "dropPermission",
         message: `Are you sure to remove ${chalk.blue(
-          `"${action}"`
-        )} permission for ${chalk.blue(`"${roleName}"`)}?`,
+          `"${args.action}"`
+        )} permission for ${chalk.blue(`"${flags.role}"`)}?`,
         default: false
       }
     ]);
 
     cli.action.start(
-      `Drop ${chalk.blue(`"${action}"`)} permission for ${chalk.blue(
-        `"${roleName}"`
-      )} role`,
+      `\n${chalk.grey("Drop")} ${chalk.blue(`"${args.action}"`)} ${chalk.grey(
+        "permission for"
+      )} ${chalk.blue(`"${flags.role}"`)}`,
       "initializing",
       { stdout: true }
     );
@@ -49,13 +53,14 @@ export default class DropPermission extends Command {
           {
             operation: V1MigrateOperationsOperationEnum.Drop,
             resource: V1MigrateOperationsResourceEnum.Permission,
-            migration: { role: roleName, action }
+            migration: { role: flags.role, action: args.action }
           }
         ]
       });
-      cli.action.stop(`${chalk.green("Success")}`);
+
+      cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
     } else {
-      cli.action.stop(`${chalk.red("Failed")}`);
+      cli.action.stop(`${chalk.red("\nFailed\n\n")}`);
     }
   }
 }

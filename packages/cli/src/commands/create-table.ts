@@ -22,12 +22,12 @@ export default class CreateTable extends Command {
       new Configuration({ apiKey: config.get("apiKey") })
     );
     cli.action.start(
-      `Create table ${chalk.blue(`"${args.tableName}"`)}`,
+      `${chalk.grey(`\nCreate table "${args.tableName}"`)}`,
       "initializing",
       { stdout: true }
     );
 
-    const response = await client.migrate({
+    await client.migrate({
       operations: [
         {
           operation: V1MigrateOperationsOperationEnum.Create,
@@ -39,6 +39,6 @@ export default class CreateTable extends Command {
       ]
     });
 
-    cli.action.stop(`${chalk.green("Success")}`);
+    cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

@@ -3,7 +3,7 @@ import { Command } from "@oclif/command";
 import config from "../config";
 import chalk from "chalk";
 
-export default class ReadMigrations extends Command {
+export default class ReadMigration extends Command {
   static description = "Read/see migrations histories";
 
   static examples = [`$ qore read-migrations`];
@@ -12,8 +12,7 @@ export default class ReadMigrations extends Command {
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
-
-    this.log(`${chalk.blue("Migration histories:")}`);
+    this.log(`\n\n${chalk.yellow("Migration histories:")}\n`);
 
     const { data } = await client.getMigrations();
     for (let item of data.items) {
@@ -23,5 +22,7 @@ export default class ReadMigrations extends Command {
         )}`
       );
     }
+
+    this.log(`\n${chalk.green("Success\n\n")}`);
   }
 }

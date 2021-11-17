@@ -1,50 +1,44 @@
 import { DefaultApi, Configuration } from "@feedloop/qore-sdk";
 import { Command, flags } from "@oclif/command";
-import { writeFile } from "fs";
 import config from "../config";
 import chalk from "chalk";
-import cli from "cli-ux";
 import path from "path";
+import fs from "fs";
 
-export default class ExportMigrations extends Command {
+export default class ExportMigration extends Command {
   static description = "Populate json file for all migrations process";
 
-  static examples = [`$ qore export-migrations location limit offset`];
+  static examples = [`$ qore export-migrations --location migrations`];
 
   static flags = {
-    limit: flags.string({ description: "limit" }),
-    offset: flags.string({ description: "offset" }),
-    location: flags.string({ description: "fileLocation" })
+    location: flags.string({
+      description: "fileLocation",
+      default: "migrations"
+    })
   };
 
   async run() {
-    const { flags } = this.parse(ExportMigrations);
-    const limit = flags.limit ? Number(flags.limit) : undefined;
-    const offset = flags.offset ? Number(flags.offset) : undefined;
-    const loc = flags.location ? `./${flags.location}` : ".";
+    const { flags } = this.parse(ExportMigration);
+    const location = path.resolve(path.join(process.cwd(), flags.location));
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
 
-    cli.action.start(
-      `${chalk.blue("Creating file migrations")}`,
-      "initializing",
-      { stdout: true }
-    );
+    const isExist = fs.existsSync(location);
+    if (!isExist) {
+      fs.mkdirSync(location);
+    }
 
-    const { data } = await client.getMigrations(limit, offset);
-
+    this.log(`${chalk.yellow("\n\nRunning process")} ...\n`);
+    const { data } = await client.getMigrations();
     for (let item of data.items) {
       this.log(
         `${chalk.grey(
           `#${item.id} ${new Date(item.createdAt).toISOString()}-${item.name}`
         )}`
       );
-      writeFile(
-        path.resolve(
-          `${loc}/`,
-          `${item.id}-${new Date(item.createdAt).toISOString()}.json`
-        ),
+      fs.writeFile(
+        `${location}/${item.id}-${new Date(item.createdAt).toISOString()}.json`,
         JSON.stringify(item, null, 2),
         {
           encoding: "utf8",
@@ -56,5 +50,7 @@ export default class ExportMigrations extends Command {
         }
       );
     }
+    this.log(`${chalk.grey("\n\nExport file migrations")} ...`);
+    this.log(`${chalk.green("Success\n\n")}`);
   }
 }
