@@ -38,11 +38,11 @@
        { offset: 0, limit: 10, order: "desc" },
        { networkPolicy: "cache-only", pollInterval: 5000 }
      );
-   let subscribe;
+   let subscription;
    subscription = operation.subscribe(({ data, error, stale }) => {
      if (data && !stale) {
        tasks = data.nodes;
-       if (subscribe) subscription.unsubscribe();
+       if (subscription) subscription.unsubscribe();
      }
    });
    render();
