@@ -5,6 +5,19 @@ import chalk from "chalk";
 import path from "path";
 import fs from "fs";
 
+interface Operation {
+  id: number;
+  name: string;
+  active: boolean;
+  schema: object;
+  up: string;
+  down: string;
+  createdAt: number;
+  description?: string;
+}
+
+type Operations = Operation[];
+
 export default class ExportSchema extends Command {
   static description = "Populate json file for all migrations process";
 
@@ -17,29 +30,29 @@ export default class ExportSchema extends Command {
     })
   };
 
-  async run() {
-    const { flags } = this.parse(ExportSchema);
-    const location = path.resolve(path.join(process.cwd(), flags.location));
-    const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
-    );
-
+  async mkdirLocation(location: string) {
     const isExist = fs.existsSync(location);
     if (!isExist) {
       fs.mkdirSync(location);
     }
+  }
 
-    this.log(`${chalk.yellow("\n\nRunning process")} ...\n`);
+  async getDataMigrations(client: any): Promise<Operations> {
     const { data } = await client.getMigrations();
-    for (let item of data.items) {
+    return data.items;
+  }
+
+  async exportFile(location: string, data: Operations) {
+    data.forEach(file => {
       this.log(
         `${chalk.grey(
-          `#${item.id} ${new Date(item.createdAt).toISOString()}-${item.name}`
+          `#${file.id} ${new Date(file.createdAt).toISOString()}-${file.name}`
         )}`
       );
+
       fs.writeFile(
-        `${location}/${item.id}-${new Date(item.createdAt).toISOString()}.json`,
-        JSON.stringify(item, null, 2),
+        `${location}/${file.id}-${new Date(file.createdAt).toISOString()}.json`,
+        JSON.stringify(file, null, 2),
         {
           encoding: "utf8",
           flag: "w",
@@ -49,7 +62,20 @@ export default class ExportSchema extends Command {
           if (err) return this.log(`${chalk.red(err)}`);
         }
       );
-    }
+    });
+  }
+
+  async run() {
+    const client = new DefaultApi(
+      new Configuration({ apiKey: config.get("apiKey") })
+    );
+    const { flags } = this.parse(ExportSchema);
+    const location = path.resolve(path.join(process.cwd(), flags.location));
+
+    await this.mkdirLocation(location);
+    this.log(`${chalk.yellow("\n\nRunning process")} ...\n`);
+    const data = await this.getDataMigrations(client);
+    await this.exportFile(location, data);
     this.log(`${chalk.grey("\n\nExport file migrations")} ...`);
     this.log(`${chalk.green("Success\n\n")}`);
   }
