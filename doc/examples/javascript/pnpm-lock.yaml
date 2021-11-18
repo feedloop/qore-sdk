@@ -3,6 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@feedloop/qore-cli': 0.1.29
   '@feedloop/qore-client': 0.1.35
+  prettier: 2.4.1
   vite: ^2.6.4
 
 dependencies:
@@ -10,6 +11,7 @@ dependencies:
 
 devDependencies:
   '@feedloop/qore-cli': 0.1.29
+  prettier: 2.4.1
   vite: 2.6.14
 
 packages:
