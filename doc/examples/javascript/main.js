@@ -39,7 +39,7 @@
        { networkPolicy: "cache-only", pollInterval: 5000 }
      );
    let subscribe;
-   const subscription = operation.subscribe(({ data, error, stale }) => {
+   subscription = operation.subscribe(({ data, error, stale }) => {
      if (data && !stale) {
        tasks = data.nodes;
        if (subscribe) subscription.unsubscribe();
