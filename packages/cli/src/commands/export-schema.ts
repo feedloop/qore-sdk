@@ -5,10 +5,10 @@ import chalk from "chalk";
 import path from "path";
 import fs from "fs";
 
-export default class ExportMigration extends Command {
+export default class ExportSchema extends Command {
   static description = "Populate json file for all migrations process";
 
-  static examples = [`$ qore export-migrations --location migrations`];
+  static examples = [`$ qore export-schema --location migrations`];
 
   static flags = {
     location: flags.string({
@@ -18,7 +18,7 @@ export default class ExportMigration extends Command {
   };
 
   async run() {
-    const { flags } = this.parse(ExportMigration);
+    const { flags } = this.parse(ExportSchema);
     const location = path.resolve(path.join(process.cwd(), flags.location));
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
