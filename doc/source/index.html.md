@@ -392,7 +392,7 @@ export default Component;
 
 ## Reading individual row
 
-Some other times we want to get the detail of a specific row by the ID. You can use `readRow()` for JavaScript SDK or `useGetRow()` for React SDK. Assuming the id is _some-task-id_, you can fetch it this way:
+Some other times we want to get the detail of a specific row by the ID. You can use `readRow()` for JavaScript SDK or `useGetRow()` for React SDK. Assuming the id is being sent as parameter, you can fetch it this way:
 
 ```javascript
 async function getTask(id) {
@@ -678,7 +678,7 @@ export default Form;
 
 ## Update a row
 
-To do an update operation, data parameter of `allTasks` view with an id of _some-task-id_.
+To do an update operation, data parameter of `allTasks` view with an id being sent as parameter.
 
 And also `data` object must be compliant with the schema of the view, excluding the `id` field similar to the insert operation above.
 
@@ -829,7 +829,7 @@ We need two simple steps. Step one, upload some file from HTML form using `uploa
 ```javascript
 const file =  document.getElementById('fileInput').files[0];
 const url = await client.view("allTasks").upload(file);
-await client.view("allTasks").updateRow("some-task-id", {
+await client.view("allTasks").updateRow(id, {
   ...data
   avatar: url
 });
@@ -844,7 +844,7 @@ const Component = () => {
     const file = e.currentTarget.files?.item(0);
     if (!file) return;
     const url = await client.view("allTasks").upload(file);
-    await updateRow("some-task-id", { ...data, avatar: url });
+    await updateRow(id, { ...data, avatar: url });
   };
   return <input type="file" onChange={handleUpload} />;
 };
@@ -860,10 +860,10 @@ The `upload()` method accepts a `file` variable that is a [File](https://develop
 
 ## Delete a row
 
-To remove a data of `allTasks` view with an id of _some-task-id_ using `deleteRow()` method for JavaScript or `useDeleteRow()` method for React SDK.
+To remove a data of `allTasks` view with an id using `deleteRow()` method for JavaScript or `useDeleteRow()` method for React SDK.
 
 ```javascript
-await client.view("allTasks").deleteRow("some-task-id");
+await client.view("allTasks").deleteRow(id);
 ```
 
 ```jsx
@@ -874,7 +874,7 @@ const Component = () => {
   return (
     <button
       onClick={async () => {
-        await deleteRow("some-task-id", { ...data });
+        await deleteRow(id, { ...data });
       }}
     >
       delete
@@ -889,7 +889,7 @@ Each Qore row can have one or more action triggers. An action trigger may requir
 To use trigger, there is `trigger()` method for JavaScript SDK and `useActions()` method for React SDK.
 
 ```javascript
-await client.view("allTasks").action("archiveTask").trigger("some-task-id", {
+await client.view("allTasks").action("archiveTask").trigger(id, {
   someParams: "someValue"
 });
 ```
@@ -898,9 +898,7 @@ await client.view("allTasks").action("archiveTask").trigger("some-task-id", {
 import qoreContext from "./qoreContext";
 
 const Component = () => {
-  const { action, statuses } = qoreContext
-    .view("allTasks")
-    .useActions("some-task-id");
+  const { action, statuses } = qoreContext.view("allTasks").useActions(id);
   return (
     <button
       onClick={async () => {
