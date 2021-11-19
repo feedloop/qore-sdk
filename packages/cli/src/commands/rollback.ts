@@ -35,9 +35,9 @@ export default class Rollback extends Command {
         rollbacks: 1
       });
 
-      cli.action.stop(`${chalk.green("\nSuccess\n")}`);
+      cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
     } else {
-      cli.action.stop(`${chalk.red("\nFailed\n")}`);
+      cli.action.stop(`${chalk.red("\n\nFailed\n\n")}`);
     }
   }
 }

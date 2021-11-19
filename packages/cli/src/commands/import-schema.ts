@@ -5,7 +5,7 @@ import config from "../config";
 import path from "path";
 import fs from "fs";
 
-interface Operation {
+interface Migration {
   id: number;
   name: string;
   active: boolean;
@@ -16,7 +16,7 @@ interface Operation {
   description?: string;
 }
 
-type Operations = Operation[];
+type Migrations = Migration[];
 
 export default class ImportSchema extends Command {
   static description =
@@ -31,9 +31,13 @@ export default class ImportSchema extends Command {
     })
   };
 
-  async getMigrationsDataInDB(client: any): Promise<Operations> {
-    const { data } = await client.getMigrations();
-    return data.items;
+  async getMigrationsDataInDB(client: any): Promise<Migrations> {
+    try {
+      const { data } = await client.getMigrations();
+      return data.items;
+    } catch (err) {
+      this.error(`\n${chalk.red(`\n"${err}"`)}\n\n`);
+    }
   }
 
   async getLatestMigrationID(client: object): Promise<number> {
@@ -69,9 +73,9 @@ export default class ImportSchema extends Command {
           operations
         });
 
-        this.log(`${chalk.green(`\nSuccess\n\n`)}`);
+        this.log(`${chalk.green("\nSuccess\n\n")}`);
       } catch (err) {
-        this.log(`\n${chalk.red(`\n"${err}"`)}\n\n`);
+        this.error(`\n${chalk.red(`\n"${err}"`)}\n\n`);
       }
     });
   }

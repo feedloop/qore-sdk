@@ -45,7 +45,9 @@ export default class Select extends Command {
     );
 
     this.log(
-      `\n${chalk.grey("Table")} ${chalk.blue(`${tableName.toUpperCase()}`)}\n`
+      `\n${chalk.grey("Read Table")} ${chalk.blue(
+        `${tableName.toUpperCase()}`
+      )} ...\n`
     );
 
     const identityName =

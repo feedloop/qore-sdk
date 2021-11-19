@@ -40,6 +40,6 @@ export default class AlterTable extends Command {
       ]
     });
 
-    cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
+    cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
   }
 }

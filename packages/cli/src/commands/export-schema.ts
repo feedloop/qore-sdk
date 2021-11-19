@@ -5,7 +5,7 @@ import chalk from "chalk";
 import path from "path";
 import fs from "fs";
 
-interface Operation {
+interface Migration {
   id: number;
   name: string;
   active: boolean;
@@ -16,7 +16,7 @@ interface Operation {
   description?: string;
 }
 
-type Operations = Operation[];
+type Migrations = Migration[];
 
 export default class ExportSchema extends Command {
   static description = "Populate json file for all migrations process";
@@ -30,19 +30,19 @@ export default class ExportSchema extends Command {
     })
   };
 
-  async mkdirLocation(location: string) {
+  async findOrCreateLoc(location: string) {
     const isExist = fs.existsSync(location);
     if (!isExist) {
       fs.mkdirSync(location);
     }
   }
 
-  async getDataMigrations(client: any): Promise<Operations> {
+  async getDataMigrations(client: any): Promise<Migrations> {
     const { data } = await client.getMigrations();
     return data.items;
   }
 
-  async exportFile(location: string, data: Operations) {
+  async exportFile(location: string, data: Migrations) {
     data.forEach(file => {
       this.log(
         `${chalk.grey(
@@ -59,7 +59,7 @@ export default class ExportSchema extends Command {
           mode: 0o666
         },
         err => {
-          if (err) return this.log(`${chalk.red(err)}`);
+          if (err) return this.error(`${chalk.red(err)}`);
         }
       );
     });
@@ -72,11 +72,11 @@ export default class ExportSchema extends Command {
     const { flags } = this.parse(ExportSchema);
     const location = path.resolve(path.join(process.cwd(), flags.location));
 
-    await this.mkdirLocation(location);
+    await this.findOrCreateLoc(location);
     this.log(`${chalk.yellow("\n\nRunning process")} ...\n`);
     const data = await this.getDataMigrations(client);
     await this.exportFile(location, data);
     this.log(`${chalk.grey("\n\nExport file migrations")} ...`);
-    this.log(`${chalk.green("Success\n\n")}`);
+    this.log(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

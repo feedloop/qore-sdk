@@ -23,6 +23,6 @@ export default class ReadMigration extends Command {
       );
     }
 
-    this.log(`\n${chalk.green("Success\n\n")}`);
+    this.log(`\n${chalk.green("\nSuccess\n\n")}`);
   }
 }

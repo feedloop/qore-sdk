@@ -48,10 +48,10 @@ export default class CreateColumn extends Command {
       });
     }
     this.log(
-      `\n${chalk.grey("Create columns in table")} ${chalk.blue(
+      `\n${chalk.grey("\nCreate columns in table")} ${chalk.blue(
         `"${flags.table}"`
       )} ${chalk.grey("...")}`
     );
-    this.log(`${chalk.green("Success\n\n")}`);
+    this.log(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

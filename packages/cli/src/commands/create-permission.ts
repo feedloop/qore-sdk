@@ -11,7 +11,7 @@ import config from "../config";
 export default class CreatePermission extends Command {
   static description = "Create permission for specific role in specific tables";
   static examples = [
-    `$ qore create-permission --role users --tables todos,projects --actions select,delete --condition'{"$and": []}'`
+    `$ qore create-permission --role users --tables todos,projects --actions select,delete --condition '{"$and": []}'`
   ];
 
   static flags = {

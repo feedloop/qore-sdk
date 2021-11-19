@@ -14,46 +14,56 @@ export default class AlterPermission extends Command {
     "Change condition in permissions table for specific role";
 
   static examples = [
-    `$ qore alter-permission --role users --action select --condition '{"$and": [ { "title": { "$eq": "sleeping" } } ]}' --table tableName`
+    `$ qore alter-permission --role users --action select --condition '{"$and": [ { "title": { "$eq": "sleeping" } } ]}' --tables all`,
+    `$ qore alter-permission --role users --action delete --condition  '{"$and": [ { "title": { "$eq": "add fitur login" } } ]}' --tables todos,projects`
   ];
 
   static flags = {
     role: flags.string({ description: "roleName", required: true }),
     action: flags.string({ description: "action", required: true }),
     condition: flags.string({ description: "condition", required: true }),
-    table: flags.string({ description: "table" })
+    tables: flags.string({ description: "tables", required: true })
   };
 
   async run() {
     const { flags } = this.parse(AlterPermission);
+    const { role, action, condition, tables } = flags;
+    const listTables = tables.toLowerCase().includes("all")
+      ? ["*"]
+      : tables.split(",");
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
 
+    const statement = listTables.includes("*") ? "all" : listTables;
+
     cli.action.start(
-      `\n${chalk.grey(`Change`)} ${chalk.blue(
+      `\n${chalk.grey(`Change permission`)} ${chalk.blue(
         `"${flags.action}"`
       )} ${chalk.grey("condition for role")} ${chalk.blue(
         `"${flags.role}"`
-      )} ${chalk.grey("in table")} ${chalk.blue(`"${flags.table}"`)}`,
+      )} ${chalk.grey("in")} ${chalk.blue(`"${statement}"`)} ${chalk.grey(
+        "table"
+      )} `,
       "initializing",
       { stdout: true }
     );
+
     await client.migrate({
       operations: [
         {
           operation: V1MigrateOperationsOperationEnum.Alter,
           resource: V1MigrateOperationsResourceEnum.Permission,
           migration: {
-            role: flags.role,
-            action: flags.action,
-            table: flags.table,
-            condition: JSON.parse(flags.condition)
+            role: role,
+            action: action,
+            tables: listTables,
+            condition: JSON.parse(condition)
           }
         }
       ]
     });
 
-    cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
+    cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
   }
 }

@@ -11,23 +11,31 @@ import config from "../config";
 import chalk from "chalk";
 
 export default class DropPermission extends Command {
-  static description =
-    "Drop specific action in permissions table for specific role";
+  static description = "Drop action permission for role in tables";
 
-  static examples = [`$ qore drop-permission actionName --role user`];
+  static examples = [
+    `$ qore drop-permission select --role user --tables all`,
+    `$ qore drop-permission delete --role user --tables todos,projects`
+  ];
 
-  static args = [{ name: "action" }];
+  static args = [{ name: "action", description: "actionName" }];
 
   static flags = {
-    role: flags.string({ description: "roleName", required: true })
+    role: flags.string({ description: "roleName", required: true }),
+    tables: flags.string({ description: "tables", required: true })
   };
 
   async run() {
     const { flags, args } = this.parse(DropPermission);
+    const { role, tables } = flags;
+    const listTables = tables.toLowerCase().includes("all")
+      ? ["*"]
+      : tables.split(",");
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
 
+    const statement = listTables.includes("*") ? "all" : listTables;
     const response = await inquirer.prompt([
       {
         type: "confirm",
@@ -42,7 +50,9 @@ export default class DropPermission extends Command {
     cli.action.start(
       `\n${chalk.grey("Drop")} ${chalk.blue(`"${args.action}"`)} ${chalk.grey(
         "permission for"
-      )} ${chalk.blue(`"${flags.role}"`)}`,
+      )} ${chalk.blue(`"${flags.role}"`)} ${chalk.grey("in")} ${chalk.blue(
+        `"${statement}"`
+      )} ${chalk.grey("table")} ...`,
       "initializing",
       { stdout: true }
     );
@@ -53,14 +63,14 @@ export default class DropPermission extends Command {
           {
             operation: V1MigrateOperationsOperationEnum.Drop,
             resource: V1MigrateOperationsResourceEnum.Permission,
-            migration: { role: flags.role, action: args.action }
+            migration: { role, action: args.action, tables: listTables }
           }
         ]
       });
 
-      cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
+      cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
     } else {
-      cli.action.stop(`${chalk.red("\nFailed\n\n")}`);
+      cli.action.stop(`${chalk.red("\n\nFailed\n\n")}`);
     }
   }
 }

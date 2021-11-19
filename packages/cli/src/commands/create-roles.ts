@@ -42,7 +42,7 @@ export default class CreateRole extends Command {
       });
     }
 
-    this.log(`\n${chalk.grey("Create roles ...")}`);
-    this.log(`${chalk.green("Success\n\n")}`);
+    this.log(`\n${chalk.grey("\nCreate roles ...")}`);
+    this.log(`${chalk.green("\nSuccess\n\n")}`);
   }
 }

@@ -15,7 +15,8 @@ export default class DropRelation extends Command {
     "Drop relation column in 1:m or drop junction table if m:n relation ";
 
   static examples = [
-    `$ qore drop-relation relationType tableOrigin/tableOne tableTarget/tableMany --relation personTodo`
+    `$ qore drop-relation 1:m tableOrigin/tableOne tableTarget/tableMany --relation personTodo`,
+    `$ qore drop-relation m:n tableOrigin/tableOne tableTarget/tableMany --relation personProject`
   ];
   static args = [
     { name: "relationType" },
@@ -99,9 +100,9 @@ export default class DropRelation extends Command {
         });
       }
 
-      cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
+      cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
     } else {
-      cli.action.stop(`${chalk.red("\nFailed\n\n")}`);
+      cli.action.stop(`${chalk.red("\n\nFailed\n\n")}`);
     }
   }
 }
