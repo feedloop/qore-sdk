@@ -5,9 +5,16 @@ import {
   V1MigrateOperationsOperationEnum,
   V1MigrateOperationsResourceEnum
 } from "@feedloop/qore-sdk";
-import cli from "cli-ux";
 import chalk from "chalk";
 import config from "../config";
+
+interface Operation {
+  operation: string;
+  resource: string;
+  migration: {
+    name: string;
+  };
+}
 
 export default class CreateTable extends Command {
   static description = "Create tables";
@@ -25,26 +32,28 @@ export default class CreateTable extends Command {
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
-    cli.action.start(
-      `${chalk.grey(`\nCreate table "${listTables}"`)}`,
-      "initializing",
-      { stdout: true }
-    );
 
-    for (let table of listTables) {
-      await client.migrate({
-        operations: [
-          {
-            operation: V1MigrateOperationsOperationEnum.Create,
-            resource: V1MigrateOperationsResourceEnum.Table,
-            migration: {
-              name: table
-            }
-          }
-        ]
-      });
-    }
+    const operations = listTables.map((table: string) => {
+      return {
+        operation: V1MigrateOperationsOperationEnum.Create,
+        resource: V1MigrateOperationsResourceEnum.Table,
+        migration: {
+          name: table
+        }
+      };
+    });
 
-    cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
+    this.log(`\n${chalk.yellow(`\nCreate tables `)}...\n`);
+    await client.migrate({
+      operations
+    });
+
+    operations.forEach((operation: Operation, i: number) => {
+      this.log(
+        `${chalk.grey(`#${i + 1} Create-table ${operation.migration.name}`)}`
+      );
+    });
+
+    this.log(`${chalk.green("\n\nSuccess\n\n")}`);
   }
 }

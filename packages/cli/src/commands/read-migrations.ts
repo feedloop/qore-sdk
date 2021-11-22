@@ -12,16 +12,17 @@ export default class ReadMigration extends Command {
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
+
     this.log(`\n\n${chalk.yellow("Migration histories:")}\n`);
 
     const { data } = await client.getMigrations();
-    for (let item of data.items) {
+    data.items.forEach(item => {
       this.log(
         `${chalk.grey(
           `#${item.id} ${new Date(item.createdAt).toISOString()}-${item.name}`
         )}`
       );
-    }
+    });
 
     this.log(`\n${chalk.green("\nSuccess\n\n")}`);
   }

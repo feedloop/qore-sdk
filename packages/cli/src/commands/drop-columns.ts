@@ -1,5 +1,4 @@
 import { Command, flags } from "@oclif/command";
-import cli from "cli-ux";
 import {
   DefaultApi,
   Configuration,
@@ -9,6 +8,13 @@ import {
 import chalk from "chalk";
 import inquirer from "inquirer";
 import config from "../config";
+import cli from "cli-ux";
+
+interface Operation {
+  operation: string;
+  resource: string;
+  migration: { table: string; column: string };
+}
 
 export default class DropColumn extends Command {
   static description = "Drop columns from specific table";
@@ -32,7 +38,7 @@ export default class DropColumn extends Command {
     const response = await inquirer.prompt([
       {
         type: "confirm",
-        name: "dropColumn",
+        name: "dropColumns",
         message: `Are you sure to delete ${chalk.blue(
           `"${listColumns}"`
         )} column ?`,
@@ -40,26 +46,28 @@ export default class DropColumn extends Command {
       }
     ]);
 
-    cli.action.start(
-      `\n${chalk.grey(
-        `Drop column "${listColumns}" from table "${flags.table}"`
-      )}`,
-      "initializing",
-      { stdout: true }
-    );
+    cli.action.start(`\n${chalk.yellow(`Drop columns `)}`, "initializing", {
+      stdout: true
+    });
 
-    if (response.dropColumn) {
-      for (let column of listColumns) {
-        await client.migrate({
-          operations: [
-            {
-              operation: V1MigrateOperationsOperationEnum.Drop,
-              resource: V1MigrateOperationsResourceEnum.Column,
-              migration: { table: flags.table, column }
-            }
-          ]
-        });
-      }
+    if (response.dropColumns) {
+      const operations = listColumns.map((column: string) => {
+        return {
+          operation: V1MigrateOperationsOperationEnum.Drop,
+          resource: V1MigrateOperationsResourceEnum.Column,
+          migration: { table: flags.table, column }
+        };
+      });
+
+      await client.migrate({
+        operations
+      });
+
+      operations.forEach((operation: Operation, i: number) => {
+        this.log(
+          `${chalk.grey(`#${i + 1} Drop-column ${operation.migration.column}`)}`
+        );
+      });
 
       cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
     } else {

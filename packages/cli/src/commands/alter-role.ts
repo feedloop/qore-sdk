@@ -17,7 +17,7 @@ export default class AlterRole extends Command {
   static args = [{ name: "formerName" }, { name: "newName" }];
 
   async run() {
-    const { args, flags } = this.parse(AlterRole);
+    const { args } = this.parse(AlterRole);
     const { formerName, newName } = args;
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })

@@ -33,7 +33,7 @@ export default class CreatePermission extends Command {
       new Configuration({ apiKey: config.get("apiKey") })
     );
 
-    this.log(`${chalk.yellow(`\nRunning process ...\n`)}`);
+    this.log(`${chalk.yellow(`\nRunning process`)} ...\n`);
     for (let i = 0; i < tables.length; i++) {
       this.log(
         `${chalk.grey(`#${i + 1} Create permission-`)}${chalk.blue(

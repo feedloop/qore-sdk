@@ -8,6 +8,18 @@ import {
 import chalk from "chalk";
 import config from "../config";
 
+interface Operation {
+  operation: string;
+  resource: string;
+  migration: {
+    name: string;
+    table: string;
+    column: {
+      type: string;
+    };
+  };
+}
+
 export default class CreateColumn extends Command {
   static description = "Create new columns in specific table";
 
@@ -27,10 +39,9 @@ export default class CreateColumn extends Command {
     );
 
     const columns = flags.columns.split(",");
-    const operations = [];
-    for (const column of columns) {
+    const operations = columns.map((column: string, i: number) => {
       const [name, type] = column.split(":");
-      operations.push({
+      return {
         operation: V1MigrateOperationsOperationEnum.Create,
         resource: V1MigrateOperationsResourceEnum.Column,
         migration: {
@@ -40,25 +51,20 @@ export default class CreateColumn extends Command {
             type
           }
         }
-      });
-    }
-    this.log(`${chalk.yellow(`\nRunning process ....\n`)}`);
+      };
+    });
 
+    this.log(`\n${chalk.yellow("\nCreate columns ")}...\n`);
     await client.migrate({
       operations
     });
 
-    for (let i = 0; i < operations.length; i++) {
-      const { name } = operations[i].migration;
-      const { type } = operations[i].migration.column;
+    operations.forEach((operation: Operation, i: number) => {
+      const { name } = operation.migration;
+      const { type } = operation.migration.column;
       this.log(`${chalk.grey(`#${i + 1} Create-column ${name}:${type}`)}`);
-    }
+    });
 
-    this.log(
-      `\n${chalk.grey("\nCreate columns in table")} ${chalk.blue(
-        `"${flags.table}"`
-      )} ${chalk.grey("...")}`
-    );
-    this.log(`${chalk.green("\nSuccess\n\n")}`);
+    this.log(`${chalk.green("\n\nSuccess\n\n")}`);
   }
 }

@@ -10,6 +10,11 @@ import cli from "cli-ux";
 import inquirer from "inquirer";
 import config from "../config";
 
+interface Operation {
+  operation: string;
+  resource: string;
+  migration: { name: string };
+}
 export default class DropTable extends Command {
   static description = "Drop specific table";
 
@@ -23,7 +28,6 @@ export default class DropTable extends Command {
   async run() {
     const { args } = this.parse(DropTable);
     const listTables = args.tablesName.split(",");
-    console.log(listTables);
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("apiKey") })
     );
@@ -39,28 +43,32 @@ export default class DropTable extends Command {
       }
     ]);
 
-    cli.action.start(
-      `\n${chalk.grey(`Drop table "${listTables}"`)}`,
-      "initializing",
-      { stdout: true }
-    );
+    cli.action.start(`\n${chalk.yellow(`Drop tables `)}`, "initializing", {
+      stdout: true
+    });
 
     if (confirmation.dropTables) {
-      for (const table of listTables) {
-        await client.migrate({
-          operations: [
-            {
-              operation: V1MigrateOperationsOperationEnum.Drop,
-              resource: V1MigrateOperationsResourceEnum.Table,
-              migration: { name: table }
-            }
-          ]
-        });
-      }
+      const operations = listTables.map((table: string) => {
+        return {
+          operation: V1MigrateOperationsOperationEnum.Drop,
+          resource: V1MigrateOperationsResourceEnum.Table,
+          migration: { name: table }
+        };
+      });
 
-      cli.action.stop(`${chalk.green("\nSuccess\n\n")}`);
+      await client.migrate({
+        operations
+      });
+
+      operations.forEach((operation: Operation, i: number) => {
+        this.log(
+          `${chalk.grey(`#${i + 1} Drop-table ${operation.migration.name}`)}`
+        );
+      });
+
+      cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
     } else {
-      cli.action.stop(`${chalk.red("\nFailed\n\n")}`);
+      cli.action.stop(`${chalk.red("\n\nFailed\n\n")}`);
     }
   }
 }

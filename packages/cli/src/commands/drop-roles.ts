@@ -10,6 +10,12 @@ import inquirer from "inquirer";
 import cli from "cli-ux";
 import config from "../config";
 
+interface Operation {
+  operation: string;
+  resource: string;
+  migration: { name: string };
+}
+
 export default class DropRole extends Command {
   static description = "Drop some roles";
 
@@ -29,29 +35,33 @@ export default class DropRole extends Command {
     const response = await inquirer.prompt([
       {
         type: "confirm",
-        name: "dropRole",
+        name: "dropRoles",
         message: `Are you sure to delete role ${chalk.blue(`"${roles}"`)} ?`,
         default: false
       }
     ]);
 
-    cli.action.start(
-      `\n${chalk.grey(`Drop role "${roles}"`)}`,
-      "initializing",
-      { stdout: true }
-    );
-    if (response.dropRole) {
-      for (let role of roles) {
-        await client.migrate({
-          operations: [
-            {
-              operation: V1MigrateOperationsOperationEnum.Drop,
-              resource: V1MigrateOperationsResourceEnum.Role,
-              migration: { name: role }
-            }
-          ]
-        });
-      }
+    cli.action.start(`\n${chalk.yellow(`Drop roles `)}`, "initializing", {
+      stdout: true
+    });
+    if (response.dropRoles) {
+      const operations = roles.map((role: string) => {
+        return {
+          operation: V1MigrateOperationsOperationEnum.Drop,
+          resource: V1MigrateOperationsResourceEnum.Role,
+          migration: { name: role }
+        };
+      });
+
+      await client.migrate({
+        operations
+      });
+
+      operations.forEach((operation: Operation, i: number) => {
+        this.log(
+          `${chalk.grey(`#${i + 1} Drop-role ${operation.migration.name}`)}`
+        );
+      });
       cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);
     } else {
       cli.action.stop(`${chalk.red("\n\nFailed\n\n")}`);
