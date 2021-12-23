@@ -1,6 +1,5 @@
 import Axios, { AxiosRequestConfig } from "axios";
 import { nanoid } from "nanoid";
-import { APIField } from "@feedloop/qore-sdk";
 import {
   FormDrivers,
   QoreOperation,
@@ -37,7 +36,7 @@ export class FormDriver<T extends QoreViewSchema["forms"][string]> {
 export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   id: string;
   tableId: string;
-  fields: Record<string, APIField> = {};
+  fields: Record<string, any> = {};
   project: QoreProject;
   client: QoreClient;
   actions: RowActions<T["actions"]>;
@@ -47,7 +46,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     project: QoreProject,
     id: string,
     tableId: string,
-    fields: APIField[]
+    fields: any[]
   ) {
     this.client = client;
     this.id = id;
@@ -124,16 +123,35 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     return this.forms[formId];
   }
   readRows(
-    opts: Partial<{ offset: number; limit: number; order: "asc" | "desc" }> &
+    opts: Partial<{
+      offset: number;
+      limit: number;
+      order: "asc" | "desc";
+      populate: Array<string>;
+    }> &
       T["params"] = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<
-    QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
+    QoreOperationResult<AxiosRequestConfig, { results: { data: T["read"][] } }>
   > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> } {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/${this.id}/rows`,
-      params: opts,
-      method: "GET"
+      url: `/v1/execute`,
+      method: "POST",
+      data: {
+        operations: [
+          {
+            operation: "Select",
+            instruction: {
+              table: this.id,
+              name: "data",
+              populate: opts.populate,
+              limit: opts.limit,
+              offset: opts.offset,
+              orderBy: { id: opts.order?.toUpperCase() }
+            }
+          }
+        ]
+      }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -143,7 +161,10 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       ...{ ...defaultOperationConfig, ...config }
     };
     const stream = this.client.execute(operation) as PromisifiedSource<
-      QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
+      QoreOperationResult<
+        AxiosRequestConfig,
+        { results: { data: T["read"][] } }
+      >
     > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> };
     stream.fetchMore = async fetchMoreOpts => {
       const existingItems = await stream.revalidate({
@@ -154,8 +175,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         networkPolicy: "cache-only",
         optimisticResponse: {
           nodes: [
-            ...(existingItems.data?.nodes || []),
-            ...(moreItems.data?.nodes || [])
+            ...(existingItems.data?.results.data || []),
+            ...(moreItems.data?.results.data || [])
           ]
         }
       });
@@ -168,8 +189,29 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"]>> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/${this.id}/rows/${id}`,
-      method: "GET"
+      baseURL: this.project.config.endpoint,
+      url: `/v1/execute`,
+      method: "POST",
+      data: {
+        operations: [
+          {
+            operation: "Select",
+            instruction: {
+              table: this.id,
+              name: "data",
+              condition: {
+                $and: [
+                  {
+                    id: {
+                      $eq: id
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -186,9 +228,30 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/${this.id}/rows/${id}`,
-      data: input,
-      method: "PATCH",
+      baseURL: this.project.config.endpoint,
+      url: `/v1/execute`,
+      method: "POST",
+      data: {
+        operations: [
+          {
+            operation: "Update",
+            instruction: {
+              table: this.id,
+              name: "data",
+              condition: {
+                $and: [
+                  {
+                    id: {
+                      $eq: id
+                    }
+                  }
+                ]
+              },
+              set: input
+            }
+          }
+        ]
+      },
       headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
@@ -199,7 +262,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       pollInterval: 0,
       networkPolicy: "network-only"
     };
-    const { error: patchError } = await this.client
+    const { data, error: patchError } = await this.client
       .execute(operation)
       .toPromise();
     if (patchError) throw patchError;
@@ -212,8 +275,29 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): Promise<boolean> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/${this.id}/rows/${id}`,
-      method: "DELETE",
+      baseURL: this.project.config.endpoint,
+      url: `/v1/execute`,
+      method: "POST",
+      data: {
+        operations: [
+          {
+            operation: "Delete",
+            instruction: {
+              table: this.id,
+              name: "data",
+              condition: {
+                $and: [
+                  {
+                    id: {
+                      $eq: id
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
       headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
@@ -233,8 +317,20 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): Promise<T["read"]> {
     const axiosConfig: AxiosRequestConfig = {
-      url: `/${this.id}/rows`,
-      data: input,
+      baseURL: this.project.config.endpoint,
+      url: `/v1/execute`,
+      data: {
+        operations: [
+          {
+            operation: "Insert",
+            instruction: {
+              table: this.id,
+              name: "data",
+              data: input
+            }
+          }
+        ]
+      },
       method: "POST",
       headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
@@ -246,31 +342,49 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       pollInterval: 0,
       networkPolicy: "network-only"
     };
-    const result = await this.client
-      .execute<{ id: string }>(operation)
-      .toPromise();
-    if (!result.data?.id) throw result.error;
-    const row = await this.readRow(result.data.id).toPromise();
-    if (!row.data) throw row.error;
-    return row.data;
+    const result = await this.client.execute(operation).toPromise();
+    if (!result.data) throw result.error;
+    return result.data;
   }
 
   async addRelation(
     rowId: string,
     relations: Partial<ConditionalPick<T["write"], string[]>>
   ): Promise<boolean> {
-    await Promise.all(
-      Object.entries(relations).flatMap(([field, refs]) => {
-        return (refs as string[]).map(ref => {
-          const axiosConfig: AxiosRequestConfig = {
-            baseURL: this.project.config.endpoint,
-            url: `/${this.project.config.projectId}/${this.id}/rows/${rowId}/${field}/${ref}`,
-            method: "POST"
-          };
-          return this.project.axios(axiosConfig);
-        });
-      })
-    );
+    const operations = Object.entries(relations).flatMap(([field, refs]) => {
+      return (refs as string[]).map(ref => ({
+        operation: "AddRelation",
+        instruction: {
+          table: this.id,
+          name: `addRelation_${field}_${ref}`,
+          relation: {
+            name: field,
+            data: {
+              origin: rowId,
+              target: ref
+            }
+          }
+        }
+      }));
+    });
+    const axiosConfig: AxiosRequestConfig = {
+      baseURL: this.project.config.endpoint,
+      url: `/v1/execute`,
+      method: "POST",
+      data: {
+        operations
+      }
+    };
+    const operation: QoreOperation = {
+      key: JSON.stringify(axiosConfig),
+      request: axiosConfig,
+      type: axiosConfig.method,
+      meta: {},
+      pollInterval: 0,
+      networkPolicy: "network-only"
+    };
+    const res = await this.client.execute(operation).toPromise();
+    if (res.error) throw res.error;
     return true;
   }
 
@@ -278,18 +392,40 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     rowId: string,
     relations: Partial<ConditionalPick<T["write"], string[]>>
   ): Promise<boolean> {
-    await Promise.all(
-      Object.entries(relations).flatMap(([field, refs]) => {
-        return (refs as string[]).map(ref => {
-          const axiosConfig: AxiosRequestConfig = {
-            baseURL: this.project.config.endpoint,
-            url: `/${this.project.config.projectId}/${this.id}/rows/${rowId}/${field}/${ref}`,
-            method: "DELETE"
-          };
-          return this.project.axios(axiosConfig);
-        });
-      })
-    );
+    const operations = Object.entries(relations).flatMap(([field, refs]) => {
+      return (refs as string[]).map(ref => ({
+        operation: "RemoveRelation",
+        instruction: {
+          table: this.id,
+          name: `addRelation_${field}_${ref}`,
+          relation: {
+            name: field,
+            data: {
+              origin: rowId,
+              target: ref
+            }
+          }
+        }
+      }));
+    });
+    const axiosConfig: AxiosRequestConfig = {
+      baseURL: this.project.config.endpoint,
+      url: `/v1/execute`,
+      method: "POST",
+      data: {
+        operations
+      }
+    };
+    const operation: QoreOperation = {
+      key: JSON.stringify(axiosConfig),
+      request: axiosConfig,
+      type: axiosConfig.method,
+      meta: {},
+      pollInterval: 0,
+      networkPolicy: "network-only"
+    };
+    const res = await this.client.execute(operation).toPromise();
+    if (res.error) throw res.error;
     return true;
   }
 

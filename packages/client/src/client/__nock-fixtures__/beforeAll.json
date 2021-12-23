@@ -1,199 +1,1312 @@
 [
     {
-        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "scope": "http://localhost:8080",
         "method": "OPTIONS",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/I0D3NimZQ9GKEDP/authenticate",
+        "path": "/v1/migrate",
         "body": "",
         "status": 204,
         "response": "",
         "rawHeaders": [
-            "Date",
-            "Tue, 26 Jan 2021 01:54:05 GMT",
-            "Content-Length",
-            "0",
-            "X-Powered-By",
-            "Express",
-            "Access-Control-Allow-Origin",
-            "*",
-            "Access-Control-Allow-Methods",
+            "vary",
+            "Origin, Access-Control-Request-Headers",
+            "access-control-allow-origin",
+            "http://localhost",
+            "access-control-allow-methods",
             "GET,HEAD,PUT,PATCH,POST,DELETE",
-            "Vary",
-            "Access-Control-Request-Headers",
-            "Access-Control-Allow-Headers",
-            "Authorization",
-            "Via",
-            "1.1 google",
-            "Alt-Svc",
-            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+            "access-control-allow-headers",
+            "x-qore-engine-admin-secret",
+            "content-length",
+            "0",
+            "Date",
+            "Thu, 23 Dec 2021 05:51:50 GMT",
+            "Connection",
+            "keep-alive",
+            "Keep-Alive",
+            "timeout=5"
         ],
         "responseIsBinary": false
     },
     {
-        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "scope": "http://localhost:8080",
         "method": "POST",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/I0D3NimZQ9GKEDP/authenticate",
+        "path": "/v1/migrate",
         "body": {
-            "token": "d5a1c695-7961-4098-97c6-915da7d909c9"
+            "operations": [
+                {
+                    "operation": "Create",
+                    "resource": "Table",
+                    "migration": {
+                        "name": "product"
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "Column",
+                    "migration": {
+                        "name": "name",
+                        "table": "product",
+                        "column": {
+                            "type": "text",
+                            "definition": {
+                                "textType": "text",
+                                "default": "",
+                                "unique": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "Table",
+                    "migration": {
+                        "name": "todo"
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "Table",
+                    "migration": {
+                        "name": "person"
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "Column",
+                    "migration": {
+                        "table": "todo",
+                        "name": "title",
+                        "column": {
+                            "type": "text",
+                            "definition": {
+                                "textType": "text",
+                                "default": "",
+                                "unique": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "Column",
+                    "migration": {
+                        "table": "person",
+                        "name": "name",
+                        "column": {
+                            "type": "text",
+                            "definition": {
+                                "textType": "text",
+                                "default": "",
+                                "unique": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "OneToManyRelation",
+                    "migration": {
+                        "name": "persontodo",
+                        "nullable": true,
+                        "one": {
+                            "table": "person"
+                        },
+                        "many": {
+                            "table": "todo"
+                        },
+                        "onDelete": "RESTRICT",
+                        "onUpdate": "RESTRICT"
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "Role",
+                    "migration": {
+                        "name": "user"
+                    }
+                },
+                {
+                    "operation": "Create",
+                    "resource": "Permission",
+                    "migration": {
+                        "role": "user",
+                        "tables": [
+                            "*"
+                        ],
+                        "actions": [
+                            "select",
+                            "insert",
+                            "update",
+                            "delete"
+                        ]
+                    }
+                }
+            ]
         },
         "status": 200,
-        "response": [
-            "1f",
-            "8b",
-            "0800000000000003ab562ac9cf4ecd53b2524a4cb534b04c3334d435364c36d435494c36d34d32b730d74d4b364f364f4a4c4b4a4e3354aa0500bfb2a75630000000"
-        ],
+        "response": {
+            "results": [
+                {
+                    "id": 7,
+                    "name": "Create Table product",
+                    "active": true,
+                    "schema": {
+                        "resource": "Table",
+                        "migration": {
+                            "name": "product"
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_tables\" (\"created_at\", \"deletion_protection\", \"id\", \"name\", \"updated_at\") values ('2021-12-23T05:51:50.320Z', true, '42e13c3b-40c9-42c1-8f49-08bda9545030', 'product', '2021-12-23T05:51:50.320Z') returning \"id\", \"deletion_protection\", \"is_hidden\";\ncreate table \"product\" (\"id\" serial primary key);",
+                    "down": "delete from \"qore_engine_tables\" where \"name\" = 'product';\ndrop table \"product\";",
+                    "description": null
+                },
+                {
+                    "id": 8,
+                    "name": "Create Column name (text) in table product",
+                    "active": true,
+                    "schema": {
+                        "resource": "Column",
+                        "migration": {
+                            "name": "name",
+                            "table": "product",
+                            "column": {
+                                "type": "text",
+                                "definition": {
+                                    "unique": false,
+                                    "default": "",
+                                    "textType": "text"
+                                }
+                            }
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_columns\" (\"active\", \"created_at\", \"definition\", \"deletion_protection\", \"field_type\", \"id\", \"name\", \"table_id\", \"updated_at\") values (true, '2021-12-23T05:51:50.347Z', '{\"type\":\"text\",\"definition\":{\"textType\":\"text\",\"default\":\"\",\"unique\":false}}', true, 'text', 'e593f294-ccd7-4962-ae91-b4e8b9a7e93f', 'name', '42e13c3b-40c9-42c1-8f49-08bda9545030', '2021-12-23T05:51:50.347Z') returning \"id\";\nalter table \"product\" add column \"name\" text default '';\n",
+                    "down": "delete from \"qore_engine_columns\" where \"table_id\" = '42e13c3b-40c9-42c1-8f49-08bda9545030' and \"name\" = 'name';\nalter table \"product\" drop column \"name\";\ndrop function if exists  cascade;",
+                    "description": null
+                },
+                {
+                    "id": 9,
+                    "name": "Create Table todo",
+                    "active": true,
+                    "schema": {
+                        "resource": "Table",
+                        "migration": {
+                            "name": "todo"
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_tables\" (\"created_at\", \"deletion_protection\", \"id\", \"name\", \"updated_at\") values ('2021-12-23T05:51:50.358Z', true, '757fa12e-404d-4f72-934b-0b9d38514ed1', 'todo', '2021-12-23T05:51:50.358Z') returning \"id\", \"deletion_protection\", \"is_hidden\";\ncreate table \"todo\" (\"id\" serial primary key);",
+                    "down": "delete from \"qore_engine_tables\" where \"name\" = 'todo';\ndrop table \"todo\";",
+                    "description": null
+                },
+                {
+                    "id": 10,
+                    "name": "Create Table person",
+                    "active": true,
+                    "schema": {
+                        "resource": "Table",
+                        "migration": {
+                            "name": "person"
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_tables\" (\"created_at\", \"deletion_protection\", \"id\", \"name\", \"updated_at\") values ('2021-12-23T05:51:50.369Z', true, 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', 'person', '2021-12-23T05:51:50.369Z') returning \"id\", \"deletion_protection\", \"is_hidden\";\ncreate table \"person\" (\"id\" serial primary key);",
+                    "down": "delete from \"qore_engine_tables\" where \"name\" = 'person';\ndrop table \"person\";",
+                    "description": null
+                },
+                {
+                    "id": 11,
+                    "name": "Create Column title (text) in table todo",
+                    "active": true,
+                    "schema": {
+                        "resource": "Column",
+                        "migration": {
+                            "name": "title",
+                            "table": "todo",
+                            "column": {
+                                "type": "text",
+                                "definition": {
+                                    "unique": false,
+                                    "default": "",
+                                    "textType": "text"
+                                }
+                            }
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_columns\" (\"active\", \"created_at\", \"definition\", \"deletion_protection\", \"field_type\", \"id\", \"name\", \"table_id\", \"updated_at\") values (true, '2021-12-23T05:51:50.393Z', '{\"type\":\"text\",\"definition\":{\"textType\":\"text\",\"default\":\"\",\"unique\":false}}', true, 'text', '4b44546b-094e-481e-b602-9f146aa191e5', 'title', '757fa12e-404d-4f72-934b-0b9d38514ed1', '2021-12-23T05:51:50.393Z') returning \"id\";\nalter table \"todo\" add column \"title\" text default '';\n",
+                    "down": "delete from \"qore_engine_columns\" where \"table_id\" = '757fa12e-404d-4f72-934b-0b9d38514ed1' and \"name\" = 'title';\nalter table \"todo\" drop column \"title\";\ndrop function if exists  cascade;",
+                    "description": null
+                },
+                {
+                    "id": 12,
+                    "name": "Create Column name (text) in table person",
+                    "active": true,
+                    "schema": {
+                        "resource": "Column",
+                        "migration": {
+                            "name": "name",
+                            "table": "person",
+                            "column": {
+                                "type": "text",
+                                "definition": {
+                                    "unique": false,
+                                    "default": "",
+                                    "textType": "text"
+                                }
+                            }
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_columns\" (\"active\", \"created_at\", \"definition\", \"deletion_protection\", \"field_type\", \"id\", \"name\", \"table_id\", \"updated_at\") values (true, '2021-12-23T05:51:50.426Z', '{\"type\":\"text\",\"definition\":{\"textType\":\"text\",\"default\":\"\",\"unique\":false}}', true, 'text', 'ac43198d-c90b-4e9f-9dad-9d8cdefac746', 'name', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', '2021-12-23T05:51:50.426Z') returning \"id\";\nalter table \"person\" add column \"name\" text default '';\n",
+                    "down": "delete from \"qore_engine_columns\" where \"table_id\" = 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d' and \"name\" = 'name';\nalter table \"person\" drop column \"name\";\ndrop function if exists  cascade;",
+                    "description": null
+                },
+                {
+                    "id": 13,
+                    "name": "Create OneToManyRelation persontodo_person_id",
+                    "active": true,
+                    "schema": {
+                        "resource": "OneToManyRelation",
+                        "migration": {
+                            "one": {
+                                "table": "person"
+                            },
+                            "many": {
+                                "table": "todo"
+                            },
+                            "name": "persontodo",
+                            "nullable": true,
+                            "onDelete": "RESTRICT",
+                            "onUpdate": "RESTRICT"
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_relations\" (\"created_at\", \"id\", \"name\", \"nullable\", \"on_delete\", \"on_update\", \"origin_table_id\", \"target_table_id\", \"type\", \"updated_at\") values ('2021-12-23T05:51:50.442Z', '251393ce-c136-4567-a198-de06ec1828b7', 'persontodo_person_id', true, 'RESTRICT', 'RESTRICT', '757fa12e-404d-4f72-934b-0b9d38514ed1', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', 'OneToMany', '2021-12-23T05:51:50.442Z') returning \"id\";\nalter table \"todo\" add column \"persontodo_person_id\" integer null;\nalter table \"todo\" add constraint \"todo_persontodo_person_id_foreign\" foreign key (\"persontodo_person_id\") references \"person\" (\"id\") on update RESTRICT on delete RESTRICT;",
+                    "down": "delete from \"qore_engine_relations\" where \"origin_table_id\" = '757fa12e-404d-4f72-934b-0b9d38514ed1' and \"target_table_id\" = 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d' and \"name\" = 'persontodo_person_id';\nalter table \"todo\" drop constraint \"todo_persontodo_person_id_foreign\";\nalter table \"todo\" drop column \"persontodo_person_id\";",
+                    "description": null
+                },
+                {
+                    "id": 14,
+                    "name": "Create Role user",
+                    "active": true,
+                    "schema": {
+                        "resource": "Role",
+                        "migration": {
+                            "name": "user"
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_roles\" (\"created_at\", \"deletion_protection\", \"id\", \"name\", \"updated_at\") values ('2021-12-23T05:51:50.458Z', false, 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', 'user', '2021-12-23T05:51:50.458Z') returning \"id\", \"deletion_protection\";",
+                    "down": "delete from \"qore_engine_roles\" where \"name\" = 'user';",
+                    "description": null
+                },
+                {
+                    "id": 15,
+                    "name": "Create Permission select, insert, update, delete for role user in table product, todo, person",
+                    "active": true,
+                    "schema": {
+                        "resource": "Permission",
+                        "migration": {
+                            "role": "user",
+                            "tables": [
+                                "product",
+                                "todo",
+                                "person"
+                            ],
+                            "actions": [
+                                "select",
+                                "insert",
+                                "update",
+                                "delete"
+                            ]
+                        },
+                        "operation": "Create"
+                    },
+                    "up": "insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('select', '{\"$and\":[]}', '2021-12-23T05:51:50.475Z', '39dc2472-f486-48ee-a93d-e2fce0e5ff90', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '42e13c3b-40c9-42c1-8f49-08bda9545030', '2021-12-23T05:51:50.475Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('insert', '{\"$and\":[]}', '2021-12-23T05:51:50.478Z', '9f480537-0ed4-464f-958c-385e41dd0608', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '42e13c3b-40c9-42c1-8f49-08bda9545030', '2021-12-23T05:51:50.478Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('addRelation', '{\"$and\":[]}', '2021-12-23T05:51:50.478Z', '2f260710-6001-4540-81cf-5e395147d2ca', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '42e13c3b-40c9-42c1-8f49-08bda9545030', '2021-12-23T05:51:50.478Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('update', '{\"$and\":[]}', '2021-12-23T05:51:50.481Z', '2797b3f1-4810-4a5d-b2cc-004cb23758c6', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '42e13c3b-40c9-42c1-8f49-08bda9545030', '2021-12-23T05:51:50.481Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('delete', '{\"$and\":[]}', '2021-12-23T05:51:50.483Z', 'b3f80395-7d66-4aaf-b34d-b7dab2c12139', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '42e13c3b-40c9-42c1-8f49-08bda9545030', '2021-12-23T05:51:50.483Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('removeRelation', '{\"$and\":[]}', '2021-12-23T05:51:50.483Z', '2f2d8478-3abc-4529-8a45-6afd054f0c0e', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '42e13c3b-40c9-42c1-8f49-08bda9545030', '2021-12-23T05:51:50.483Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('select', '{\"$and\":[]}', '2021-12-23T05:51:50.490Z', 'facde993-0359-4856-8930-0353dfeffdca', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '757fa12e-404d-4f72-934b-0b9d38514ed1', '2021-12-23T05:51:50.490Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('insert', '{\"$and\":[]}', '2021-12-23T05:51:50.493Z', '068dcdf7-e514-4991-999e-7cbf51fe61b2', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '757fa12e-404d-4f72-934b-0b9d38514ed1', '2021-12-23T05:51:50.493Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('addRelation', '{\"$and\":[]}', '2021-12-23T05:51:50.493Z', 'f01b511f-3d03-4497-b1ea-76902c712809', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '757fa12e-404d-4f72-934b-0b9d38514ed1', '2021-12-23T05:51:50.493Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('update', '{\"$and\":[]}', '2021-12-23T05:51:50.496Z', '4e0fb40a-b9e9-4098-a539-6a0c2d4398a6', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '757fa12e-404d-4f72-934b-0b9d38514ed1', '2021-12-23T05:51:50.496Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('delete', '{\"$and\":[]}', '2021-12-23T05:51:50.498Z', '7e2800d7-b8e7-49b2-aa23-15d71e86e63f', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '757fa12e-404d-4f72-934b-0b9d38514ed1', '2021-12-23T05:51:50.498Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('removeRelation', '{\"$and\":[]}', '2021-12-23T05:51:50.498Z', 'f02d174e-6bc5-4528-8961-36dffce6759c', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', '757fa12e-404d-4f72-934b-0b9d38514ed1', '2021-12-23T05:51:50.498Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('select', '{\"$and\":[]}', '2021-12-23T05:51:50.502Z', '65aa516a-5a11-4f93-bc44-02088a104858', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', '2021-12-23T05:51:50.502Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('insert', '{\"$and\":[]}', '2021-12-23T05:51:50.504Z', '2a8a29b7-66b5-4919-8ce5-ed525e76ed01', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', '2021-12-23T05:51:50.504Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('addRelation', '{\"$and\":[]}', '2021-12-23T05:51:50.504Z', '2b810c72-d496-4835-bb3f-d45aacf7af36', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', '2021-12-23T05:51:50.504Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('update', '{\"$and\":[]}', '2021-12-23T05:51:50.507Z', '15357643-bed3-49d0-b3e8-bd656c8eec6a', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', '2021-12-23T05:51:50.507Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('delete', '{\"$and\":[]}', '2021-12-23T05:51:50.509Z', 'e575fc1e-32c5-4b4a-ad31-7c05011baec1', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', '2021-12-23T05:51:50.509Z') returning \"id\";insert into \"qore_engine_permissions\" (\"action\", \"condition\", \"created_at\", \"id\", \"role_id\", \"table_id\", \"updated_at\") values ('removeRelation', '{\"$and\":[]}', '2021-12-23T05:51:50.509Z', '3d0c47eb-af6f-466c-ba04-b82342f2d2ca', 'cf2d14b2-34ae-4065-bc6b-419877bd2aee', 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d', '2021-12-23T05:51:50.509Z') returning \"id\";",
+                    "down": "delete from \"qore_engine_permissions\" where \"action\" = '0' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '42e13c3b-40c9-42c1-8f49-08bda9545030';delete from \"qore_engine_permissions\" where \"action\" = '1' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '42e13c3b-40c9-42c1-8f49-08bda9545030';delete from \"qore_engine_permissions\" where \"action\" = '2' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '42e13c3b-40c9-42c1-8f49-08bda9545030';delete from \"qore_engine_permissions\" where \"action\" = '3' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '42e13c3b-40c9-42c1-8f49-08bda9545030';delete from \"qore_engine_permissions\" where \"action\" = '0' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '757fa12e-404d-4f72-934b-0b9d38514ed1';delete from \"qore_engine_permissions\" where \"action\" = '1' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '757fa12e-404d-4f72-934b-0b9d38514ed1';delete from \"qore_engine_permissions\" where \"action\" = '2' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '757fa12e-404d-4f72-934b-0b9d38514ed1';delete from \"qore_engine_permissions\" where \"action\" = '3' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = '757fa12e-404d-4f72-934b-0b9d38514ed1';delete from \"qore_engine_permissions\" where \"action\" = '0' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d';delete from \"qore_engine_permissions\" where \"action\" = '1' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d';delete from \"qore_engine_permissions\" where \"action\" = '2' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d';delete from \"qore_engine_permissions\" where \"action\" = '3' and \"role_id\" = 'cf2d14b2-34ae-4065-bc6b-419877bd2aee' and \"table_id\" = 'cb9d3a07-4b55-42b0-bde6-cfeaba0b685d';",
+                    "description": null
+                }
+            ]
+        },
         "rawHeaders": [
-            "Date",
-            "Tue, 26 Jan 2021 01:54:05 GMT",
-            "Content-Type",
+            "vary",
+            "Origin",
+            "access-control-allow-origin",
+            "http://localhost",
+            "content-type",
             "application/json; charset=utf-8",
-            "Vary",
-            "Accept-Encoding",
-            "X-Powered-By",
-            "Express",
-            "Access-Control-Allow-Origin",
-            "*",
-            "ETag",
-            "W/\"30-EjzuRTRUcW1iqFgCJtJMxUae/hc\"",
-            "Content-Encoding",
-            "gzip",
-            "Via",
-            "1.1 google",
-            "Alt-Svc",
-            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
-            "Transfer-Encoding",
-            "chunked"
+            "content-length",
+            "15748",
+            "Date",
+            "Thu, 23 Dec 2021 05:51:50 GMT",
+            "Connection",
+            "keep-alive",
+            "Keep-Alive",
+            "timeout=5"
         ],
         "responseIsBinary": false
     },
     {
-        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "scope": "http://localhost:8080",
         "method": "OPTIONS",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/I0D3NimZQ9GKEDP/authConfig",
+        "path": "/v1/roles",
         "body": "",
         "status": 204,
         "response": "",
         "rawHeaders": [
-            "Date",
-            "Tue, 26 Jan 2021 01:54:05 GMT",
-            "Content-Length",
-            "0",
-            "X-Powered-By",
-            "Express",
-            "Access-Control-Allow-Origin",
-            "*",
-            "Access-Control-Allow-Methods",
+            "vary",
+            "Origin, Access-Control-Request-Headers",
+            "access-control-allow-origin",
+            "http://localhost",
+            "access-control-allow-methods",
             "GET,HEAD,PUT,PATCH,POST,DELETE",
-            "Vary",
-            "Access-Control-Request-Headers",
-            "Access-Control-Allow-Headers",
-            "Authorization",
-            "Via",
-            "1.1 google",
-            "Alt-Svc",
-            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+            "access-control-allow-headers",
+            "x-qore-engine-admin-secret",
+            "content-length",
+            "0",
+            "Date",
+            "Thu, 23 Dec 2021 05:51:50 GMT",
+            "Connection",
+            "keep-alive",
+            "Keep-Alive",
+            "timeout=5"
         ],
         "responseIsBinary": false
     },
     {
-        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "scope": "http://localhost:8080",
         "method": "GET",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/I0D3NimZQ9GKEDP/authConfig",
+        "path": "/v1/roles",
         "body": "",
         "status": 200,
-        "response": [
-            "1f",
-            "8b",
-            "08",
-            "00",
-            "00",
-            "0000000003a58fb10ac2301040ffe5e65ad2a4b56d36418a74ad8b6ed59c18686c4c222ad27f3741ab8b82e0162eef8ef76e70ec0d02bf8114c0a191ee52ed7469a76ca56c0711b8abf6df0f2a82adc1d6a198393fa28492494227a458929cb38493342e48bef64b272d7ec15cbbe9c271856a83c6ef4981072777124d25b10b42a85a19344cdfe1380b6f1822d0adb5e7de78ec699f31316f5865678b7aafeb70f069ff223f1724be80f2ace484c5659a7e2b7863595c94d380fd53f00e18c35e9ac370075f9ec62998010000"
-        ],
+        "response": {
+            "roles": [
+                {
+                    "id": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                    "name": "user",
+                    "permissions": [
+                        {
+                            "id": "39dc2472-f486-48ee-a93d-e2fce0e5ff90",
+                            "action": "select",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                "name": "product",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "e593f294-ccd7-4962-ae91-b4e8b9a7e93f",
+                                        "name": "name",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                            "name": "product",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "9f480537-0ed4-464f-958c-385e41dd0608",
+                            "action": "insert",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                "name": "product",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "e593f294-ccd7-4962-ae91-b4e8b9a7e93f",
+                                        "name": "name",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                            "name": "product",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "2f260710-6001-4540-81cf-5e395147d2ca",
+                            "action": "addRelation",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                "name": "product",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "e593f294-ccd7-4962-ae91-b4e8b9a7e93f",
+                                        "name": "name",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                            "name": "product",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "2797b3f1-4810-4a5d-b2cc-004cb23758c6",
+                            "action": "update",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                "name": "product",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "e593f294-ccd7-4962-ae91-b4e8b9a7e93f",
+                                        "name": "name",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                            "name": "product",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "b3f80395-7d66-4aaf-b34d-b7dab2c12139",
+                            "action": "delete",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                "name": "product",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "e593f294-ccd7-4962-ae91-b4e8b9a7e93f",
+                                        "name": "name",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                            "name": "product",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "2f2d8478-3abc-4529-8a45-6afd054f0c0e",
+                            "action": "removeRelation",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                "name": "product",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "e593f294-ccd7-4962-ae91-b4e8b9a7e93f",
+                                        "name": "name",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "42e13c3b-40c9-42c1-8f49-08bda9545030",
+                                            "name": "product",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "facde993-0359-4856-8930-0353dfeffdca",
+                            "action": "select",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                "name": "todo",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "4b44546b-094e-481e-b602-9f146aa191e5",
+                                        "name": "title",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                            "name": "todo",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "068dcdf7-e514-4991-999e-7cbf51fe61b2",
+                            "action": "insert",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                "name": "todo",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "4b44546b-094e-481e-b602-9f146aa191e5",
+                                        "name": "title",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                            "name": "todo",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "f01b511f-3d03-4497-b1ea-76902c712809",
+                            "action": "addRelation",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                "name": "todo",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "4b44546b-094e-481e-b602-9f146aa191e5",
+                                        "name": "title",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                            "name": "todo",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "4e0fb40a-b9e9-4098-a539-6a0c2d4398a6",
+                            "action": "update",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                "name": "todo",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "4b44546b-094e-481e-b602-9f146aa191e5",
+                                        "name": "title",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                            "name": "todo",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "7e2800d7-b8e7-49b2-aa23-15d71e86e63f",
+                            "action": "delete",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                "name": "todo",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "4b44546b-094e-481e-b602-9f146aa191e5",
+                                        "name": "title",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                            "name": "todo",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "f02d174e-6bc5-4528-8961-36dffce6759c",
+                            "action": "removeRelation",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                "name": "todo",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [
+                                    {
+                                        "id": "4b44546b-094e-481e-b602-9f146aa191e5",
+                                        "name": "title",
+                                        "fieldType": "text",
+                                        "definition": {
+                                            "type": "text",
+                                            "definition": {
+                                                "unique": false,
+                                                "default": "",
+                                                "textType": "text"
+                                            }
+                                        },
+                                        "table": {
+                                            "id": "757fa12e-404d-4f72-934b-0b9d38514ed1",
+                                            "name": "todo",
+                                            "deletionProtection": true,
+                                            "createdAt": "2021-12-23T05:51:50.000Z",
+                                            "updatedAt": "2021-12-23T05:51:50.000Z",
+                                            "isHidden": false
+                                        },
+                                        "enums": null,
+                                        "active": true,
+                                        "function": null,
+                                        "trigger": null,
+                                        "destination": null,
+                                        "condition": null,
+                                        "operation": null,
+                                        "deletionProtection": true,
+                                        "createdAt": "2021-12-23T05:51:50.000Z",
+                                        "updatedAt": "2021-12-23T05:51:50.000Z"
+                                    }
+                                ],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:50.000Z",
+                            "updatedAt": "2021-12-23T05:51:50.000Z"
+                        },
+                        {
+                            "id": "65aa516a-5a11-4f93-bc44-02088a104858",
+                            "action": "select",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "cb9d3a07-4b55-42b0-bde6-cfeaba0b685d",
+                                "name": "person",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:51.000Z",
+                            "updatedAt": "2021-12-23T05:51:51.000Z"
+                        },
+                        {
+                            "id": "2a8a29b7-66b5-4919-8ce5-ed525e76ed01",
+                            "action": "insert",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "cb9d3a07-4b55-42b0-bde6-cfeaba0b685d",
+                                "name": "person",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:51.000Z",
+                            "updatedAt": "2021-12-23T05:51:51.000Z"
+                        },
+                        {
+                            "id": "2b810c72-d496-4835-bb3f-d45aacf7af36",
+                            "action": "addRelation",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "cb9d3a07-4b55-42b0-bde6-cfeaba0b685d",
+                                "name": "person",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:51.000Z",
+                            "updatedAt": "2021-12-23T05:51:51.000Z"
+                        },
+                        {
+                            "id": "15357643-bed3-49d0-b3e8-bd656c8eec6a",
+                            "action": "update",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "cb9d3a07-4b55-42b0-bde6-cfeaba0b685d",
+                                "name": "person",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:51.000Z",
+                            "updatedAt": "2021-12-23T05:51:51.000Z"
+                        },
+                        {
+                            "id": "e575fc1e-32c5-4b4a-ad31-7c05011baec1",
+                            "action": "delete",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "cb9d3a07-4b55-42b0-bde6-cfeaba0b685d",
+                                "name": "person",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:51.000Z",
+                            "updatedAt": "2021-12-23T05:51:51.000Z"
+                        },
+                        {
+                            "id": "3d0c47eb-af6f-466c-ba04-b82342f2d2ca",
+                            "action": "removeRelation",
+                            "condition": {
+                                "$and": []
+                            },
+                            "role": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "table": {
+                                "id": "cb9d3a07-4b55-42b0-bde6-cfeaba0b685d",
+                                "name": "person",
+                                "deletionProtection": true,
+                                "createdAt": "2021-12-23T05:51:50.000Z",
+                                "updatedAt": "2021-12-23T05:51:50.000Z",
+                                "columns": [],
+                                "isHidden": false
+                            },
+                            "createdAt": "2021-12-23T05:51:51.000Z",
+                            "updatedAt": "2021-12-23T05:51:51.000Z"
+                        }
+                    ],
+                    "deletionProtection": false,
+                    "createdAt": "2021-12-23T05:51:50.000Z",
+                    "updatedAt": "2021-12-23T05:51:50.000Z"
+                }
+            ]
+        },
         "rawHeaders": [
-            "Date",
-            "Tue, 26 Jan 2021 01:54:05 GMT",
-            "Content-Type",
+            "vary",
+            "Origin",
+            "access-control-allow-origin",
+            "http://localhost",
+            "content-type",
             "application/json; charset=utf-8",
-            "Vary",
-            "Accept-Encoding",
-            "X-Powered-By",
-            "Express",
-            "Access-Control-Allow-Origin",
-            "*",
-            "ETag",
-            "W/\"198-ZLiX2kotInJt+TsTuFtt+iD5wWk\"",
-            "Content-Encoding",
-            "gzip",
-            "Via",
-            "1.1 google",
-            "Alt-Svc",
-            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
-            "Transfer-Encoding",
-            "chunked"
+            "content-length",
+            "14601",
+            "Date",
+            "Thu, 23 Dec 2021 05:51:50 GMT",
+            "Connection",
+            "keep-alive",
+            "Keep-Alive",
+            "timeout=5"
         ],
         "responseIsBinary": false
     },
     {
-        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
+        "scope": "http://localhost:8080",
         "method": "OPTIONS",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/I0D3NimZQ9GKEDP/schema",
+        "path": "/v1/execute",
         "body": "",
         "status": 204,
         "response": "",
         "rawHeaders": [
-            "Date",
-            "Tue, 26 Jan 2021 01:54:05 GMT",
-            "Content-Length",
-            "0",
-            "X-Powered-By",
-            "Express",
-            "Access-Control-Allow-Origin",
-            "*",
-            "Access-Control-Allow-Methods",
+            "vary",
+            "Origin, Access-Control-Request-Headers",
+            "access-control-allow-origin",
+            "http://localhost",
+            "access-control-allow-methods",
             "GET,HEAD,PUT,PATCH,POST,DELETE",
-            "Vary",
-            "Access-Control-Request-Headers",
-            "Access-Control-Allow-Headers",
-            "Authorization",
-            "Via",
-            "1.1 google",
-            "Alt-Svc",
-            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+            "access-control-allow-headers",
+            "x-qore-engine-admin-secret",
+            "content-length",
+            "0",
+            "Date",
+            "Thu, 23 Dec 2021 05:51:50 GMT",
+            "Connection",
+            "keep-alive",
+            "Keep-Alive",
+            "timeout=5"
         ],
         "responseIsBinary": false
     },
     {
-        "scope": "https://p-qore-dot-pti-feedloop.et.r.appspot.com:443",
-        "method": "GET",
-        "path": "/orgs/lIdfC42DJCN2XzQ/projects/I0D3NimZQ9GKEDP/schema",
-        "body": "",
+        "scope": "http://localhost:8080",
+        "method": "POST",
+        "path": "/v1/execute",
+        "body": {
+            "operations": [
+                {
+                    "operation": "Insert",
+                    "instruction": {
+                        "table": "users",
+                        "name": "insertAyu",
+                        "data": {
+                            "external_id": "Ayu",
+                            "roleId": "cf2d14b2-34ae-4065-bc6b-419877bd2aee",
+                            "password": "123456"
+                        }
+                    }
+                },
+                {
+                    "operation": "Insert",
+                    "instruction": {
+                        "table": "product",
+                        "name": "insertBaju",
+                        "data": {
+                            "name": "Baju"
+                        }
+                    }
+                },
+                {
+                    "operation": "Insert",
+                    "instruction": {
+                        "table": "product",
+                        "name": "insertRok",
+                        "data": {
+                            "name": "Rok"
+                        }
+                    }
+                },
+                {
+                    "operation": "Insert",
+                    "instruction": {
+                        "table": "person",
+                        "name": "insertPerson",
+                        "data": {
+                            "name": "Budi"
+                        }
+                    }
+                },
+                {
+                    "operation": "Insert",
+                    "instruction": {
+                        "table": "todo",
+                        "name": "insertCoding",
+                        "data": {
+                            "title": "Coding"
+                        }
+                    }
+                }
+            ]
+        },
         "status": 200,
-        "response": [
-            "1f",
-            "8b",
-            "0800000000000003ed5ceb6fdb3610ff5704614036c02dba152b0663c3902dc95aa06983d62d300cfdc058b4cb560f4f8f764690ff7d77e4f1259bf2330fa7fa16c9d2f178fcddddef8e54aee29a5da6bc8a87ff5cc539cb783c8c339e5df2321ec4f57c86d7aca93fc29548dcdf2682a789f75a59a4dcbe4457094f792d8afca22c6a3ec6bfe2615d367c10277cc29ab47ecfd20606c99b34a521f49ba29aa56c7e86e3c4c3094b2b7e3d303af28c89d48e56f3ff6ab8da62342d28f18643159dd146457452d8d14a9e323995e5234a5d3b2658174a181a1e4c4a97e3226d32b04e3ce36505661ac4199847ccf019b298a762db22a3a2666954b3eab3a36891a6cd2c6098d56a82c0919257154d3976944d78558b5c1a013180d8f83088d9745af229abf1c171d1e4b824e3224f845a77b5c6bea197cf625608f932011010b1e3342e48e0aa79c881abf65caa26db76261f5999ec7d519e83d07d2e4c9c88c9448c016ef3e8b7e808c51f21683af1f667c961a55b7363cac5b7f38bb19448139bb112a2510dbe204353953653f4150fded2ebd14de95740e5b81433724d028f7a08d089ef2a61f48bc82b5e2246e98fe11504102b61187f279578ecde1c68f71c22e69550d08b9e94ea5de35dc7b5af61ec0dbde0384922b2838ec1bb1896251a2e7762d53d18e4855caa7dda44ad3919d933cbba5029728c7347a337ef4ea5b76c001d9d74245ef68e9e0b56555f8b52c25365f099bdb32c4552269009de7d740dff4703fe847e40546117985aff4789de9a1817971633c36de4db37636c34009003c082d16ab77405f248dcaa64b556d28d13d00da3bac169e7aabecbe5f3be992745095c84c10c3bd013e4738d14897602015a14d21ea217d123994468d225af9b321f2938e50d31d165a9e84390a0396492c8d5225b257d08b71dfc71254d5213f3356cf1473f83ec3ea62fcf1fbacda8c8ae34e865012c9d21bb5c7b29632911de90f101e1816f77a248d2ad0a1ea351ed3a2e2907961a387ea207244ab66ac813ce9254b86e982011dd609e0e6a122bac7ba2278638d9c95630c771a81a593a597764572049027e7dcaaa398c70ce1321b928523464a9ddda5de84a829661c7bac514269ade9842d1d42ee46e9b552e6fbcc2312d8acf5bd72c543b9ac86954068ff10a16f92018d00b376a5e6ee1a597ab13edc775cdc61f33ee962c13218be1b59d4c4100df1aa9d027323645f84aa763ee08dd6b3e12198f8ed3b418",
-            "eb1295165f47deed3ca206b19e542d6e187faf3c34fa35faf9c90fd1efd1d1dbe7afdf8c8ea26174f4f2f5abbf901bf956a65abdd3a69fa004fed1fa145ec2558739a59dd45b4e5ea0f7c8041b48891d21884f2798ed0c5094751b08fd80950702dd6bd3b02413684b511dcbbfa8b920aa53a8d38b925a2df8fb4573998ab1b901be9489aa82160eca73b3ef19346f2af0014cf0462cb9cea672af4c35a69a1e3a06aaab6626a3ba6e88603631ed912f827f7d813d2a198470fd745db793a413ea538174098a9d85ca0cba17f554fcddbb8235c4caf8da5d609617f93c2b1a44eefe169810a257982ef512ebd04b6b4c976691d5dccf795d0244f762cd05d8ec413f6f6d5c8bce946fedd39cfb43b90c1c18e0bdc091f3af11de8c9e66cddfc92fafdf7f7af46c92a4d347a779f6ee0b22039d0f9e3a83879e9ed333cfcee011fd844cb0d647a11cb05d64f9b6ac3be46aa22c97e6da9b4840cd15b143736d981be017a21fc2454d428a27f24a7d6ecd8cb159e32ae5559e20a42aca5a863c4f5f1272f37504a6bd4a4ca1358c2401674a43bbe631547b874ac697b784660435d19654d4e5066b8ca006b755710415b8c5faa3a50320d40508823485be29fa8f57fa1b1f594c1b030d29f55344612b7a8f490fa0653c44fd0eb736f211d3ee52f8e880a88a6149686b480bf2b1a95f5aea245411e80a48951acb78a496b2f1ae946f7ec73ffb0ef99e3be4414bf7fd72dc1e0d9aa7ef9eafda810c9aee067be9c13155dc4062f1ed75d65b4669e5b6560a23f66fb2d7b93cb81099dbabf296d955d07985b20425a892ffdb88920313c5dc8074b293092e17b245aad1820e23cb1df0b98316d82cb3567392b505d21f455b80491cc8298415f37a606712c2b385087ae85b73c1c91dce465d6b0aad90ee942b32eec156251da65061d084fc928b8a8a6da7f48e2ee7d1426fdac67dda8ff0aa1513f517dff3ea131bfe65236865fcef3b015072f69d80f8ee3a013681ddc37dc95618b0badee75dcaa0d2b82764a9c1ce5b4220ea16768482b3b9fb1dcca06a87bc9fd99a5438f3f999c8a640ffbeed7ad7c06cfe981bc769e543737fcd3c081b7b6a7b3554fef4f9af7d12bdb5b23698f5f9afcf7fe8e78b871b8290b1ee4a75e66e5f17586fa643c8a667bfc5299da0d27dfe43d32cee156c7b822768e80794ff6c9454e7744c67658373397826c8dded72b65bb63feb131489283fc0933fadf98479878a158f45622907850f5376cbc320a6c37a518aa28466bab28ad9165c5666c3a89dedd26fb85c6e2d88b5b5fa304cd339fdd1596f663a7aec7c610110df20c5f6acec0e59590bed4ec34f9f4f383b7ef916bea1f1fcc03d3965c20fc60c198fd77589abf8720e5d293a253488e1ab18753202a00447dcfa033d815cda3bcc1d3a8ce5497d1b8f0e1f810ff7650c6c44d391d480d73ec85ae11ef726fb320673abee1e0228f7fb894d771963d882fabe10ea42e2cd6a67149bf39d2cc16c039af7fbf6279de1869574bea3ef89f666b586fd76900075631f22b61ca4e70d6e3892dedff306e7dfe704e1728f53ec03a2342beb603af742f9083e60f91f5f0e41359d490000"
-        ],
+        "response": {
+            "results": {
+                "insertAyu": [
+                    {
+                        "id": 1,
+                        "external_id": "Ayu",
+                        "password": "a977d54cf21072f0aa2ecaaeb7b0f5c59338c18a4ed32cc231381f710d8f50ea",
+                        "created_at": "2021-12-23T05:50:40.407Z",
+                        "updated_at": "2021-12-23T05:50:40.407Z"
+                    }
+                ],
+                "insertBaju": [
+                    {
+                        "id": 1,
+                        "name": "Baju"
+                    }
+                ],
+                "insertRok": [
+                    {
+                        "id": 2,
+                        "name": "Rok"
+                    }
+                ],
+                "insertPerson": [
+                    {
+                        "id": 1,
+                        "name": "Budi"
+                    }
+                ],
+                "insertCoding": [
+                    {
+                        "id": 1,
+                        "title": "Coding"
+                    }
+                ]
+            }
+        },
         "rawHeaders": [
-            "Date",
-            "Tue, 26 Jan 2021 01:54:06 GMT",
-            "Content-Type",
+            "vary",
+            "Origin",
+            "access-control-allow-origin",
+            "http://localhost",
+            "content-type",
             "application/json; charset=utf-8",
-            "Vary",
-            "Accept-Encoding",
-            "X-Powered-By",
-            "Express",
-            "Access-Control-Allow-Origin",
-            "*",
-            "ETag",
-            "W/\"499d-dH/WkFuHbNrygS6ALKhXRXGicpw\"",
-            "Content-Encoding",
-            "gzip",
-            "Via",
-            "1.1 google",
-            "Alt-Svc",
-            "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
-            "Transfer-Encoding",
-            "chunked"
+            "content-length",
+            "371",
+            "Date",
+            "Thu, 23 Dec 2021 05:51:50 GMT",
+            "Connection",
+            "keep-alive",
+            "Keep-Alive",
+            "timeout=5"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "http://localhost:8080",
+        "method": "POST",
+        "path": "/v1/authorize",
+        "body": {
+            "identifier": "Ayu",
+            "password": "123456"
+        },
+        "status": 200,
+        "response": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBeXUiLCJyb2xlIjoidXNlciIsImlzcyI6InFvcmUtZW5naW5lIiwiaWF0IjoxNjQwMjM4NzEwfQ.2HBBkN4h7F20jFWNXhTzW7ZD0l3e_-5LiCXvaIbfO14"
+        },
+        "rawHeaders": [
+            "vary",
+            "Origin",
+            "access-control-allow-origin",
+            "http://localhost",
+            "content-type",
+            "application/json; charset=utf-8",
+            "content-length",
+            "179",
+            "Date",
+            "Thu, 23 Dec 2021 05:51:50 GMT",
+            "Connection",
+            "keep-alive",
+            "Keep-Alive",
+            "timeout=5"
         ],
         "responseIsBinary": false
     }

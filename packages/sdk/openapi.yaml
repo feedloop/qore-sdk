@@ -49,7 +49,11 @@ paths:
       requestBody:
         content:
           application/json:
-            examples: {}
+            examples:
+              as user:
+                value:
+                  identifier: Ayu
+                  role: user
             schema:
               properties:
                 identifier:
@@ -68,12 +72,42 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  id:
-                    type: number
                 required:
-                  - id
+                  - results
                 type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - name
+                        - active
+                        - up
+                        - down
+                        - schema
+                        - id
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        active:
+                          type: boolean
+                        schema:
+                          type: object
+                          additionalProperties: true
+                          required:
+                            - migration
+                            - operation
+                            - resource
+                        up:
+                          type: string
+                        down:
+                          type: string
+                        description:
+                          type: string
+                          nullable: true
       operationId: migrate
       requestBody:
         content:
@@ -127,14 +161,37 @@ paths:
                       resource: Role
                       migration:
                         name: picker
+                        deletionProtection: true
                     - operation: Create
                       resource: Role
                       migration:
                         name: user
+                    - operation: Create
+                      resource: Permission
+                      migration:
+                        role: picker
+                        tables:
+                          - order
+                          - product
+                        actions:
+                          - select
+                          - insert
+                          - update
+                          - delete
+                    - operation: Create
+                      resource: Permission
+                      migration:
+                        role: user
+                        tables:
+                          - order
+                        actions:
+                          - select
+                          - insert
                         condition:
                           $and:
-                            - userOrder_users_id:
-                                $eq: '{{user.id}}'
+                            - userOrder:
+                                external_id:
+                                  $eq: '{{user.id}}'
               'Create todo and person table (m:1)':
                 value:
                   operations:
@@ -204,6 +261,107 @@ paths:
                       resource: Role
                       migration:
                         name: maintainer
+              Create View to certain table:
+                value:
+                  operations:
+                    - operation: Create
+                      resource: Table
+                      migration:
+                        name: task
+                    - operation: Create
+                      resource: Column
+                      migration:
+                        name: title
+                        column:
+                          type: text
+                          definition:
+                            textType: text
+                            default: ''
+                            unique: false
+                        table: task
+                    - operation: Create
+                      resource: Column
+                      migration:
+                        name: is_done
+                        column:
+                          type: boolean
+                          definition:
+                            default: false
+                        table: task
+                    - operation: Create
+                      resource: Table
+                      migration:
+                        name: member
+                    - operation: Create
+                      resource: Column
+                      migration:
+                        name: name
+                        column:
+                          type: text
+                          definition:
+                            textType: text
+                            default: ''
+                            unique: false
+                        table: member
+                    - operation: Create
+                      resource: OneToManyRelation
+                      migration:
+                        name: memberTask
+                        one:
+                          table: member
+                        many:
+                          table: task
+                        onDelete: CASCADE
+                        onUpdate: CASCADE
+                    - operation: Create
+                      resource: Role
+                      migration:
+                        name: user
+                    - operation: Create
+                      resource: Permission
+                      migration:
+                        role: user
+                        tables:
+                          - task
+                        actions:
+                          - select
+                          - insert
+                        condition:
+                          $and:
+                            - memberTask:
+                                name:
+                                  $eq: '{{user.id}}'
+                    - operation: Create
+                      resource: Permission
+                      migration:
+                        role: user
+                        tables:
+                          - member
+                        actions:
+                          - select
+                        condition:
+                          $and:
+                            - name:
+                                $eq: '{{user.id}}'
+                    - operation: Create
+                      resource: View
+                      migration:
+                        name: memberTask
+                        table: task
+                        condition:
+                          $and:
+                            - is_done:
+                                $eq: '{{done}}'
+                        populate:
+                          - memberTask
+                        join: left
+                        groupBy:
+                          - id
+                        orderBy:
+                          title: ASC
+                        fields:
+                          - title
+                          - is_done
             schema:
               required:
                 - operations
@@ -233,6 +391,7 @@ paths:
                           - Permission
                           - Role
                           - Table
+                          - View
                       migration:
                         type: object
         required: true
@@ -443,6 +602,111 @@ paths:
                         data:
                           title: Leha - leha
                           personTodo_person_id: '{{insertPerson[0].id}}'
+              Populate View:
+                value:
+                  operations:
+                    - operation: Insert
+                      instruction:
+                        name: insertAlex
+                        table: users
+                        data:
+                          external_id: Alex
+                          roleId: userId
+                    - operation: Insert
+                      instruction:
+                        name: insertGloria
+                        table: users
+                        data:
+                          external_id: Gloria
+                          roleId: userId
+                    - operation: Insert
+                      instruction:
+                        name: insertAlexMember
+                        table: member
+                        data:
+                          name: Alex
+                    - operation: Insert
+                      instruction:
+                        name: insertGloriaMember
+                        table: member
+                        data:
+                          name: Gloria
+                    - operation: Insert
+                      instruction:
+                        name: insertLayouting
+                        table: task
+                        data:
+                          title: Layouting
+                          is_done: true
+                    - operation: Insert
+                      instruction:
+                        name: insertCooking
+                        table: task
+                        data:
+                          title: Cooking
+                    - operation: Insert
+                      instruction:
+                        name: insertStudying
+                        table: task
+                        data:
+                          title: Studying
+                    - operation: Insert
+                      instruction:
+                        name: insertCodingBackEnd
+                        table: task
+                        data:
+                          title: Coding Back End
+                    - operation: Insert
+                      instruction:
+                        name: insertCodingFrontEnd
+                        table: task
+                        data:
+                          title: Coding Front End
+                    - operation: AddRelation
+                      instruction:
+                        name: insertLayoutingTask
+                        table: task
+                        relation:
+                          name: memberTask
+                          data:
+                            origin: '{{insertLayouting[0].id}}'
+                            target: '{{insertAlexMember[0].id}}'
+                    - operation: AddRelation
+                      instruction:
+                        name: insertCodingTask
+                        table: task
+                        relation:
+                          name: memberTask
+                          data:
+                            origin: '{{insertCodingBackEnd[0].id}}'
+                            target: '{{insertAlexMember[0].id}}'
+                    - operation: AddRelation
+                      instruction:
+                        name: insertCodingTask
+                        table: task
+                        relation:
+                          name: memberTask
+                          data:
+                            origin: '{{insertCodingFrontEnd[0].id}}'
+                            target: '{{insertAlexMember[0].id}}'
+                    - operation: AddRelation
+                      instruction:
+                        name: insertCodingTask
+                        table: task
+                        relation:
+                          name: memberTask
+                          data:
+                            origin: '{{insertStudying[0].id}}'
+                            target: '{{insertAlexMember[0].id}}'
+                    - operation: AddRelation
+                      instruction:
+                        name: insertCodingTask
+                        table: task
+                        relation:
+                          name: memberTask
+                          data:
+                            origin: '{{insertCooking[0].id}}'
+                            target: '{{insertGloriaMember[0].id}}'
               Get all tasks:
                 value:
                   operations:
@@ -468,10 +732,27 @@ paths:
                     - operation: Select
                       instruction:
                         table: order
-                        name: selectPerson
+                        name: selectOrder
                         populate:
                           - productOrder
                         condition: {}
+              Select from View:
+                value:
+                  operations:
+                    - operation: Select
+                      instruction:
+                        name: selectTaskofUser
+                        view: memberTask
+                        condition:
+                          title:
+                            $like: Coding%
+                        orderBy:
+                          is_done: DESC
+                        limit: 1
+                        fields:
+                          - title
+                        params:
+                          done: false
             schema:
               type: object
               required:
@@ -492,10 +773,166 @@ paths:
                           - Insert
                           - Select
                           - Update
+                          - AddRelation
+                          - RemoveRelation
                       instruction:
                         type: object
                         required: []
         required: true
+  /v1/tables:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                required:
+                  - items
+                  - pagination
+                type: object
+                properties:
+                  pagination:
+                    type: object
+                    required: []
+                    properties:
+                      limit:
+                        type: number
+                        default: 50
+                      offset:
+                        type: number
+                        default: 0
+                      total:
+                        type: number
+                        default: 0
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                        - deletionProtection
+                        - isHidden
+                        - createdAt
+                        - columns
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        deletionProtection:
+                          type: boolean
+                        isHidden:
+                          type: boolean
+                        createdAt:
+                          type: number
+                        columns:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              fieldType:
+                                type: string
+                              active:
+                                type: boolean
+                              definition:
+                                type: object
+                                properties:
+                                  type:
+                                    type: string
+                                  definition:
+                                    type: object
+                                    properties:
+                                      default:
+                                        type: string
+                                        additionalProperties: true
+                                      unique:
+                                        type: boolean
+                                      textType:
+                                        type: string
+                                    required:
+                                      - default
+                            required: []
+      operationId: getTables
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: number
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: number
+            default: 0
+  /v1/schema:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tables:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tableName:
+                          type: string
+                        columns:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              type:
+                                type: string
+                              references:
+                                type: object
+                                properties:
+                                  targetTable:
+                                    type: string
+                                  column:
+                                    type: string
+                                required:
+                                  - column
+                                  - targetTable
+                            required:
+                              - name
+                              - type
+                        roles:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              permissions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    action:
+                                      type: string
+                                    condition:
+                                      type: object
+                                      additionalProperties: true
+                                  required:
+                                    - action
+                                    - condition
+                            required:
+                              - name
+                              - permissions
+                      required:
+                        - tableName
+                        - columns
+                        - roles
+      operationId: getSchema
   '/v1/table/{table}':
     get:
       responses:
