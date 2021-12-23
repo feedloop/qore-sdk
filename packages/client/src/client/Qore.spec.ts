@@ -51,13 +51,7 @@ type TestSchema = {
 const recorder = setupRecorder();
 
 describe("Qore SDK", () => {
-  process.env.QORE_SERVER = "http://localhost:8080";
-  const userToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBeXUiLCJyb2xlIjoidXNlciIsImlzcyI6InFvcmUtZW5naW5lIiwiaWF0IjoxNjQwMDc1OTY4fQ.lm6wxQjDFWzZ9o5B1sEBSdvcy4CWCoVpdoDd19sL8QA";
   let token: string | undefined;
-  let schema: any;
-  const endpoint = "http://localhost:8080";
-  let authenticationId: string | undefined;
   const config: QoreConfig = {
     endpoint: "http://localhost:8080",
     organizationId: "lIdfC42DJCN2XzQ",
