@@ -181,25 +181,11 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     }
     return this.views[viewId];
   }
-  init(schema: Record<string, any>) {
-    // const views = schema.views.map((view: any) => {
-    //   return new ViewDriver(
-    //     this,
-    //     this.project,
-    //     view.id,
-    //     view.tableId
-    //     // view.fields
-    //   );
-    // });
-    // for (const view of views) {
-    //   // @ts-ignore
-    //   this.views[view.id] = view;
-    // }
-  }
-  async currentUser(): Promise<any> {
-    // const currentUser = await this.project.axios.get("/me");
-    // return currentUser.data;
-  }
+
+  init(schema: Record<string, any>) {}
+
+  async currentUser(): Promise<any> {}
+
   async authenticate(email: string, password: string): Promise<string> {
     const config: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
