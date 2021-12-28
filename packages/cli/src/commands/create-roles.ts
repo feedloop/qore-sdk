@@ -26,7 +26,7 @@ export default class CreateRole extends Command {
   async run() {
     const { args } = this.parse(CreateRole);
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     const roles = args.roles.split(",");

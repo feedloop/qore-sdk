@@ -21,7 +21,7 @@ export default class AlterTable extends Command {
     const { formerName, newName } = args;
 
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     cli.action.start(

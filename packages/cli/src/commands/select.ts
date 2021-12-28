@@ -41,7 +41,7 @@ export default class Select extends Command {
     const { args, flags } = this.parse(Select);
     const { tableName } = args;
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     this.log(

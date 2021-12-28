@@ -10,12 +10,16 @@ export default class Login extends Command {
 
   async run() {
     const values = await prompts([
-      { name: "apiKey", type: "password", message: "Enter your apiKey" }
+      {
+        name: "adminSecret",
+        type: "password",
+        message: "Enter your admin secret"
+      }
     ]);
 
-    config.set("apiKey", values.apiKey);
+    config.set("adminSecret", values.adminSecret);
 
-    this.log(`\n\n${chalk.grey("Logged in")} ${chalk.green("success")} ...`);
+    this.log(`\n${chalk.grey("Admin secret set")}`);
     this.log(`\n${chalk.grey(`Welcome to qore-cli\n\n`)}`);
   }
 }

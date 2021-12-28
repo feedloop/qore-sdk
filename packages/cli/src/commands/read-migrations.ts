@@ -10,7 +10,7 @@ export default class ReadMigration extends Command {
 
   async run() {
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     this.log(`\n\n${chalk.yellow("Migration histories:")}\n`);

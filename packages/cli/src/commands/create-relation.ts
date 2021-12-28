@@ -30,7 +30,7 @@ export default class CreateRelation extends Command {
   async run() {
     const { args, flags } = this.parse(CreateRelation);
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
     const { relationType, tableOrigin, tableTarget } = args;
 

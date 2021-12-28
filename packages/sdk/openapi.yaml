@@ -49,7 +49,11 @@ paths:
       requestBody:
         content:
           application/json:
-            examples: {}
+            examples:
+              as user:
+                value:
+                  identifier: Ayu
+                  role: user
             schema:
               properties:
                 identifier:
@@ -127,14 +131,37 @@ paths:
                       resource: Role
                       migration:
                         name: picker
+                        deletionProtection: true
                     - operation: Create
                       resource: Role
                       migration:
                         name: user
+                    - operation: Create
+                      resource: Permission
+                      migration:
+                        role: picker
+                        tables:
+                          - order
+                          - product
+                        actions:
+                          - select
+                          - insert
+                          - update
+                          - delete
+                    - operation: Create
+                      resource: Permission
+                      migration:
+                        role: user
+                        tables:
+                          - order
+                        actions:
+                          - select
+                          - insert
                         condition:
                           $and:
-                            - userOrder_users_id:
-                                $eq: '{{user.id}}'
+                            - userOrder:
+                                external_id:
+                                  $eq: '{{user.id}}'
               'Create todo and person table (m:1)':
                 value:
                   operations:
@@ -468,7 +495,7 @@ paths:
                     - operation: Select
                       instruction:
                         table: order
-                        name: selectPerson
+                        name: selectOrder
                         populate:
                           - productOrder
                         condition: {}

@@ -29,7 +29,7 @@ export default class DropRole extends Command {
   async run() {
     const { args } = this.parse(DropRole);
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
     const roles = args.roles.split(",");
     const response = await inquirer.prompt([

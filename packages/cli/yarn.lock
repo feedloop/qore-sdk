@@ -1507,7 +1507,7 @@
     "slice-ansi" "0.0.4"
     "string-width" "^1.0.1"
 
-"cli-ux@^5.2.1":
+"cli-ux@^5.2.1", "cli-ux@^5.5.1":
   "integrity" "sha512-t3DT1U1C3rArLGYLpKa3m9dr/8uKZRI8HRm/rXKL7UTjm4c+Yd9zHNWg1tP8uaJkUbhmvx5SQHwb3VWpPUVdHQ=="
   "resolved" "https://registry.npmjs.org/cli-ux/-/cli-ux-5.5.1.tgz"
   "version" "5.5.1"
@@ -2242,6 +2242,9 @@
   "integrity" "sha1-FQStJSMVjKpA20onh8sBQRmU6k8="
   "resolved" "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   "version" "1.0.0"
+
+"fsevents@^2.1.2":
+  "version" "2.3.2"
 
 "function-bind@^1.1.1":
   "integrity" "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A=="

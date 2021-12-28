@@ -12,7 +12,7 @@ export default class Rollback extends Command {
 
   async run() {
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     const response = await inquirer.prompt([

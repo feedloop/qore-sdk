@@ -30,7 +30,7 @@ export default class CreatePermission extends Command {
       : { $and: [] };
 
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     this.log(`${chalk.yellow(`\nRunning process`)} ...\n`);

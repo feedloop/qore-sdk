@@ -29,7 +29,7 @@ export default class DropTable extends Command {
     const { args } = this.parse(DropTable);
     const listTables = args.tablesName.split(",");
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     const confirmation = await inquirer.prompt([

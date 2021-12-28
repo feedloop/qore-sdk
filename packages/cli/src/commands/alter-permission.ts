@@ -32,7 +32,7 @@ export default class AlterPermission extends Command {
       ? ["*"]
       : tables.split(",");
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     const statement = listTables.includes("*") ? "all" : listTables;
