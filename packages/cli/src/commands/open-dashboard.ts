@@ -10,7 +10,9 @@ export default class OpenDashboard extends Command {
 
   async run() {
     const url = config.get("url");
+    const adminSecret = config.get("adminSecret");
+    const parsedUrl = url + `/?ADMIN-SECRET=${adminSecret}`;
     this.log(`\n\n ${chalk.blue(`opening ${url} on browser....`)} \n\n`);
-    await cli.open(url);
+    await cli.open(parsedUrl);
   }
 }

@@ -12,14 +12,24 @@ export default class Login extends Command {
     const values = await prompts([
       {
         name: "adminSecret",
-        type: "password",
-        message: "Enter your admin secret"
+        type: "text",
+        message: "Enter your admin secret (default: admin-secret)"
+      },
+      {
+        name: "url",
+        type: "text",
+        message: "Enter your project url (default: http://localhost:8080)"
       }
     ]);
+    this.log("test");
+    this.log(values.url);
+    if (values.url[values.url.length - 1] === "/") {
+      values.url = values.url.substring(0, values.url.length - 1);
+    }
+    config.set("adminSecret", values.adminSecret || "admin-secret");
+    config.set("url", values.url || "http://localhost:8080");
 
-    config.set("adminSecret", values.adminSecret);
-
-    this.log(`\n${chalk.grey("Admin secret set")}`);
+    this.log(`\n${chalk.grey("Context set")}`);
     this.log(`\n${chalk.grey(`Welcome to qore-cli\n\n`)}`);
   }
 }

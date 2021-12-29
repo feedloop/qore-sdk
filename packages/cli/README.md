@@ -32,6 +32,7 @@ USAGE
 * [`qore alter-permission`](#qore-alter-permission)
 * [`qore alter-role [FORMERNAME] [NEWNAME]`](#qore-alter-role-formername-newname)
 * [`qore alter-table [FORMERNAME] [NEWNAME]`](#qore-alter-table-formername-newname)
+* [`qore context`](#qore-context)
 * [`qore create-columns`](#qore-create-columns)
 * [`qore create-permission`](#qore-create-permission)
 * [`qore create-relation [RELATIONTYPE] [TABLEORIGIN] [TABLETARGET]`](#qore-create-relation-relationtype-tableorigin-tabletarget)
@@ -113,6 +114,18 @@ EXAMPLE
 ```
 
 _See code: [src/commands/alter-table.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/alter-table.ts)_
+
+## `qore context`
+
+```
+USAGE
+  $ qore context
+
+EXAMPLE
+  $ qore set-url
+```
+
+_See code: [src/commands/context.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/context.ts)_
 
 ## `qore create-columns`
 
