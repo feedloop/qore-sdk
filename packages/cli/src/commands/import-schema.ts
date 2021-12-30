@@ -48,17 +48,20 @@ export default class ImportSchema extends Command {
 
   async run() {
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
     const { flags } = this.parse(ImportSchema);
     const location = path.resolve(path.join(process.cwd(), flags.location));
     fs.readdir(location, async (err, files) => {
       try {
         if (err) return this.error(err);
-
         this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
         const latestID = await this.getLatestMigrationID(client);
         const operations = [];
+        files.sort(
+          (a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]
+        );
+        files.splice(0, 6);
         for (const file of files) {
           const jsonFile = await import(`${location}/${file}`);
           const { id, name, schema } = jsonFile.default;

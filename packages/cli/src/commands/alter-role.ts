@@ -20,7 +20,7 @@ export default class AlterRole extends Command {
     const { args } = this.parse(AlterRole);
     const { formerName, newName } = args;
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     cli.action.start(

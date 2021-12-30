@@ -35,7 +35,7 @@ export default class CreateColumn extends Command {
   async run() {
     const { flags } = this.parse(CreateColumn);
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     const columns = flags.columns.split(",");

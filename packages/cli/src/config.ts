@@ -1,9 +1,18 @@
 import Conf, { Schema } from "conf";
 
-export type CLIConfig = { apiKey: string };
+export type CLIConfig = { adminSecret: string; url: string };
 
 export const schema: Schema<CLIConfig> = {
-  apiKey: { type: "string", description: "apiKey" }
+  adminSecret: {
+    type: "string",
+    description: "admin secret",
+    default: "admin-secret"
+  },
+  url: {
+    type: "string",
+    description: "project url",
+    default: "http://localhost:8080/"
+  }
 };
 
 const config = new Conf({

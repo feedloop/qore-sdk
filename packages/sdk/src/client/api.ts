@@ -173,6 +173,12 @@ export interface InlineResponse2001Results {
    * @memberof InlineResponse2001Results
    */
   description?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof InlineResponse2001Results
+   */
+  createdAt?: number;
 }
 /**
  *
@@ -321,81 +327,6 @@ export interface InlineResponse2005 {
 /**
  *
  * @export
- * @interface InlineResponse2005Columns
- */
-export interface InlineResponse2005Columns {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2005Columns
-   */
-  name?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2005Columns
-   */
-  fieldType?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof InlineResponse2005Columns
-   */
-  active?: boolean;
-  /**
-   *
-   * @type {InlineResponse2005Definition}
-   * @memberof InlineResponse2005Columns
-   */
-  definition?: InlineResponse2005Definition;
-}
-/**
- *
- * @export
- * @interface InlineResponse2005Definition
- */
-export interface InlineResponse2005Definition {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2005Definition
-   */
-  type?: string;
-  /**
-   *
-   * @type {InlineResponse2005DefinitionDefinition}
-   * @memberof InlineResponse2005Definition
-   */
-  definition?: InlineResponse2005DefinitionDefinition;
-}
-/**
- *
- * @export
- * @interface InlineResponse2005DefinitionDefinition
- */
-export interface InlineResponse2005DefinitionDefinition {
-  /**
-   *
-   * @type {{ [key: string]: object; }}
-   * @memberof InlineResponse2005DefinitionDefinition
-   */
-  default: { [key: string]: object };
-  /**
-   *
-   * @type {boolean}
-   * @memberof InlineResponse2005DefinitionDefinition
-   */
-  unique?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2005DefinitionDefinition
-   */
-  textType?: string;
-}
-/**
- *
- * @export
  * @interface InlineResponse2005Items
  */
 export interface InlineResponse2005Items {
@@ -404,7 +335,7 @@ export interface InlineResponse2005Items {
    * @type {string}
    * @memberof InlineResponse2005Items
    */
-  id: string;
+  id?: string;
   /**
    *
    * @type {string}
@@ -425,16 +356,28 @@ export interface InlineResponse2005Items {
   isHidden: boolean;
   /**
    *
-   * @type {number}
+   * @type {{ [key: string]: object; }}
    * @memberof InlineResponse2005Items
    */
-  createdAt: number;
+  createdAt: { [key: string]: object };
   /**
    *
-   * @type {Array<InlineResponse2005Columns>}
+   * @type {{ [key: string]: object; }}
    * @memberof InlineResponse2005Items
    */
-  columns: Array<InlineResponse2005Columns>;
+  updatedAt: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  columns: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  view: { [key: string]: object };
 }
 /**
  *
@@ -447,7 +390,7 @@ export interface InlineResponse2006 {
    * @type {Array<InlineResponse2006Tables>}
    * @memberof InlineResponse2006
    */
-  tables?: Array<InlineResponse2006Tables>;
+  tables: Array<InlineResponse2006Tables>;
 }
 /**
  *
@@ -472,7 +415,7 @@ export interface InlineResponse2006Columns {
    * @type {InlineResponse2006References}
    * @memberof InlineResponse2006Columns
    */
-  references?: InlineResponse2006References;
+  references?: InlineResponse2006References | null;
 }
 /**
  *

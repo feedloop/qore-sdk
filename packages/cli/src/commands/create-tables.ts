@@ -30,7 +30,7 @@ export default class CreateTable extends Command {
     const { args } = this.parse(CreateTable);
     const listTables = args.tablesName.split(",");
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
 
     const operations = listTables.map((table: string) => {

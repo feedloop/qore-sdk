@@ -2,28 +2,21 @@ import { flags } from "@oclif/command";
 import prompts from "prompts";
 import config, { CLIConfig, schema } from "./config";
 
-export const projectFlag = flags.string({
-  name: "project",
-  description: "project id",
-  default: () => config.get("project")
+export const adminSecretFlag = flags.string({
+  name: "adminSecret",
+  description: "admin secret",
+  default: () => config.get("project") as string
 });
 
-export const orgFlag = flags.string({
-  name: "org",
-  description: "organization id",
-  default: () => config.get("org")
-});
-
-export const tokenFlag = flags.string({
-  name: "token",
-  description: "organization id",
-  default: () => config.get("token")
+export const urlFlag = flags.string({
+  name: "url",
+  description: "project url",
+  default: () => config.get("project") as string
 });
 
 export const configFlags: flags.Input<CLIConfig> = {
-  project: projectFlag,
-  org: orgFlag,
-  token: tokenFlag
+  adminSecret: adminSecretFlag,
+  url: urlFlag
 };
 
 export const promptFlags = async <T = {}>(

@@ -937,7 +937,7 @@
 
 "@feedloop/qore-client@^0.1.35":
   version "0.1.35"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-0.1.35.tgz#a1470724420235d99a9dbef4a1fbf7ca66673bc7"
+  resolved "https://registry.npmjs.org/@feedloop/qore-client/-/qore-client-0.1.35.tgz#a1470724420235d99a9dbef4a1fbf7ca66673bc7"
   integrity sha512-GQc9AxmKiM81sz/QYbPDHNqBkacJHZ8t3e2CFt0UQ9QHuRSFXfNupNqiDIwEi0ucj+Cu72XnaG3eoYJDEcSaLA==
   dependencies:
     "@feedloop/qore-sdk" "^0.1.8"

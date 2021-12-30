@@ -67,7 +67,7 @@ export default class ExportSchema extends Command {
 
   async run() {
     const client = new DefaultApi(
-      new Configuration({ apiKey: config.get("apiKey") })
+      new Configuration({ apiKey: config.get("adminSecret") })
     );
     const { flags } = this.parse(ExportSchema);
     const location = path.resolve(path.join(process.cwd(), flags.location));
