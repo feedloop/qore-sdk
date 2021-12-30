@@ -13,7 +13,6 @@ import networkExchange from "../exchanges/networkExchange";
 import { ViewDriver } from "./ViewDriver";
 import cacheExchange from "../exchanges/cacheExchange";
 import dedupeExchange from "../exchanges/dedupeExchange";
-import { QoreProjectSchema } from "@feedloop/qore-sdk";
 
 export type RelationValue = { id: string } | Array<{ id: string }>;
 
@@ -42,9 +41,7 @@ export class QoreProject {
   constructor(config: QoreConfig) {
     this.config = config;
     this.axios = Axios.create({
-      baseURL: `${config.endpoint || "http://localhost:8080"}/${
-        this.config.projectId
-      }`
+      baseURL: `${config.endpoint || "http://localhost:8080"}`
     });
     this.axios.interceptors.request.use(async req => {
       const getTokenResult = this.config.getToken && this.config.getToken();
@@ -184,32 +181,18 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     }
     return this.views[viewId];
   }
-  init(schema: QoreProjectSchema) {
-    const views = schema.views.map(view => {
-      return new ViewDriver(
-        this,
-        this.project,
-        view.id,
-        view.tableId,
-        view.fields
-      );
-    });
-    for (const view of views) {
-      // @ts-ignore
-      this.views[view.id] = view;
-    }
-  }
-  async currentUser(): Promise<any> {
-    const currentUser = await this.project.axios.get("/me");
-    return currentUser.data;
-  }
+
+  init(schema: Record<string, any>) {}
+
+  async currentUser(): Promise<any> {}
+
   async authenticate(email: string, password: string): Promise<string> {
     const config: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
-      url: `/project-authenticate/${this.project.config.projectId}`,
+      url: "/v1/authorize",
       method: "post",
       headers: {
-        "X-Qore-Authentication": this.project.config.authenticationId
+        "X-API-KEY": "admin-secret"
       },
       data: { identifier: email, password }
     };

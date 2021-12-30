@@ -120,10 +120,65 @@ export interface InlineResponse200 {
 export interface InlineResponse2001 {
   /**
    *
-   * @type {number}
+   * @type {Array<InlineResponse2001Results>}
    * @memberof InlineResponse2001
    */
+  results: Array<InlineResponse2001Results>;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2001Results
+ */
+export interface InlineResponse2001Results {
+  /**
+   *
+   * @type {number}
+   * @memberof InlineResponse2001Results
+   */
   id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2001Results
+   */
+  name: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof InlineResponse2001Results
+   */
+  active: boolean;
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2001Results
+   */
+  schema: { [key: string]: object };
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2001Results
+   */
+  up: string;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2001Results
+   */
+  down: string;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2001Results
+   */
+  description?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof InlineResponse2001Results
+   */
+  createdAt?: number;
 }
 /**
  *
@@ -258,33 +313,227 @@ export interface InlineResponse2004 {
 export interface InlineResponse2005 {
   /**
    *
-   * @type {Array<{ [key: string]: object; }>}
+   * @type {InlineResponse2003Pagination}
    * @memberof InlineResponse2005
    */
-  items: Array<{ [key: string]: object }>;
+  pagination: InlineResponse2003Pagination;
   /**
    *
-   * @type {InlineResponse2005Pagination}
+   * @type {Array<InlineResponse2005Items>}
    * @memberof InlineResponse2005
    */
-  pagination: InlineResponse2005Pagination;
+  items: Array<InlineResponse2005Items>;
 }
 /**
  *
  * @export
- * @interface InlineResponse2005Pagination
+ * @interface InlineResponse2005Items
  */
-export interface InlineResponse2005Pagination {
+export interface InlineResponse2005Items {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2005Items
+   */
+  id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2005Items
+   */
+  name: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof InlineResponse2005Items
+   */
+  deletionProtection: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof InlineResponse2005Items
+   */
+  isHidden: boolean;
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  createdAt: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  updatedAt: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  columns: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  view: { [key: string]: object };
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006
+ */
+export interface InlineResponse2006 {
+  /**
+   *
+   * @type {Array<InlineResponse2006Tables>}
+   * @memberof InlineResponse2006
+   */
+  tables: Array<InlineResponse2006Tables>;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Columns
+ */
+export interface InlineResponse2006Columns {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Columns
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Columns
+   */
+  type: string;
+  /**
+   *
+   * @type {InlineResponse2006References}
+   * @memberof InlineResponse2006Columns
+   */
+  references?: InlineResponse2006References | null;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Permissions
+ */
+export interface InlineResponse2006Permissions {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Permissions
+   */
+  action: string;
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2006Permissions
+   */
+  condition: { [key: string]: object };
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006References
+ */
+export interface InlineResponse2006References {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006References
+   */
+  targetTable: string;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006References
+   */
+  column: string;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Roles
+ */
+export interface InlineResponse2006Roles {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Roles
+   */
+  name: string;
+  /**
+   *
+   * @type {Array<InlineResponse2006Permissions>}
+   * @memberof InlineResponse2006Roles
+   */
+  permissions: Array<InlineResponse2006Permissions>;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Tables
+ */
+export interface InlineResponse2006Tables {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Tables
+   */
+  tableName: string;
+  /**
+   *
+   * @type {Array<InlineResponse2006Columns>}
+   * @memberof InlineResponse2006Tables
+   */
+  columns: Array<InlineResponse2006Columns>;
+  /**
+   *
+   * @type {Array<InlineResponse2006Roles>}
+   * @memberof InlineResponse2006Tables
+   */
+  roles: Array<InlineResponse2006Roles>;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2007
+ */
+export interface InlineResponse2007 {
+  /**
+   *
+   * @type {Array<{ [key: string]: object; }>}
+   * @memberof InlineResponse2007
+   */
+  items: Array<{ [key: string]: object }>;
+  /**
+   *
+   * @type {InlineResponse2007Pagination}
+   * @memberof InlineResponse2007
+   */
+  pagination: InlineResponse2007Pagination;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2007Pagination
+ */
+export interface InlineResponse2007Pagination {
   /**
    *
    * @type {number}
-   * @memberof InlineResponse2005Pagination
+   * @memberof InlineResponse2007Pagination
    */
   page: number;
   /**
    *
    * @type {number}
-   * @memberof InlineResponse2005Pagination
+   * @memberof InlineResponse2007Pagination
    */
   total: number;
 }
@@ -316,7 +565,9 @@ export enum V1ExecuteOperationsOperationEnum {
   Delete = "Delete",
   Insert = "Insert",
   Select = "Select",
-  Update = "Update"
+  Update = "Update",
+  AddRelation = "AddRelation",
+  RemoveRelation = "RemoveRelation"
 }
 
 /**
@@ -364,7 +615,8 @@ export enum V1MigrateOperationsResourceEnum {
   OneToManyRelation = "OneToManyRelation",
   Permission = "Permission",
   Role = "Role",
-  Table = "Table"
+  Table = "Table",
+  View = "View"
 }
 
 /**
@@ -805,6 +1057,116 @@ export const DefaultApiAxiosParamCreator = function (
 
       if (populate) {
         localVarQueryParameter["populate"] = populate;
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getSchema: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/v1/schema`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication ApiKeyAuth required
+      await setApiKeyToObject(
+        localVarHeaderParameter,
+        "x-qore-engine-admin-secret",
+        configuration
+      );
+
+      // authentication bearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {number} [limit]
+     * @param {number} [offset]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getTables: async (
+      limit?: number,
+      offset?: number,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/v1/tables`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication ApiKeyAuth required
+      await setApiKeyToObject(
+        localVarHeaderParameter,
+        "x-qore-engine-admin-secret",
+        configuration
+      );
+
+      // authentication bearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      if (limit !== undefined) {
+        localVarQueryParameter["limit"] = limit;
+      }
+
+      if (offset !== undefined) {
+        localVarQueryParameter["offset"] = offset;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -1301,13 +1663,65 @@ export const DefaultApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string
-      ) => AxiosPromise<InlineResponse2005>
+      ) => AxiosPromise<InlineResponse2007>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getRows(
         table,
         limit,
         offset,
         populate,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getSchema(
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<InlineResponse2006>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getSchema(
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     *
+     * @param {number} [limit]
+     * @param {number} [offset]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getTables(
+      limit?: number,
+      offset?: number,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<InlineResponse2005>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getTables(
+        limit,
+        offset,
         options
       );
       return createRequestFunction(
@@ -1556,9 +1970,35 @@ export const DefaultApiFactory = function (
       offset?: number,
       populate?: Array<string>,
       options?: any
-    ): AxiosPromise<InlineResponse2005> {
+    ): AxiosPromise<InlineResponse2007> {
       return localVarFp
         .getRows(table, limit, offset, populate, options)
+        .then(request => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getSchema(options?: any): AxiosPromise<InlineResponse2006> {
+      return localVarFp
+        .getSchema(options)
+        .then(request => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {number} [limit]
+     * @param {number} [offset]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getTables(
+      limit?: number,
+      offset?: number,
+      options?: any
+    ): AxiosPromise<InlineResponse2005> {
+      return localVarFp
+        .getTables(limit, offset, options)
         .then(request => request(axios, basePath));
     },
     /**
@@ -1748,6 +2188,36 @@ export class DefaultApi extends BaseAPI {
   ) {
     return DefaultApiFp(this.configuration)
       .getRows(table, limit, offset, populate, options)
+      .then(request => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DefaultApi
+   */
+  public getSchema(options?: AxiosRequestConfig) {
+    return DefaultApiFp(this.configuration)
+      .getSchema(options)
+      .then(request => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {number} [limit]
+   * @param {number} [offset]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DefaultApi
+   */
+  public getTables(
+    limit?: number,
+    offset?: number,
+    options?: AxiosRequestConfig
+  ) {
+    return DefaultApiFp(this.configuration)
+      .getTables(limit, offset, options)
       .then(request => request(this.axios, this.basePath));
   }
 

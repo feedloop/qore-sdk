@@ -198,7 +198,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             }
             if (data) {
               setError(null);
-              setData(data.nodes);
+              setData(data.results.data);
               setStatus("success");
             }
           });
@@ -210,7 +210,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const revalidate = React.useCallback(
           async (config?: Partial<QoreOperationConfig>) => {
             const result = await stream.revalidate(config);
-            return result;
+
+            return {
+              ...result,
+              data: { nodes: result.data?.results.data || [] }
+            };
           },
           [stream.revalidate]
         );

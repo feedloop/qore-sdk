@@ -14,4 +14,4 @@ jobs:
           yarn lerna bootstrap --npm-client yarn
           yarn lerna run build
           cd packages/react
-          yarn test
+          yarn tsc --noEmit
