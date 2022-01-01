@@ -14,6 +14,7 @@ import QoreClient, {
   defaultOperationConfig
 } from "./Qore";
 import { ConditionalPick, ConditionalExcept } from "type-fest";
+import { map, pipe } from "wonka";
 
 export class FormDriver<T extends QoreViewSchema["forms"][string]> {
   project: QoreProject;
@@ -132,7 +133,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       T["params"] = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<
-    QoreOperationResult<AxiosRequestConfig, { results: { data: T["read"][] } }>
+    QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
   > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> } {
     const axiosConfig: AxiosRequestConfig = {
       url: `/v1/execute`,
@@ -160,13 +161,17 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       meta: {},
       ...{ ...defaultOperationConfig, ...config }
     };
-    const stream = this.client.execute(operation) as PromisifiedSource<
-      QoreOperationResult<
-        AxiosRequestConfig,
-        { results: { data: T["read"][] } }
-      >
+    const stream = this.client.execute(operation);
+    const mappedStream = pipe(
+      stream,
+      map(result => ({
+        ...result,
+        data: { nodes: result.data?.results.data || [] }
+      }))
+    ) as PromisifiedSource<
+      QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
     > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> };
-    stream.fetchMore = async fetchMoreOpts => {
+    mappedStream.fetchMore = async fetchMoreOpts => {
       const existingItems = await stream.revalidate({
         networkPolicy: "cache-only"
       });
@@ -175,13 +180,13 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         networkPolicy: "cache-only",
         optimisticResponse: {
           nodes: [
-            ...(existingItems.data?.results.data || []),
-            ...(moreItems.data?.results.data || [])
+            ...(existingItems.data?.nodes || []),
+            ...(moreItems.data?.nodes || [])
           ]
         }
       });
     };
-    return stream;
+    return mappedStream;
   }
 
   readRow(
