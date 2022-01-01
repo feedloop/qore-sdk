@@ -1,14 +1,14 @@
 {
   "name": "@feedloop/qore-cli",
   "description": "qore cli",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.3",
   "author": "Rizki Romadhoni @rrmdn",
   "bin": {
     "qore": "./bin/run"
   },
   "bugs": "https://github.com/rrmdn/cli/issues",
   "dependencies": {
-    "@feedloop/qore-sdk": "^2.0.0-alpha.2",
+    "@feedloop/qore-sdk": "^2.0.0-alpha.3",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
