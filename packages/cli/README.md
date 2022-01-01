@@ -19,7 +19,7 @@ $ npm install -g @feedloop/qore-cli
 $ qore COMMAND
 running command...
 $ qore (-v|--version|version)
-@feedloop/qore-cli/2.0.0-alpha.1 darwin-x64 node-v14.15.4
+@feedloop/qore-cli/2.0.0-alpha.2 linux-x64 node-v16.10.0
 $ qore --help [COMMAND]
 USAGE
   $ qore COMMAND
@@ -57,6 +57,8 @@ USAGE
 
 ## `qore alter-column [FORMERNAME] [NEWNAME]`
 
+Rename column from specific table
+
 ```
 USAGE
   $ qore alter-column [FORMERNAME] [NEWNAME]
@@ -68,9 +70,11 @@ EXAMPLES
   $ qore alter-column formerName newName --table tableName
 ```
 
-_See code: [src/commands/alter-column.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/alter-column.ts)_
+_See code: [src/commands/alter-column.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/alter-column.ts)_
 
 ## `qore alter-permission`
+
+Change condition in permissions table for specific role
 
 ```
 USAGE
@@ -89,9 +93,11 @@ EXAMPLES
   } ]}' --tables todos,projects
 ```
 
-_See code: [src/commands/alter-permission.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/alter-permission.ts)_
+_See code: [src/commands/alter-permission.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/alter-permission.ts)_
 
 ## `qore alter-role [FORMERNAME] [NEWNAME]`
+
+Rename specific role
 
 ```
 USAGE
@@ -101,9 +107,11 @@ EXAMPLE
   $ qore alter-role formerName newName
 ```
 
-_See code: [src/commands/alter-role.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/alter-role.ts)_
+_See code: [src/commands/alter-role.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/alter-role.ts)_
 
 ## `qore alter-table [FORMERNAME] [NEWNAME]`
+
+Rename specific table
 
 ```
 USAGE
@@ -113,9 +121,11 @@ EXAMPLE
   $ qore alter-table formerName newName
 ```
 
-_See code: [src/commands/alter-table.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/alter-table.ts)_
+_See code: [src/commands/alter-table.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/alter-table.ts)_
 
 ## `qore context`
+
+Set base url for project access
 
 ```
 USAGE
@@ -125,9 +135,11 @@ EXAMPLE
   $ qore set-url
 ```
 
-_See code: [src/commands/context.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/context.ts)_
+_See code: [src/commands/context.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/context.ts)_
 
 ## `qore create-columns`
+
+Create new columns in specific table
 
 ```
 USAGE
@@ -141,9 +153,11 @@ EXAMPLE
   $ qore create-columns --table todo --columns title:text,status:boolean
 ```
 
-_See code: [src/commands/create-columns.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/create-columns.ts)_
+_See code: [src/commands/create-columns.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/create-columns.ts)_
 
 ## `qore create-permission`
+
+Create permission for specific role in specific tables
 
 ```
 USAGE
@@ -159,9 +173,11 @@ EXAMPLE
   $ qore create-permission --role users --tables todos,projects --actions select,delete --condition '{"$and": []}'
 ```
 
-_See code: [src/commands/create-permission.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/create-permission.ts)_
+_See code: [src/commands/create-permission.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/create-permission.ts)_
 
 ## `qore create-relation [RELATIONTYPE] [TABLEORIGIN] [TABLETARGET]`
+
+Create relation 1:m for one-to-many or m:n for many-to-many relation
 
 ```
 USAGE
@@ -174,9 +190,11 @@ EXAMPLE
   $ qore create-relation relationType tableOrigin tableTarget --relation personTodo
 ```
 
-_See code: [src/commands/create-relation.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/create-relation.ts)_
+_See code: [src/commands/create-relation.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/create-relation.ts)_
 
 ## `qore create-roles [ROLES]`
+
+Create new roles
 
 ```
 USAGE
@@ -186,9 +204,11 @@ EXAMPLE
   $ qore create-roles user,engineer
 ```
 
-_See code: [src/commands/create-roles.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/create-roles.ts)_
+_See code: [src/commands/create-roles.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/create-roles.ts)_
 
 ## `qore create-tables [TABLESNAME]`
+
+Create tables
 
 ```
 USAGE
@@ -202,9 +222,11 @@ EXAMPLES
   $ qore create-tables todos,projects
 ```
 
-_See code: [src/commands/create-tables.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/create-tables.ts)_
+_See code: [src/commands/create-tables.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/create-tables.ts)_
 
 ## `qore drop-columns [COLUMNSNAME]`
+
+Drop columns from specific table
 
 ```
 USAGE
@@ -220,9 +242,11 @@ EXAMPLE
   $ qore drop-columns title,status --table todos
 ```
 
-_See code: [src/commands/drop-columns.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/drop-columns.ts)_
+_See code: [src/commands/drop-columns.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/drop-columns.ts)_
 
 ## `qore drop-permission [ACTION]`
+
+Drop action permission for role in tables
 
 ```
 USAGE
@@ -240,9 +264,11 @@ EXAMPLES
   $ qore drop-permission delete --role user --tables todos,projects
 ```
 
-_See code: [src/commands/drop-permission.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/drop-permission.ts)_
+_See code: [src/commands/drop-permission.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/drop-permission.ts)_
 
 ## `qore drop-relation [RELATIONTYPE] [TABLEORIGIN/TABLEONE] [TABLETARGET/TABLEMANY]`
+
+Drop relation column in 1:m or drop junction table if m:n relation
 
 ```
 USAGE
@@ -256,9 +282,11 @@ EXAMPLES
   $ qore drop-relation m:n tableOrigin/tableOne tableTarget/tableMany --relation personProject
 ```
 
-_See code: [src/commands/drop-relation.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/drop-relation.ts)_
+_See code: [src/commands/drop-relation.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/drop-relation.ts)_
 
 ## `qore drop-roles [ROLES]`
+
+Drop some roles
 
 ```
 USAGE
@@ -272,9 +300,11 @@ EXAMPLES
   $ qore drop-roles developer
 ```
 
-_See code: [src/commands/drop-roles.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/drop-roles.ts)_
+_See code: [src/commands/drop-roles.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/drop-roles.ts)_
 
 ## `qore drop-tables [TABLESNAME]`
+
+Drop specific table
 
 ```
 USAGE
@@ -288,9 +318,11 @@ EXAMPLES
   $ qore drop-tables todos,projects
 ```
 
-_See code: [src/commands/drop-tables.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/drop-tables.ts)_
+_See code: [src/commands/drop-tables.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/drop-tables.ts)_
 
 ## `qore export-schema`
+
+Populate json file for all migrations process
 
 ```
 USAGE
@@ -303,9 +335,11 @@ EXAMPLE
   $ qore export-schema --location migrations
 ```
 
-_See code: [src/commands/export-schema.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/export-schema.ts)_
+_See code: [src/commands/export-schema.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/export-schema.ts)_
 
 ## `qore help [COMMAND]`
+
+display help for qore
 
 ```
 USAGE
@@ -318,9 +352,11 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.0/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.3.1/src/commands/help.ts)_
 
 ## `qore import-schema`
+
+Import-schema in specific folder for other database architecture
 
 ```
 USAGE
@@ -333,10 +369,12 @@ EXAMPLE
   $ qore import-schema --location
 ```
 
-_See code: [src/commands/import-schema.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/import-schema.ts)_
+_See code: [src/commands/import-schema.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/import-schema.ts)_
 
 ## `qore login`
 
+Login to qore cli
+
 ```
 USAGE
   $ qore login
@@ -345,10 +383,12 @@ EXAMPLE
   $ qore login
 ```
 
-_See code: [src/commands/login.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/login.ts)_
 
 ## `qore logout`
 
+Logout from qore cli
+
 ```
 USAGE
   $ qore logout
@@ -357,10 +397,12 @@ EXAMPLE
   $ qore logout
 ```
 
-_See code: [src/commands/logout.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/logout.ts)_
+_See code: [src/commands/logout.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/logout.ts)_
 
 ## `qore open-dashboard`
 
+Open project dashboard on browser
+
 ```
 USAGE
   $ qore open-dashboard
@@ -369,10 +411,12 @@ EXAMPLE
   $ qore open-dashboard
 ```
 
-_See code: [src/commands/open-dashboard.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/open-dashboard.ts)_
+_See code: [src/commands/open-dashboard.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/open-dashboard.ts)_
 
 ## `qore ping`
 
+Ping
+
 ```
 USAGE
   $ qore ping
@@ -381,10 +425,12 @@ EXAMPLE
   $ qore ping
 ```
 
-_See code: [src/commands/ping.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/ping.ts)_
+_See code: [src/commands/ping.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/ping.ts)_
 
 ## `qore read-migrations`
 
+Read/see migrations histories
+
 ```
 USAGE
   $ qore read-migrations
@@ -393,10 +439,12 @@ EXAMPLE
   $ qore read-migrations
 ```
 
-_See code: [src/commands/read-migrations.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/read-migrations.ts)_
+_See code: [src/commands/read-migrations.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/read-migrations.ts)_
 
 ## `qore rollback`
 
+Rollback to previous migration
+
 ```
 USAGE
   $ qore rollback
@@ -405,9 +453,11 @@ EXAMPLE
   $ qore rollback
 ```
 
-_See code: [src/commands/rollback.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/rollback.ts)_
+_See code: [src/commands/rollback.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/rollback.ts)_
 
 ## `qore select [TABLENAME]`
+
+Get all rows from specific table
 
 ```
 USAGE
@@ -427,9 +477,11 @@ EXAMPLE
   $ qore select tableName
 ```
 
-_See code: [src/commands/select.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/select.ts)_
+_See code: [src/commands/select.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.2/src/commands/select.ts)_
 
 ## `qore set-url`
+
+Set base url for project access
 
 ```
 USAGE
@@ -438,6 +490,4 @@ USAGE
 EXAMPLE
   $ qore set-url
 ```
-
-_See code: [src/commands/set-url.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.1/src/commands/set-url.ts)_
 <!-- commandsstop -->
