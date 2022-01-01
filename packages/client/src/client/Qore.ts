@@ -23,9 +23,7 @@ export type QoreRow = { id: string } & Record<
 
 export type QoreConfig = {
   endpoint: string;
-  projectId: string;
-  organizationId: string;
-  authenticationId?: string;
+  adminSecret?: string;
   getToken?: () => Promise<string | undefined> | string | undefined;
   onError?: (error: Error) => void;
 };
@@ -53,6 +51,8 @@ export class QoreProject {
       }
       if (typeof token === "string") {
         req.headers["Authorization"] = `Bearer ${token}`;
+      } else if (this.config.adminSecret) {
+        req.headers["x-qore-engine-admin-secret"] = this.config.adminSecret;
       }
       return req;
     });

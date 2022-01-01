@@ -437,7 +437,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   private async generateFileUrl(filename: string): Promise<string> {
     const axiosConfig: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
-      url: `/${this.project.config.projectId}/${this.id}/upload-url?fileName=${filename}`,
+      url: `/${this.id}/upload-url?fileName=${filename}`,
       method: "GET"
     };
     const result = await this.project.axios(axiosConfig);
