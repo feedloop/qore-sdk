@@ -161,23 +161,26 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       meta: {},
       ...{ ...defaultOperationConfig, ...config }
     };
-    const stream = this.client.execute(operation);
-    const mappedStream = pipe(
-      stream,
-      map(result => ({
-        ...result,
-        data: { nodes: result.data?.results.data || [] }
-      }))
+    const stream = this.client.execute(operation, resultStream =>
+      pipe(
+        resultStream,
+        map(result => ({
+          ...result,
+          // @ts-ignore
+          data: { nodes: result.data?.results.data || [] }
+        }))
+      )
     ) as PromisifiedSource<
       QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
     > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> };
-    mappedStream.fetchMore = async fetchMoreOpts => {
+
+    stream.fetchMore = async fetchMoreOpts => {
       const existingItems = await stream.revalidate({
         networkPolicy: "cache-only"
       });
       const moreItems = await this.readRows(fetchMoreOpts, config).toPromise();
       await stream.revalidate({
-        networkPolicy: "cache-only",
+        networkPolicy: "network-only",
         optimisticResponse: {
           nodes: [
             ...(existingItems.data?.nodes || []),
@@ -186,7 +189,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         }
       });
     };
-    return mappedStream;
+    return stream;
   }
 
   readRow(

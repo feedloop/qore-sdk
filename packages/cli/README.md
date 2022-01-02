@@ -53,7 +53,6 @@ USAGE
 * [`qore read-migrations`](#qore-read-migrations)
 * [`qore rollback`](#qore-rollback)
 * [`qore select [TABLENAME]`](#qore-select-tablename)
-* [`qore set-url`](#qore-set-url)
 
 ## `qore alter-column [FORMERNAME] [NEWNAME]`
 
@@ -478,16 +477,4 @@ EXAMPLE
 ```
 
 _See code: [src/commands/select.ts](https://github.com/rrmdn/cli/blob/v2.0.0-alpha.4/src/commands/select.ts)_
-
-## `qore set-url`
-
-Set base url for project access
-
-```
-USAGE
-  $ qore set-url
-
-EXAMPLE
-  $ qore set-url
-```
 <!-- commandsstop -->

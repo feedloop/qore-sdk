@@ -258,8 +258,13 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     return resultStream;
   }
   execute<Data = any>(
-    operation: QoreOperation
+    operation: QoreOperation,
+    resultOp: (
+      stream: Wonka.Source<QoreOperationResult<AxiosRequestConfig, Data>>
+    ) => Wonka.Source<QoreOperationResult<AxiosRequestConfig, Data>> = stream =>
+      stream
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, Data>> {
-    return withHelpers(this.executeOperation(operation), this, operation);
+    const resultStream = resultOp(this.executeOperation(operation));
+    return withHelpers(resultStream, this, operation);
   }
 }
