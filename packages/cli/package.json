@@ -84,7 +84,7 @@
   },
   "repository": "rrmdn/cli",
   "scripts": {
-    "qore1": "DEBUG=1 ./bin/run",
+    "qore": "DEBUG=1 ./bin/run",
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "yarn jest --testTimeout 20000 -i",
