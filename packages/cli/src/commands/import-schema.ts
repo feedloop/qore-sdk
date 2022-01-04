@@ -54,6 +54,7 @@ export default class ImportSchema extends Command {
     const location = path.resolve(path.join(process.cwd(), flags.location));
     fs.readdir(location, async (err, files) => {
       try {
+        this.log(String(files), "<<<<<");
         if (err) return this.error(err);
         this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
         const latestID = await this.getLatestMigrationID(client);
