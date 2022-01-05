@@ -32,7 +32,7 @@ export declare type QoreOperationConfig<T extends OptimisticResponse = {}> = {
   pollInterval: number;
   optimisticResponse?: T;
   optimisticStrategy?: "cache-first" | "optimistic-first";
-  mode?: "sync" | "default";
+  mode?: "sync" | "default" | "subscription";
 };
 
 export type QoreOperation<

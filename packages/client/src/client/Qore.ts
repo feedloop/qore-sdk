@@ -101,7 +101,9 @@ export type PromisifiedSource<
 export function withHelpers<T extends QoreOperationResult>(
   source$: Wonka.Source<T>,
   client: QoreClient,
-  operation: QoreOperation
+  operation: QoreOperation,
+  resultModifier: (stream: Wonka.Source<T>) => Wonka.Source<T> = stream =>
+    stream
 ): PromisifiedSource<T> {
   (source$ as PromisifiedSource<T>).toPromise = () =>
     Wonka.pipe(source$, Wonka.take(1), Wonka.toPromise);
@@ -112,12 +114,15 @@ export function withHelpers<T extends QoreOperationResult>(
   ): Promise<T> => {
     // @ts-ignore
     return client
-      .execute<T>({
-        ...defaultOperationConfig,
-        ...operation,
-        networkPolicy: "network-only",
-        ...config
-      })
+      .execute<T>(
+        {
+          ...defaultOperationConfig,
+          ...operation,
+          networkPolicy: "network-only",
+          ...config
+        },
+        resultModifier
+      )
       .toPromise();
   };
 
@@ -225,8 +230,8 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
       this.results,
       Wonka.filter(result => result.operation.key === operation.key)
     );
-    // non GET operations should receive only one result
-    if (operation.type?.toLowerCase() !== "get") {
+    // non subscription operations should receive only one result
+    if (operation.mode !== "subscription") {
       return Wonka.pipe(
         resultStream,
         Wonka.onStart(() => this.nextOperation(operation)),
@@ -259,12 +264,10 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   }
   execute<Data = any>(
     operation: QoreOperation,
-    resultOp: (
-      stream: Wonka.Source<QoreOperationResult<AxiosRequestConfig, Data>>
-    ) => Wonka.Source<QoreOperationResult<AxiosRequestConfig, Data>> = stream =>
+    resultModifier: (stream: Wonka.Source<any>) => Wonka.Source<any> = stream =>
       stream
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, Data>> {
-    const resultStream = resultOp(this.executeOperation(operation));
+    const resultStream = resultModifier(this.executeOperation(operation));
     return withHelpers(resultStream, this, operation);
   }
 }

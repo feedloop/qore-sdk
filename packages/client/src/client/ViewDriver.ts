@@ -159,6 +159,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       request: axiosConfig,
       type: axiosConfig.method,
       meta: {},
+      mode: "subscription",
       ...{ ...defaultOperationConfig, ...config }
     };
     const stream = this.client.execute(operation, resultStream =>
@@ -226,6 +227,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       request: axiosConfig,
       type: axiosConfig.method,
       meta: {},
+      mode: "subscription",
       ...{ ...defaultOperationConfig, ...config }
     };
     return this.client.execute(operation);
