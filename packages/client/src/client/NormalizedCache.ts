@@ -4,10 +4,8 @@ import { CacheRef, ViewDriverObject, QoreRow } from "./Qore";
 
 // for future reference if normalized cache is necessary
 export class NormalizedCache {
-  data: Record<
-    string,
-    Record<string, boolean | number | string | CacheRef>
-  > = {};
+  data: Record<string, Record<string, boolean | number | string | CacheRef>> =
+    {};
   modify(modifier: (data: NormalizedCache["data"]) => void) {
     // this.data = produce(this.data, modifier);
   }

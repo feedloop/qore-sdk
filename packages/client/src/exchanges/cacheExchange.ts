@@ -13,20 +13,21 @@ const shouldCacheOperation = (operation: QoreOperation) => {
   return false;
 };
 
-const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
-  const resultCache = new Map<string, QoreOperationResult["data"]>();
-  const sharedOpsStream = Wonka.share(operationStream);
-  const hasCache = (operation: QoreOperation) => {
-    return (
-      (shouldCacheOperation(operation) && resultCache.has(operation.key)) ||
-      !!operation.optimisticResponse
-    );
-  };
-  const cachedStream = Wonka.pipe(
-    sharedOpsStream,
-    Wonka.filter(operation => hasCache(operation)),
-    Wonka.map(
-      (operation): QoreOperationResult => {
+const cacheExchange: Exchange =
+  ({ forward, client }) =>
+  operationStream => {
+    const resultCache = new Map<string, QoreOperationResult["data"]>();
+    const sharedOpsStream = Wonka.share(operationStream);
+    const hasCache = (operation: QoreOperation) => {
+      return (
+        (shouldCacheOperation(operation) && resultCache.has(operation.key)) ||
+        !!operation.optimisticResponse
+      );
+    };
+    const cachedStream = Wonka.pipe(
+      sharedOpsStream,
+      Wonka.filter(operation => hasCache(operation)),
+      Wonka.map((operation): QoreOperationResult => {
         const cached = resultCache.get(operation.key);
         const optimisticResponse = operation.optimisticResponse;
         const merged =
@@ -50,23 +51,22 @@ const cacheExchange: Exchange = ({ forward, client }) => operationStream => {
         result.operation.meta["cacheHit"] = true;
         result.operation.meta["optimistic"] = !!optimisticResponse;
         return result;
-      }
-    )
-  );
+      })
+    );
 
-  const forwardStream = Wonka.pipe(
-    sharedOpsStream,
-    Wonka.filter(operation => !hasCache(operation)),
-    forward,
-    Wonka.tap(result => {
-      if (result.data) {
-        result.operation.meta["cacheHit"] = false;
-        resultCache.set(result.operation.key, result.data);
-      }
-    })
-  );
+    const forwardStream = Wonka.pipe(
+      sharedOpsStream,
+      Wonka.filter(operation => !hasCache(operation)),
+      forward,
+      Wonka.tap(result => {
+        if (result.data) {
+          result.operation.meta["cacheHit"] = false;
+          resultCache.set(result.operation.key, result.data);
+        }
+      })
+    );
 
-  return Wonka.merge([cachedStream, forwardStream]);
-};
+    return Wonka.merge([cachedStream, forwardStream]);
+  };
 
 export default cacheExchange;
