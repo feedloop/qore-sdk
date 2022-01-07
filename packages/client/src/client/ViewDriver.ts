@@ -128,6 +128,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       offset: number;
       limit: number;
       order: "asc" | "desc";
+      orderBy: Record<string, "ASC" | "DESC">;
       populate: Array<string>;
     }> &
       T["params"] = {},
@@ -148,7 +149,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
               populate: opts.populate,
               limit: opts.limit,
               offset: opts.offset,
-              orderBy: { id: opts.order?.toUpperCase() }
+              orderBy: opts.orderBy || {}
             }
           }
         ]

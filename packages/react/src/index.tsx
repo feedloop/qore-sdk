@@ -43,6 +43,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
       limit?: number;
       offset?: number;
       order?: "asc" | "desc";
+      orderBy?: Record<string, "ASC" | "DESC">;
     } & T["params"],
     config?: Partial<QoreOperationConfig>
   ) => {
