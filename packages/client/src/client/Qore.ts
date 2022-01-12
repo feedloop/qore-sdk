@@ -189,16 +189,24 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
 
   init(schema: Record<string, any>) {}
 
-  async currentUser(): Promise<any> {}
+  async currentUser(): Promise<Record<string, any>> {
+    const config: AxiosRequestConfig = {
+      baseURL: this.project.config.endpoint,
+      url: "/v1/user",
+      method: "get"
+    };
+    const resp = await this.project.axios.request<{
+      email: string;
+      token: string;
+    }>(config);
+    return resp.data;
+  }
 
   async authenticate(email: string, password: string): Promise<string> {
     const config: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
       url: "/v1/authorize",
       method: "post",
-      headers: {
-        "X-API-KEY": "admin-secret"
-      },
       data: { identifier: email, password }
     };
     const resp = await this.project.axios.request<{

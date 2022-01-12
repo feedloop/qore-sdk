@@ -146,7 +146,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     client: QoreClient<ProjectSchema>;
   }>({ client });
 
-  const useCurrentUser = () => {
+  const useCurrentUser = (deps: any[] = []) => {
     const qoreClient = useClient();
     const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
     const [error, setError] = React.useState<Error | null>(null);
@@ -164,7 +164,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           setStatus("error");
         }
       })();
-    }, []);
+    }, deps);
     return { status, error, user };
   };
 
