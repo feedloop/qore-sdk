@@ -44,6 +44,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
       offset?: number;
       order?: "asc" | "desc";
       orderBy?: Record<string, "ASC" | "DESC">;
+      condition?: Record<string, any>;
     } & T["params"],
     config?: Partial<QoreOperationConfig>
   ) => {
