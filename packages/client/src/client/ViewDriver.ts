@@ -130,6 +130,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       order: "asc" | "desc";
       orderBy: Record<string, "ASC" | "DESC">;
       populate: Array<string>;
+      condition: Record<string, any>;
     }> &
       T["params"] = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
