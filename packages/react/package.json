@@ -1,6 +1,6 @@
 {
   "name": "@feedloop/qore-react",
-  "version": "2.0.0-alpha.9",
+  "version": "2.0.0-alpha.10",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
@@ -16,7 +16,7 @@
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
     "@babel/preset-typescript": "^7.12.7",
-    "@feedloop/qore-client": "^2.0.0-alpha.9",
+    "@feedloop/qore-client": "^2.0.0-alpha.10",
     "@testing-library/react-hooks": "^3.7.0",
     "@types/jest": "^26.0.19",
     "@types/nock": "^11.1.0",
