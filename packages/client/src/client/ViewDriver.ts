@@ -150,7 +150,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
               populate: opts.populate,
               limit: opts.limit,
               offset: opts.offset,
-              orderBy: opts.orderBy || {}
+              orderBy: opts.orderBy || {},
+              condition: opts.condition || { $and: [] }
             }
           }
         ]
