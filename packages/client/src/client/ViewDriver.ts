@@ -264,8 +264,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
             }
           }
         ]
-      },
-      headers: { Sync: config.mode === "sync" ? "true" : undefined }
+      }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -310,8 +309,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
             }
           }
         ]
-      },
-      headers: { Sync: config.mode === "sync" ? "true" : undefined }
+      }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -344,8 +342,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           }
         ]
       },
-      method: "POST",
-      headers: { Sync: config.mode === "sync" ? "true" : undefined }
+      method: "POST"
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
