@@ -42,6 +42,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   client: QoreClient;
   actions: RowActions<T["actions"]>;
   forms: FormDrivers<T["forms"]>;
+  isTable: boolean = false;
   constructor(
     client: QoreClient,
     project: QoreProject,
@@ -59,6 +60,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       (map, field) => ({ ...map, [field.id]: field }),
       {}
     );
+    this.isTable = id === tableId;
     this.actions = new Proxy({} as RowActions<T["actions"]>, {
       get: (actions, key: string): RowActions<T["actions"]>[string] => {
         if (!actions[key]) {
@@ -145,7 +147,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Select",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               populate: opts.populate,
               limit: opts.limit,
@@ -209,7 +211,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Select",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -249,7 +251,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Update",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -295,7 +297,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Delete",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -335,7 +337,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Insert",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               data: input
             }
@@ -365,7 +367,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       return (refs as string[]).map(ref => ({
         operation: "AddRelation",
         instruction: {
-          table: this.id,
+          [this.isTable ? "table" : "view"]: this.id,
           name: `addRelation_${field}_${ref}`,
           relation: {
             name: field,
@@ -406,7 +408,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       return (refs as string[]).map(ref => ({
         operation: "RemoveRelation",
         instruction: {
-          table: this.id,
+          [this.isTable ? "table" : "view"]: this.id,
           name: `addRelation_${field}_${ref}`,
           relation: {
             name: field,

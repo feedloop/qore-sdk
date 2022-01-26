@@ -187,6 +187,20 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     return this.views[viewId];
   }
 
+  table<K extends keyof T>(tableId: K): ViewDriver<T[K]> {
+    if (!this.views[tableId]) {
+      const currentView: ViewDriver<T[K]> = new ViewDriver<T[K]>(
+        this,
+        this.project,
+        tableId as string,
+        tableId as string,
+        []
+      );
+      this.views[tableId] = currentView;
+    }
+    return this.views[tableId];
+  }
+
   init(schema: Record<string, any>) {}
 
   async currentUser(): Promise<Record<string, any>> {

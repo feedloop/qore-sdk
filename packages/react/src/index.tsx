@@ -170,7 +170,8 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
   };
 
   function createViewHooks<K extends keyof ProjectSchema>(
-    currentViewId: K
+    currentViewId: K,
+    isTable = false
   ): QoreHooks<ProjectSchema[K]> {
     const rowActions = {} as RowActionsHooks<ProjectSchema[string]["actions"]>;
     return {
@@ -183,7 +184,10 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [error, setError] = React.useState<Error | null>(null);
 
         const stream = React.useMemo(
-          () => qoreClient.view(currentViewId).readRows(opts, config),
+          () =>
+            (isTable ? qoreClient.table : qoreClient.view)(
+              currentViewId
+            ).readRows(opts, config),
           [
             ...Object.entries(opts).flat(),
             ...Object.entries(config).flat(),
@@ -229,7 +233,10 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [error, setError] = React.useState<Error | null>(null);
 
         const stream = React.useMemo(
-          () => qoreClient.view(currentViewId).readRow(rowId, config),
+          () =>
+            (isTable ? qoreClient.table : qoreClient.view)(
+              currentViewId
+            ).readRow(rowId, config),
           [rowId, ...Object.entries(config).flat(), currentViewId]
         );
 
@@ -271,9 +278,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           async (data: Partial<ProjectSchema[string]["write"]>) => {
             try {
               setStatus("loading");
-              const result = await qoreClient
-                .view(currentViewId)
-                .insertRow(data, config);
+              const result = await (isTable
+                ? qoreClient.table
+                : qoreClient.view)(currentViewId).insertRow(data, config);
               setError(null);
               setStatus("success");
               return result;
@@ -300,9 +307,13 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           ) => {
             try {
               setStatus("loading");
-              const result = await qoreClient
-                .view(currentViewId)
-                .updateRow(rowId, data, config);
+              const result = await (isTable
+                ? qoreClient.table
+                : qoreClient.view)(currentViewId).updateRow(
+                rowId,
+                data,
+                config
+              );
               setError(null);
               setStatus("success");
               return result;
@@ -326,9 +337,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           async (rowId: string) => {
             try {
               setStatus("loading");
-              const result = await qoreClient
-                .view(currentViewId)
-                .deleteRow(rowId, config);
+              const result = await (isTable
+                ? qoreClient.table
+                : qoreClient.view)(currentViewId).deleteRow(rowId, config);
               setError(null);
               setStatus("success");
               return result;
@@ -345,7 +356,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
       useActions: rowId => {
         const qoreClient = useClient();
-        const qoreClientRowActions = qoreClient.view(currentViewId).actions;
+        const qoreClientRowActions = (isTable
+          ? qoreClient.table
+          : qoreClient.view)(currentViewId).actions;
 
         const [statuses, setStatuses] = React.useState<
           Record<keyof RowActions<ProjectSchema>, QoreRequestStatus>
@@ -372,8 +385,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             trigger: async input => {
               try {
                 setStatuses({ ...statuses, [actionId]: "loading" });
-                const result = await qoreClient
-                  .view(currentViewId)
+                const result = await (isTable
+                  ? qoreClient.table
+                  : qoreClient.view)(currentViewId)
                   .action(actionId)
                   .trigger(rowId, input);
                 setStatuses({ ...statuses, [actionId]: "success" });
@@ -400,7 +414,8 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         );
         React.useMemo(() => {
           for (const actionId of Object.keys(
-            qoreClient.view(currentViewId).actions
+            (isTable ? qoreClient.table : qoreClient.view)(currentViewId)
+              .actions
           ) as Array<keyof typeof rowActions>) {
             rowActions[actionId] = createAction(actionId);
           }
@@ -430,9 +445,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               addRelation: "loading"
             }));
             try {
-              await qoreClient
-                .view(currentViewId)
-                .addRelation(rowId, relations);
+              await (isTable ? qoreClient.table : qoreClient.view)(
+                currentViewId
+              ).addRelation(rowId, relations);
 
               setStatuses(statuses => ({
                 ...statuses,
@@ -459,9 +474,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
               removeRelation: "loading"
             }));
             try {
-              await qoreClient
-                .view(currentViewId)
-                .removeRelation(rowId, relations);
+              await (isTable ? qoreClient.table : qoreClient.view)(
+                currentViewId
+              ).removeRelation(rowId, relations);
 
               setStatuses(statuses => ({
                 ...statuses,
@@ -490,7 +505,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
       },
       useForm: <F extends keyof ProjectSchema[K]["forms"]>(formId: F) => {
         const qoreClient = useClient();
-        const form = qoreClient.view(currentViewId).form(formId);
+        const form = (isTable ? qoreClient.table : qoreClient.view)(
+          currentViewId
+        ).form(formId);
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
         const send = React.useCallback(
@@ -543,9 +560,19 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     return views[id];
   }
 
+  function table<K extends keyof ProjectSchema>(
+    id: K
+  ): QoreHooks<ProjectSchema[K]> {
+    if (!views[id]) {
+      views[id] = createViewHooks(id, true);
+    }
+    return views[id];
+  }
+
   return {
     views,
     view,
+    table,
     client,
     context,
     useClient,
