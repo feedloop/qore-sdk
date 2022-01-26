@@ -136,6 +136,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   activeOperations: Record<string, number> = {};
   project: QoreProject;
   views: { [K in keyof T]: ViewDriver<T[K]> };
+  tables: { [K in keyof T]: ViewDriver<T[K]> };
   constructor(config: QoreConfig) {
     this.project = new QoreProject(config);
     const { next, source } = Wonka.makeSubject<
@@ -170,6 +171,23 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         return views[key];
       }
     });
+
+    this.tables = new Proxy({} as { [K in keyof T]: ViewDriver<T[K]> }, {
+      get: (views, key: string): ViewDriver<T[string]> => {
+        if (!views[key]) {
+          const currentView: ViewDriver<T[string]> = new ViewDriver<T[string]>(
+            this,
+            this.project,
+            key,
+            key,
+            []
+          );
+          // @ts-ignore
+          views[key] = currentView;
+        }
+        return views[key];
+      }
+    });
     // Keep the stream open
     Wonka.publish(this.results);
   }
@@ -188,7 +206,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   }
 
   table<K extends keyof T>(tableId: K): ViewDriver<T[K]> {
-    if (!this.views[tableId]) {
+    if (!this.tables[tableId]) {
       const currentView: ViewDriver<T[K]> = new ViewDriver<T[K]>(
         this,
         this.project,
@@ -196,9 +214,9 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         tableId as string,
         []
       );
-      this.views[tableId] = currentView;
+      this.tables[tableId] = currentView;
     }
-    return this.views[tableId];
+    return this.tables[tableId];
   }
 
   init(schema: Record<string, any>) {}

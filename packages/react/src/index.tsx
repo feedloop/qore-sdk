@@ -560,6 +560,22 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     }
   );
 
+  const tables = new Proxy<QoreContextViews<ProjectSchema>>(
+    {} as QoreContextViews<ProjectSchema>,
+    {
+      // @ts-ignore
+      get: <K extends keyof ProjectSchema>(
+        tables: QoreContextViews<ProjectSchema>,
+        currentViewId: K
+      ): QoreHooks<ProjectSchema[K]> => {
+        if (!tables[currentViewId]) {
+          tables[currentViewId] = createViewHooks(currentViewId, true);
+        }
+        return tables[currentViewId];
+      }
+    }
+  );
+
   function view<K extends keyof ProjectSchema>(
     id: K
   ): QoreHooks<ProjectSchema[K]> {
@@ -572,10 +588,10 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
   function table<K extends keyof ProjectSchema>(
     id: K
   ): QoreHooks<ProjectSchema[K]> {
-    if (!views[id]) {
-      views[id] = createViewHooks(id, true);
+    if (!tables[id]) {
+      tables[id] = createViewHooks(id, true);
     }
-    return views[id];
+    return tables[id];
   }
 
   return {
