@@ -93,6 +93,7 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
 export type PromisifiedSource<
   T extends QoreOperationResult
 > = Wonka.Source<T> & {
+  operation: QoreOperation;
   toPromise: () => Promise<T>;
   revalidate: (config?: Partial<QoreOperationConfig>) => Promise<T>;
   subscribe: (callback: (data: T) => void) => Wonka.Subscription;
@@ -105,6 +106,7 @@ export function withHelpers<T extends QoreOperationResult>(
   resultModifier: (stream: Wonka.Source<T>) => Wonka.Source<T> = stream =>
     stream
 ): PromisifiedSource<T> {
+  (source$ as PromisifiedSource<T>).operation = operation;
   (source$ as PromisifiedSource<T>).toPromise = () =>
     Wonka.pipe(source$, Wonka.take(1), Wonka.toPromise);
   (source$ as PromisifiedSource<T>).subscribe = callback =>

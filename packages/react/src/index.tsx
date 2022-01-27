@@ -6,7 +6,8 @@ import {
   RowActions,
   QoreViewSchema,
   QoreOperationResult,
-  FormDriver
+  FormDriver,
+  PromisifiedSource
 } from "@feedloop/qore-client";
 import { AxiosRequestConfig } from "axios";
 import { ConditionalPick } from "type-fest";
@@ -45,6 +46,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
       order?: "asc" | "desc";
       orderBy?: Record<string, "ASC" | "DESC">;
       condition?: Record<string, any>;
+      params?: Record<string, any>;
     } & T["params"],
     config?: Partial<QoreOperationConfig>
   ) => {
@@ -183,19 +185,34 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
 
-        const stream = React.useMemo(
-          () =>
-            (isTable
-              ? qoreClient.table(currentViewId)
-              : qoreClient.view(currentViewId)
-            ).readRows(opts, config),
-          [
-            ...Object.entries(opts).flat(),
-            ...Object.entries(config).flat(),
-            currentViewId,
-            isTable
-          ]
-        );
+        const prev = React.useRef<
+          | undefined
+          | (PromisifiedSource<
+              QoreOperationResult<
+                AxiosRequestConfig,
+                {
+                  nodes: ProjectSchema[K]["read"][];
+                }
+              >
+            > & {
+              fetchMore: (fetchMoreOptions: typeof opts) => Promise<void>;
+            })
+        >(undefined);
+
+        const stream = React.useMemo(() => {
+          const request = (isTable
+            ? qoreClient.table(currentViewId)
+            : qoreClient.view(currentViewId)
+          ).readRows(opts, config);
+          // We manually ensure reference equality if the key hasn't changed
+          // source: https://github.com/FormidableLabs/urql/blob/main/packages/react-urql/src/hooks/useRequest.ts#L14
+          if (prev.current?.operation.key === request.operation.key) {
+            return prev.current;
+          } else {
+            prev.current = request;
+            return request;
+          }
+        }, [opts, config, currentViewId, isTable]);
 
         React.useEffect(() => {
           setStatus("loading");
@@ -234,14 +251,27 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
         const [error, setError] = React.useState<Error | null>(null);
 
-        const stream = React.useMemo(
-          () =>
-            (isTable
-              ? qoreClient.table(currentViewId)
-              : qoreClient.view(currentViewId)
-            ).readRow(rowId, config),
-          [rowId, ...Object.entries(config).flat(), currentViewId, isTable]
-        );
+        const prev = React.useRef<
+          | undefined
+          | PromisifiedSource<
+              QoreOperationResult<AxiosRequestConfig, ProjectSchema[K]["read"]>
+            >
+        >(undefined);
+
+        const stream = React.useMemo(() => {
+          const request = (isTable
+            ? qoreClient.table(currentViewId)
+            : qoreClient.view(currentViewId)
+          ).readRow(rowId, config);
+          // We manually ensure reference equality if the key hasn't changed
+          // source: https://github.com/FormidableLabs/urql/blob/main/packages/react-urql/src/hooks/useRequest.ts#L14
+          if (prev.current?.operation.key === request.operation.key) {
+            return prev.current;
+          } else {
+            prev.current = request;
+            return request;
+          }
+        }, [rowId, config, currentViewId, isTable]);
 
         React.useEffect(() => {
           setStatus("loading");
