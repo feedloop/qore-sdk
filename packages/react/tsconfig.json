@@ -9,6 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "./lib",
     "declaration": true,
+    "typeRoots": ["./types", "./node_modules/@types"],
     "jsx": "react"
   },
   "exclude": ["./node_modules"],
