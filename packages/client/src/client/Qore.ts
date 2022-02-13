@@ -23,9 +23,7 @@ export type QoreRow = { id: string } & Record<
 
 export type QoreConfig = {
   endpoint: string;
-  projectId: string;
-  organizationId: string;
-  authenticationId?: string;
+  adminSecret?: string;
   getToken?: () => Promise<string | undefined> | string | undefined;
   onError?: (error: Error) => void;
 };
@@ -53,6 +51,8 @@ export class QoreProject {
       }
       if (typeof token === "string") {
         req.headers["Authorization"] = `Bearer ${token}`;
+      } else if (this.config.adminSecret) {
+        req.headers["x-qore-engine-admin-secret"] = this.config.adminSecret;
       }
       return req;
     });
@@ -93,6 +93,7 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
 export type PromisifiedSource<
   T extends QoreOperationResult
 > = Wonka.Source<T> & {
+  operation: QoreOperation;
   toPromise: () => Promise<T>;
   revalidate: (config?: Partial<QoreOperationConfig>) => Promise<T>;
   subscribe: (callback: (data: T) => void) => Wonka.Subscription;
@@ -101,8 +102,11 @@ export type PromisifiedSource<
 export function withHelpers<T extends QoreOperationResult>(
   source$: Wonka.Source<T>,
   client: QoreClient,
-  operation: QoreOperation
+  operation: QoreOperation,
+  resultModifier: (stream: Wonka.Source<T>) => Wonka.Source<T> = stream =>
+    stream
 ): PromisifiedSource<T> {
+  (source$ as PromisifiedSource<T>).operation = operation;
   (source$ as PromisifiedSource<T>).toPromise = () =>
     Wonka.pipe(source$, Wonka.take(1), Wonka.toPromise);
   (source$ as PromisifiedSource<T>).subscribe = callback =>
@@ -112,12 +116,15 @@ export function withHelpers<T extends QoreOperationResult>(
   ): Promise<T> => {
     // @ts-ignore
     return client
-      .execute<T>({
-        ...defaultOperationConfig,
-        ...operation,
-        networkPolicy: "network-only",
-        ...config
-      })
+      .execute<T>(
+        {
+          ...defaultOperationConfig,
+          ...operation,
+          networkPolicy: "network-only",
+          ...config
+        },
+        resultModifier
+      )
       .toPromise();
   };
 
@@ -131,6 +138,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   activeOperations: Record<string, number> = {};
   project: QoreProject;
   views: { [K in keyof T]: ViewDriver<T[K]> };
+  tables: { [K in keyof T]: ViewDriver<T[K]> };
   constructor(config: QoreConfig) {
     this.project = new QoreProject(config);
     const { next, source } = Wonka.makeSubject<
@@ -165,6 +173,23 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         return views[key];
       }
     });
+
+    this.tables = new Proxy({} as { [K in keyof T]: ViewDriver<T[K]> }, {
+      get: (views, key: string): ViewDriver<T[string]> => {
+        if (!views[key]) {
+          const currentView: ViewDriver<T[string]> = new ViewDriver<T[string]>(
+            this,
+            this.project,
+            key,
+            key,
+            []
+          );
+          // @ts-ignore
+          views[key] = currentView;
+        }
+        return views[key];
+      }
+    });
     // Keep the stream open
     Wonka.publish(this.results);
   }
@@ -182,18 +207,40 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     return this.views[viewId];
   }
 
+  table<K extends keyof T>(tableId: K): ViewDriver<T[K]> {
+    if (!this.tables[tableId]) {
+      const currentView: ViewDriver<T[K]> = new ViewDriver<T[K]>(
+        this,
+        this.project,
+        tableId as string,
+        tableId as string,
+        []
+      );
+      this.tables[tableId] = currentView;
+    }
+    return this.tables[tableId];
+  }
+
   init(schema: Record<string, any>) {}
 
-  async currentUser(): Promise<any> {}
+  async currentUser(): Promise<Record<string, any>> {
+    const config: AxiosRequestConfig = {
+      baseURL: this.project.config.endpoint,
+      url: "/v1/user",
+      method: "get"
+    };
+    const resp = await this.project.axios.request<{
+      email: string;
+      token: string;
+    }>(config);
+    return resp.data;
+  }
 
   async authenticate(email: string, password: string): Promise<string> {
     const config: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
       url: "/v1/authorize",
       method: "post",
-      headers: {
-        "X-API-KEY": "admin-secret"
-      },
       data: { identifier: email, password }
     };
     const resp = await this.project.axios.request<{
@@ -225,8 +272,8 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
       this.results,
       Wonka.filter(result => result.operation.key === operation.key)
     );
-    // non GET operations should receive only one result
-    if (operation.type?.toLowerCase() !== "get") {
+    // non subscription operations should receive only one result
+    if (operation.mode !== "subscription") {
       return Wonka.pipe(
         resultStream,
         Wonka.onStart(() => this.nextOperation(operation)),
@@ -258,8 +305,11 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     return resultStream;
   }
   execute<Data = any>(
-    operation: QoreOperation
+    operation: QoreOperation,
+    resultModifier: (stream: Wonka.Source<any>) => Wonka.Source<any> = stream =>
+      stream
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, Data>> {
-    return withHelpers(this.executeOperation(operation), this, operation);
+    const resultStream = resultModifier(this.executeOperation(operation));
+    return withHelpers(resultStream, this, operation);
   }
 }

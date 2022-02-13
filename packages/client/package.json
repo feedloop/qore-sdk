@@ -1,6 +1,6 @@
 {
   "name": "@feedloop/qore-client",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.16",
   "main": "lib/index.js",
   "license": "MIT",
   "files": [
@@ -21,11 +21,11 @@
     "test": "jest --testTimeout 10000"
   },
   "dependencies": {
-    "@feedloop/qore-sdk": "^2.0.0-alpha.1",
+    "@feedloop/qore-sdk": "^2.0.0-alpha.5",
     "axios": "^0.21.0",
     "nanoid": "^3.1.20",
     "type-fest": "^0.20.1",
     "wonka": "^4.0.15"
   },
-  "gitHead": "ad06d8146d1f79e932e97393c8cdb4e9fc1f7446"
+  "gitHead": "f0fa45d7ade5ea36a35e568791b353b28de94f84"
 }

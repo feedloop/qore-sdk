@@ -54,8 +54,7 @@ describe("Qore SDK", () => {
   let token: string | undefined;
   const config: QoreConfig = {
     endpoint: "http://localhost:8080",
-    organizationId: "lIdfC42DJCN2XzQ",
-    projectId: "I0D3NimZQ9GKEDP",
+    adminSecret: "admin-secret",
     getToken: () => token
   };
   beforeAll(async () => {

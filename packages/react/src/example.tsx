@@ -19,8 +19,7 @@ const qoreClient = new QoreClient<{
   };
 }>({
   endpoint: "http://localhost:8080",
-  organizationId: "FAKE_ORG",
-  projectId: "FAKE_PROJECT"
+  adminSecret: "admin-secret"
 });
 
 qoreClient.init({

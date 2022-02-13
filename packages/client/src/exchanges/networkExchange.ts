@@ -21,8 +21,7 @@ const makeNetworkSource = (
       >({
         ...operation.request,
         cancelToken: cancelToken.token,
-        url:
-          (client.project.axios.defaults.baseURL || "") + operation.request.url
+        url: operation.request.url
       });
       request
         .then(resp => {
