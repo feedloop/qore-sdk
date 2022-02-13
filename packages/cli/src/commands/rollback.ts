@@ -8,20 +8,18 @@ import config from "../config";
 export default class Rollback extends Command {
   static description = "Rollback to previous migration";
 
-  static examples = [`$ qore rollback 10`];
-
-  static args = [{ name: "steps", description: "Number of Rollbacks" }];
+  static examples = [`$ qore rollback`];
 
   async run() {
     const client = new DefaultApi(
       new Configuration({ apiKey: config.get("adminSecret") })
     );
-    const { args } = this.parse(Rollback);
+
     const response = await inquirer.prompt([
       {
         type: "confirm",
         name: "migrateDown",
-        message: `Are you sure to revert to previous migration ${args.steps} times?`,
+        message: `Are you sure to revert to previous migration?`,
         default: false
       }
     ]);
@@ -34,7 +32,7 @@ export default class Rollback extends Command {
 
     if (response.migrateDown) {
       await client.rollback({
-        rollbacks: args.steps
+        rollbacks: 1
       });
 
       cli.action.stop(`${chalk.green("\n\nSuccess\n\n")}`);

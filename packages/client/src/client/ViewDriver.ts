@@ -42,7 +42,6 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   client: QoreClient;
   actions: RowActions<T["actions"]>;
   forms: FormDrivers<T["forms"]>;
-  isTable: boolean = false;
   constructor(
     client: QoreClient,
     project: QoreProject,
@@ -60,7 +59,6 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       (map, field) => ({ ...map, [field.id]: field }),
       {}
     );
-    this.isTable = id === tableId;
     this.actions = new Proxy({} as RowActions<T["actions"]>, {
       get: (actions, key: string): RowActions<T["actions"]>[string] => {
         if (!actions[key]) {
@@ -130,10 +128,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       offset: number;
       limit: number;
       order: "asc" | "desc";
-      orderBy: Record<string, "ASC" | "DESC">;
       populate: Array<string>;
-      condition: Record<string, any>;
-      params: Record<string, any>;
     }> &
       T["params"] = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
@@ -148,14 +143,12 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Select",
             instruction: {
-              [this.isTable ? "table" : "view"]: this.id,
+              table: this.id,
               name: "data",
               populate: opts.populate,
               limit: opts.limit,
               offset: opts.offset,
-              orderBy: opts.orderBy || {},
-              condition: opts.condition || { $and: [] },
-              params: opts.params || {}
+              orderBy: { id: opts.order?.toUpperCase() }
             }
           }
         ]
@@ -166,29 +159,25 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       request: axiosConfig,
       type: axiosConfig.method,
       meta: {},
-      mode: "subscription",
       ...{ ...defaultOperationConfig, ...config }
     };
-    const stream = this.client.execute(operation, resultStream =>
-      pipe(
-        resultStream,
-        map(result => ({
-          ...result,
-          // @ts-ignore
-          data: { nodes: result.data?.results.data || [] }
-        }))
-      )
+    const stream = this.client.execute(operation);
+    const mappedStream = pipe(
+      stream,
+      map(result => ({
+        ...result,
+        data: { nodes: result.data?.results.data || [] }
+      }))
     ) as PromisifiedSource<
       QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
     > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> };
-
-    stream.fetchMore = async fetchMoreOpts => {
+    mappedStream.fetchMore = async fetchMoreOpts => {
       const existingItems = await stream.revalidate({
         networkPolicy: "cache-only"
       });
       const moreItems = await this.readRows(fetchMoreOpts, config).toPromise();
       await stream.revalidate({
-        networkPolicy: "network-only",
+        networkPolicy: "cache-only",
         optimisticResponse: {
           nodes: [
             ...(existingItems.data?.nodes || []),
@@ -197,7 +186,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         }
       });
     };
-    return stream;
+    return mappedStream;
   }
 
   readRow(
@@ -213,7 +202,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Select",
             instruction: {
-              [this.isTable ? "table" : "view"]: this.id,
+              table: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -234,7 +223,6 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       request: axiosConfig,
       type: axiosConfig.method,
       meta: {},
-      mode: "subscription",
       ...{ ...defaultOperationConfig, ...config }
     };
     return this.client.execute(operation);
@@ -253,7 +241,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Update",
             instruction: {
-              [this.isTable ? "table" : "view"]: this.id,
+              table: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -268,7 +256,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
             }
           }
         ]
-      }
+      },
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -299,7 +288,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Delete",
             instruction: {
-              [this.isTable ? "table" : "view"]: this.id,
+              table: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -313,7 +302,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
             }
           }
         ]
-      }
+      },
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -339,14 +329,15 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Insert",
             instruction: {
-              [this.isTable ? "table" : "view"]: this.id,
+              table: this.id,
               name: "data",
               data: input
             }
           }
         ]
       },
-      method: "POST"
+      method: "POST",
+      headers: { Sync: config.mode === "sync" ? "true" : undefined }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -369,7 +360,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       return (refs as string[]).map(ref => ({
         operation: "AddRelation",
         instruction: {
-          [this.isTable ? "table" : "view"]: this.id,
+          table: this.id,
           name: `addRelation_${field}_${ref}`,
           relation: {
             name: field,
@@ -410,7 +401,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       return (refs as string[]).map(ref => ({
         operation: "RemoveRelation",
         instruction: {
-          [this.isTable ? "table" : "view"]: this.id,
+          table: this.id,
           name: `addRelation_${field}_${ref}`,
           relation: {
             name: field,
@@ -446,7 +437,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   private async generateFileUrl(filename: string): Promise<string> {
     const axiosConfig: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
-      url: `/${this.id}/upload-url?fileName=${filename}`,
+      url: `/${this.project.config.projectId}/${this.id}/upload-url?fileName=${filename}`,
       method: "GET"
     };
     const result = await this.project.axios(axiosConfig);

@@ -1,14 +1,14 @@
 {
   "name": "@feedloop/qore-cli",
   "description": "qore cli",
-  "version": "2.0.0-alpha.13",
+  "version": "2.0.0-alpha.1",
   "author": "Rizki Romadhoni @rrmdn",
   "bin": {
     "qore": "./bin/run"
   },
   "bugs": "https://github.com/rrmdn/cli/issues",
   "dependencies": {
-    "@feedloop/qore-sdk": "^2.0.0-alpha.5",
+    "@feedloop/qore-sdk": "^2.0.0-alpha.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
@@ -30,7 +30,6 @@
     "conf": "^7.1.2",
     "debug": "^4.3.1",
     "fs-extra": "^9.0.1",
-    "inquirer": "^8.2.0",
     "listr": "^0.14.3",
     "nixt": "^0.5.1",
     "node-dir": "^0.1.17",

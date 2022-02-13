@@ -19,7 +19,8 @@ const createNewQoreContext = () => {
     };
   }>({
     endpoint: "http://localhost:8080",
-    adminSecret: "admin-secret"
+    organizationId: "FAKE_ORG",
+    projectId: "FAKE_PROJECT"
   });
 
   qoreClient.init({
