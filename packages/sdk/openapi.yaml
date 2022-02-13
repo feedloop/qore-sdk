@@ -32,11 +32,6 @@ paths:
       responses:
         '200':
           description: default response
-  /v1/user:
-    get:
-      responses:
-        '200':
-          description: default response
   /v1/authorize:
     post:
       responses:
@@ -58,16 +53,16 @@ paths:
               as user:
                 value:
                   identifier: Ayu
-                  password: my-password
+                  role: user
             schema:
               properties:
                 identifier:
                   type: string
-                password:
+                role:
                   type: string
-                  nullable: true
               required:
                 - identifier
+                - role
               type: object
         required: true
   /v1/migrate:
@@ -219,7 +214,7 @@ paths:
                           type: text
                           definition:
                             textType: text
-                            default: null
+                            default: ''
                             unique: false
                     - operation: Create
                       resource: Column
@@ -230,7 +225,7 @@ paths:
                           type: text
                           definition:
                             textType: text
-                            default: null
+                            default: ''
                             unique: false
                     - operation: Create
                       resource: OneToManyRelation
@@ -253,50 +248,6 @@ paths:
                           definition:
                             relation: persontodo
                             column: name
-              'Create actor and movie table (m:m)':
-                value:
-                  operations:
-                    - operation: Create
-                      resource: Table
-                      migration:
-                        name: actor
-                    - operation: Create
-                      resource: Table
-                      migration:
-                        name: movie
-                    - operation: Create
-                      resource: Column
-                      migration:
-                        table: movie
-                        name: title
-                        column:
-                          type: text
-                          definition:
-                            textType: text
-                            default: null
-                            unique: false
-                    - operation: Create
-                      resource: Column
-                      migration:
-                        table: actor
-                        name: name
-                        column:
-                          type: text
-                          definition:
-                            textType: text
-                            default: null
-                            unique: false
-                    - operation: Create
-                      resource: ManyToManyRelation
-                      migration:
-                        name: starring
-                        nullable: false
-                        origin:
-                          table: actor
-                        target:
-                          table: movie
-                        onDelete: RESTRICT
-                        onUpdate: CASCADE
               Create task table:
                 value:
                   operations:
@@ -313,7 +264,7 @@ paths:
                           type: text
                           definition:
                             textType: text
-                            default: null
+                            default: ''
                             unique: false
               Create role maintainer:
                 value:
@@ -337,7 +288,7 @@ paths:
                           type: text
                           definition:
                             textType: text
-                            default: null
+                            default: ''
                             unique: false
                         table: task
                     - operation: Create
@@ -361,7 +312,7 @@ paths:
                           type: text
                           definition:
                             textType: text
-                            default: null
+                            default: ''
                             unique: false
                         table: member
                     - operation: Create
@@ -538,7 +489,7 @@ paths:
                     properties:
                       limit:
                         type: number
-                        default: 0
+                        default: 50
                       offset:
                         type: number
                         default: 0
@@ -551,7 +502,7 @@ paths:
           in: query
           schema:
             type: number
-            default: 0
+            default: 50
         - name: offset
           in: query
           schema:
@@ -590,7 +541,6 @@ paths:
                         name: insertAyu
                         data:
                           external_id: Ayu
-                          password: ayu
                           roleId: userId
                     - operation: Insert
                       instruction:
@@ -598,7 +548,6 @@ paths:
                         name: insertBudi
                         data:
                           external_id: Budi
-                          password: budi
                           roleId: userId
                     - operation: Insert
                       instruction:
@@ -606,7 +555,6 @@ paths:
                         name: insertAdminToko
                         data:
                           external_id: Admin Toko
-                          password: admin
                           roleId: pickerId
                     - operation: Insert
                       instruction:
@@ -658,14 +606,14 @@ paths:
                         name: insertCoding
                         data:
                           title: Coding
-                          persontodo: '{{insertPerson[0].id}}'
+                          persontodo_person_id: '{{insertPerson[0].id}}'
                     - operation: Insert
                       instruction:
                         table: todo
                         name: insertLeha
                         data:
                           title: Leha - leha
-                          persontodo: '{{insertPerson[0].id}}'
+                          persontodo_person_id: '{{insertPerson[0].id}}'
               Populate View:
                 value:
                   operations:
@@ -872,50 +820,39 @@ paths:
                     type: array
                     items:
                       type: object
+                      required:
+                        - name
+                        - deletionProtection
+                        - isHidden
+                        - createdAt
+                        - columns
+                        - updatedAt
+                        - view
                       properties:
+                        id:
+                          type: string
                         name:
                           type: string
+                        deletionProtection:
+                          type: boolean
+                        isHidden:
+                          type: boolean
+                        createdAt:
+                          type: object
+                          required: []
+                          additionalProperties: true
+                        updatedAt:
+                          type: object
+                          required: []
+                          additionalProperties: true
                         columns:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              fieldType:
-                                type: string
-                              name:
-                                type: string
-                            required:
-                              - fieldType
-                              - name
-                            additionalProperties: true
-                        views:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              name:
-                                type: string
-                              query:
-                                type: object
-                                required: []
-                                additionalProperties: true
-                            required:
-                              - name
-                              - query
-                        compositeIndexes:
-                          type: array
-                          nullable: true
-                          items:
-                            type: array
-                            items:
-                              type: string
-                        category:
-                          type: string
-                          nullable: true
-                      required:
-                        - views
-                        - name
-                        - columns
+                          type: object
+                          required: []
+                          additionalProperties: true
+                        view:
+                          type: object
+                          required: []
+                          additionalProperties: true
       operationId: getTables
       parameters:
         - name: limit
@@ -928,24 +865,6 @@ paths:
           schema:
             type: number
             default: 0
-  /v1/roles:
-    get:
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - roles
-                properties:
-                  roles:
-                    type: array
-                    items:
-                      type: object
-                      required: []
-                      additionalProperties: true
-      operationId: getAllRolesAndPermissions
   /v1/schema:
     get:
       responses:
@@ -960,7 +879,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        name:
+                        tableName:
                           type: string
                         columns:
                           type: array
@@ -971,13 +890,6 @@ paths:
                                 type: string
                               type:
                                 type: string
-                              description:
-                                type: string
-                              definition:
-                                type: object
-                                required: []
-                                additionalProperties: true
-                                nullable: true
                               references:
                                 type: object
                                 nullable: true
@@ -986,10 +898,6 @@ paths:
                                     type: string
                                   column:
                                     type: string
-                                  type:
-                                    type: string
-                                  origin:
-                                    type: boolean
                                 required:
                                   - column
                                   - targetTable
@@ -1019,14 +927,8 @@ paths:
                             required:
                               - name
                               - permissions
-                        views:
-                          type: array
-                          items:
-                            type: object
-                            required: []
-                            additionalProperties: true
                       required:
-                        - name
+                        - tableName
                         - columns
                         - roles
                 required:

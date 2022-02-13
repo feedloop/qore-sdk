@@ -58,7 +58,7 @@ export interface InlineObject {
    * @type {string}
    * @memberof InlineObject
    */
-  password?: string | null;
+  role: string;
 }
 /**
  *
@@ -313,10 +313,10 @@ export interface InlineResponse2004 {
 export interface InlineResponse2005 {
   /**
    *
-   * @type {InlineResponse2005Pagination}
+   * @type {InlineResponse2003Pagination}
    * @memberof InlineResponse2005
    */
-  pagination: InlineResponse2005Pagination;
+  pagination: InlineResponse2003Pagination;
   /**
    *
    * @type {Array<InlineResponse2005Items>}
@@ -335,75 +335,49 @@ export interface InlineResponse2005Items {
    * @type {string}
    * @memberof InlineResponse2005Items
    */
-  name: string;
-  /**
-   *
-   * @type {Array<{ [key: string]: object; }>}
-   * @memberof InlineResponse2005Items
-   */
-  columns: Array<{ [key: string]: object }>;
-  /**
-   *
-   * @type {Array<InlineResponse2005Views>}
-   * @memberof InlineResponse2005Items
-   */
-  views: Array<InlineResponse2005Views>;
-  /**
-   *
-   * @type {Array<Array<string>>}
-   * @memberof InlineResponse2005Items
-   */
-  compositeIndexes?: Array<Array<string>> | null;
+  id?: string;
   /**
    *
    * @type {string}
    * @memberof InlineResponse2005Items
    */
-  category?: string | null;
-}
-/**
- *
- * @export
- * @interface InlineResponse2005Pagination
- */
-export interface InlineResponse2005Pagination {
-  /**
-   *
-   * @type {number}
-   * @memberof InlineResponse2005Pagination
-   */
-  limit?: number;
-  /**
-   *
-   * @type {number}
-   * @memberof InlineResponse2005Pagination
-   */
-  offset?: number;
-  /**
-   *
-   * @type {number}
-   * @memberof InlineResponse2005Pagination
-   */
-  total?: number;
-}
-/**
- *
- * @export
- * @interface InlineResponse2005Views
- */
-export interface InlineResponse2005Views {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2005Views
-   */
   name: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof InlineResponse2005Items
+   */
+  deletionProtection: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof InlineResponse2005Items
+   */
+  isHidden: boolean;
   /**
    *
    * @type {{ [key: string]: object; }}
-   * @memberof InlineResponse2005Views
+   * @memberof InlineResponse2005Items
    */
-  query: { [key: string]: object };
+  createdAt: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  updatedAt: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  columns: { [key: string]: object };
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2005Items
+   */
+  view: { [key: string]: object };
 }
 /**
  *
@@ -413,10 +387,117 @@ export interface InlineResponse2005Views {
 export interface InlineResponse2006 {
   /**
    *
-   * @type {Array<{ [key: string]: object; }>}
+   * @type {Array<InlineResponse2006Tables>}
    * @memberof InlineResponse2006
    */
-  roles: Array<{ [key: string]: object }>;
+  tables: Array<InlineResponse2006Tables>;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Columns
+ */
+export interface InlineResponse2006Columns {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Columns
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Columns
+   */
+  type: string;
+  /**
+   *
+   * @type {InlineResponse2006References}
+   * @memberof InlineResponse2006Columns
+   */
+  references?: InlineResponse2006References | null;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Permissions
+ */
+export interface InlineResponse2006Permissions {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Permissions
+   */
+  action: string;
+  /**
+   *
+   * @type {{ [key: string]: object; }}
+   * @memberof InlineResponse2006Permissions
+   */
+  condition: { [key: string]: object };
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006References
+ */
+export interface InlineResponse2006References {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006References
+   */
+  targetTable: string;
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006References
+   */
+  column: string;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Roles
+ */
+export interface InlineResponse2006Roles {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Roles
+   */
+  name: string;
+  /**
+   *
+   * @type {Array<InlineResponse2006Permissions>}
+   * @memberof InlineResponse2006Roles
+   */
+  permissions: Array<InlineResponse2006Permissions>;
+}
+/**
+ *
+ * @export
+ * @interface InlineResponse2006Tables
+ */
+export interface InlineResponse2006Tables {
+  /**
+   *
+   * @type {string}
+   * @memberof InlineResponse2006Tables
+   */
+  tableName: string;
+  /**
+   *
+   * @type {Array<InlineResponse2006Columns>}
+   * @memberof InlineResponse2006Tables
+   */
+  columns: Array<InlineResponse2006Columns>;
+  /**
+   *
+   * @type {Array<InlineResponse2006Roles>}
+   * @memberof InlineResponse2006Tables
+   */
+  roles: Array<InlineResponse2006Roles>;
 }
 /**
  *
@@ -426,183 +507,33 @@ export interface InlineResponse2006 {
 export interface InlineResponse2007 {
   /**
    *
-   * @type {Array<InlineResponse2007Tables>}
+   * @type {Array<{ [key: string]: object; }>}
    * @memberof InlineResponse2007
-   */
-  tables: Array<InlineResponse2007Tables>;
-}
-/**
- *
- * @export
- * @interface InlineResponse2007Columns
- */
-export interface InlineResponse2007Columns {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007Columns
-   */
-  name: string;
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007Columns
-   */
-  type: string;
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007Columns
-   */
-  description?: string;
-  /**
-   *
-   * @type {{ [key: string]: object; }}
-   * @memberof InlineResponse2007Columns
-   */
-  definition?: { [key: string]: object } | null;
-  /**
-   *
-   * @type {InlineResponse2007References}
-   * @memberof InlineResponse2007Columns
-   */
-  references?: InlineResponse2007References | null;
-}
-/**
- *
- * @export
- * @interface InlineResponse2007Permissions
- */
-export interface InlineResponse2007Permissions {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007Permissions
-   */
-  action: string;
-  /**
-   *
-   * @type {{ [key: string]: object; }}
-   * @memberof InlineResponse2007Permissions
-   */
-  condition: { [key: string]: object };
-}
-/**
- *
- * @export
- * @interface InlineResponse2007References
- */
-export interface InlineResponse2007References {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007References
-   */
-  targetTable: string;
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007References
-   */
-  column: string;
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007References
-   */
-  type?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof InlineResponse2007References
-   */
-  origin?: boolean;
-}
-/**
- *
- * @export
- * @interface InlineResponse2007Roles
- */
-export interface InlineResponse2007Roles {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007Roles
-   */
-  name: string;
-  /**
-   *
-   * @type {Array<InlineResponse2007Permissions>}
-   * @memberof InlineResponse2007Roles
-   */
-  permissions: Array<InlineResponse2007Permissions>;
-}
-/**
- *
- * @export
- * @interface InlineResponse2007Tables
- */
-export interface InlineResponse2007Tables {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse2007Tables
-   */
-  name: string;
-  /**
-   *
-   * @type {Array<InlineResponse2007Columns>}
-   * @memberof InlineResponse2007Tables
-   */
-  columns: Array<InlineResponse2007Columns>;
-  /**
-   *
-   * @type {Array<InlineResponse2007Roles>}
-   * @memberof InlineResponse2007Tables
-   */
-  roles: Array<InlineResponse2007Roles>;
-  /**
-   *
-   * @type {Array<{ [key: string]: object; }>}
-   * @memberof InlineResponse2007Tables
-   */
-  views?: Array<{ [key: string]: object }>;
-}
-/**
- *
- * @export
- * @interface InlineResponse2008
- */
-export interface InlineResponse2008 {
-  /**
-   *
-   * @type {Array<{ [key: string]: object; }>}
-   * @memberof InlineResponse2008
    */
   items: Array<{ [key: string]: object }>;
   /**
    *
-   * @type {InlineResponse2008Pagination}
-   * @memberof InlineResponse2008
+   * @type {InlineResponse2007Pagination}
+   * @memberof InlineResponse2007
    */
-  pagination: InlineResponse2008Pagination;
+  pagination: InlineResponse2007Pagination;
 }
 /**
  *
  * @export
- * @interface InlineResponse2008Pagination
+ * @interface InlineResponse2007Pagination
  */
-export interface InlineResponse2008Pagination {
+export interface InlineResponse2007Pagination {
   /**
    *
    * @type {number}
-   * @memberof InlineResponse2008Pagination
+   * @memberof InlineResponse2007Pagination
    */
   page: number;
   /**
    *
    * @type {number}
-   * @memberof InlineResponse2008Pagination
+   * @memberof InlineResponse2007Pagination
    */
   total: number;
 }
@@ -936,55 +867,6 @@ export const DefaultApiAxiosParamCreator = function (
         localVarRequestOptions,
         configuration
       );
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions
-      };
-    },
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    getAllRolesAndPermissions: async (
-      options: AxiosRequestConfig = {}
-    ): Promise<RequestArgs> => {
-      const localVarPath = `/v1/roles`;
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = {
-        method: "GET",
-        ...baseOptions,
-        ...options
-      };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication ApiKeyAuth required
-      await setApiKeyToObject(
-        localVarHeaderParameter,
-        "x-qore-engine-admin-secret",
-        configuration
-      );
-
-      // authentication bearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions =
-        baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers
-      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1586,55 +1468,6 @@ export const DefaultApiAxiosParamCreator = function (
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions
       };
-    },
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    v1UserGet: async (
-      options: AxiosRequestConfig = {}
-    ): Promise<RequestArgs> => {
-      const localVarPath = `/v1/user`;
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = {
-        method: "GET",
-        ...baseOptions,
-        ...options
-      };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication ApiKeyAuth required
-      await setApiKeyToObject(
-        localVarHeaderParameter,
-        "x-qore-engine-admin-secret",
-        configuration
-      );
-
-      // authentication bearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions =
-        baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers
-      };
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions
-      };
     }
   };
 };
@@ -1752,29 +1585,6 @@ export const DefaultApiFp = function (configuration?: Configuration) {
     },
     /**
      *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async getAllRolesAndPermissions(
-      options?: AxiosRequestConfig
-    ): Promise<
-      (
-        axios?: AxiosInstance,
-        basePath?: string
-      ) => AxiosPromise<InlineResponse2006>
-    > {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getAllRolesAndPermissions(
-        options
-      );
-      return createRequestFunction(
-        localVarAxiosArgs,
-        globalAxios,
-        BASE_PATH,
-        configuration
-      );
-    },
-    /**
-     *
      * @param {number} [limit]
      * @param {number} [offset]
      * @param {*} [options] Override http request option.
@@ -1853,7 +1663,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string
-      ) => AxiosPromise<InlineResponse2008>
+      ) => AxiosPromise<InlineResponse2007>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getRows(
         table,
@@ -1880,7 +1690,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string
-      ) => AxiosPromise<InlineResponse2007>
+      ) => AxiosPromise<InlineResponse2006>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getSchema(
         options
@@ -2044,26 +1854,6 @@ export const DefaultApiFp = function (configuration?: Configuration) {
         BASE_PATH,
         configuration
       );
-    },
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async v1UserGet(
-      options?: AxiosRequestConfig
-    ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
-    > {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.v1UserGet(
-        options
-      );
-      return createRequestFunction(
-        localVarAxiosArgs,
-        globalAxios,
-        BASE_PATH,
-        configuration
-      );
     }
   };
 };
@@ -2133,16 +1923,6 @@ export const DefaultApiFactory = function (
     },
     /**
      *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    getAllRolesAndPermissions(options?: any): AxiosPromise<InlineResponse2006> {
-      return localVarFp
-        .getAllRolesAndPermissions(options)
-        .then(request => request(axios, basePath));
-    },
-    /**
-     *
      * @param {number} [limit]
      * @param {number} [offset]
      * @param {*} [options] Override http request option.
@@ -2190,7 +1970,7 @@ export const DefaultApiFactory = function (
       offset?: number,
       populate?: Array<string>,
       options?: any
-    ): AxiosPromise<InlineResponse2008> {
+    ): AxiosPromise<InlineResponse2007> {
       return localVarFp
         .getRows(table, limit, offset, populate, options)
         .then(request => request(axios, basePath));
@@ -2200,7 +1980,7 @@ export const DefaultApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getSchema(options?: any): AxiosPromise<InlineResponse2007> {
+    getSchema(options?: any): AxiosPromise<InlineResponse2006> {
       return localVarFp
         .getSchema(options)
         .then(request => request(axios, basePath));
@@ -2286,16 +2066,6 @@ export const DefaultApiFactory = function (
       return localVarFp
         .v1InspectGet(options)
         .then(request => request(axios, basePath));
-    },
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    v1UserGet(options?: any): AxiosPromise<void> {
-      return localVarFp
-        .v1UserGet(options)
-        .then(request => request(axios, basePath));
     }
   };
 };
@@ -2358,18 +2128,6 @@ export class DefaultApi extends BaseAPI {
   public execute(inlineObject3: InlineObject3, options?: AxiosRequestConfig) {
     return DefaultApiFp(this.configuration)
       .execute(inlineObject3, options)
-      .then(request => request(this.axios, this.basePath));
-  }
-
-  /**
-   *
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof DefaultApi
-   */
-  public getAllRolesAndPermissions(options?: AxiosRequestConfig) {
-    return DefaultApiFp(this.configuration)
-      .getAllRolesAndPermissions(options)
       .then(request => request(this.axios, this.basePath));
   }
 
@@ -2530,18 +2288,6 @@ export class DefaultApi extends BaseAPI {
   public v1InspectGet(options?: AxiosRequestConfig) {
     return DefaultApiFp(this.configuration)
       .v1InspectGet(options)
-      .then(request => request(this.axios, this.basePath));
-  }
-
-  /**
-   *
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof DefaultApi
-   */
-  public v1UserGet(options?: AxiosRequestConfig) {
-    return DefaultApiFp(this.configuration)
-      .v1UserGet(options)
       .then(request => request(this.axios, this.basePath));
   }
 }

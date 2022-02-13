@@ -1,4 +1,4 @@
-curl https://stg-qore-data.qore.one/documentation/yaml -o ./openapi.yaml && \
+curl http://localhost:8080/documentation/yaml -o ./openapi.yaml && \
 docker run --rm \
   -v ${PWD}:/local openapitools/openapi-generator-cli generate \
   -i /local/openapi.yaml \
