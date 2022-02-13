@@ -11,6 +11,7 @@ import {
 } from "@feedloop/qore-client";
 import { AxiosRequestConfig } from "axios";
 import { ConditionalPick } from "type-fest";
+import stableHash from "stable-hash";
 
 type QoreRequestStatus = "idle" | "loading" | "success" | "error";
 type RelationActions = "addRelation" | "removeRelation";
@@ -212,7 +213,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             prev.current = request;
             return request;
           }
-        }, [opts, config, currentViewId, isTable]);
+        }, [stableHash(opts), stableHash(config), currentViewId, isTable]);
 
         React.useEffect(() => {
           setStatus("loading");
@@ -271,7 +272,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             prev.current = request;
             return request;
           }
-        }, [rowId, config, currentViewId, isTable]);
+        }, [rowId, stableHash(config), currentViewId, isTable]);
 
         React.useEffect(() => {
           setStatus("loading");
