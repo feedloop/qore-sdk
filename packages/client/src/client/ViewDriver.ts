@@ -237,7 +237,19 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       mode: "subscription",
       ...{ ...defaultOperationConfig, ...config }
     };
-    return this.client.execute(operation);
+    const stream = this.client.execute(operation, resultStream =>
+      pipe(
+        resultStream,
+        map(result => ({
+          ...result,
+          // @ts-ignore
+          data: result.data?.results?.data?.[0]
+        }))
+      )
+    ) as PromisifiedSource<
+      QoreOperationResult<AxiosRequestConfig, { nodes: T["read"] }>
+    >;
+    return stream;
   }
   async updateRow(
     id: string,
