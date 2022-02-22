@@ -16,23 +16,27 @@ const makeNetworkSource = (
   return Wonka.make<QoreOperationResult<AxiosRequestConfig>>(
     ({ next, complete }) => {
       const cancelToken = Axios.CancelToken.source();
-      const request = client.project.axios.request<
-        QoreOperationResultData<QoreOperationResult<AxiosRequestConfig>>
-      >({
-        ...operation.request,
-        cancelToken: cancelToken.token,
-        url: operation.request.url
-      });
-      request
-        .then(resp => {
-          next({ data: resp.data, operation, stale: false });
-        })
-        .catch(error => {
-          next({ error: error, operation, stale: false });
-        })
-        .finally(() => {
-          complete();
+      if (operation.skip) {
+        complete();
+      } else {
+        const request = client.project.axios.request<
+          QoreOperationResultData<QoreOperationResult<AxiosRequestConfig>>
+        >({
+          ...operation.request,
+          cancelToken: cancelToken.token,
+          url: operation.request.url
         });
+        request
+          .then(resp => {
+            next({ data: resp.data, operation, stale: false });
+          })
+          .catch(error => {
+            next({ error: error, operation, stale: false });
+          })
+          .finally(() => {
+            complete();
+          });
+      }
       return () => {
         cancelToken.cancel();
       };
