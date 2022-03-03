@@ -935,10 +935,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@feedloop/qore-client@^2.0.0-alpha.16":
-  version "2.0.0-alpha.16"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-2.0.0-alpha.16.tgz#a9f9a363a656df266f1d21be36dde105bb1c32e5"
-  integrity sha512-o7vZL9Dcg90/oNAcssOdDwG1Mb9q5S3JFLsAn1AM4J127ktwnYYuRQ7deV58lNo/RHWMan37YCcvlrLOHTArZw==
+"@feedloop/qore-client@^2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-client/-/qore-client-2.0.0-alpha.18.tgz#a49479283fd77fe044f963b0e902fd69a4d175fe"
+  integrity sha512-EKte2+cnYAuT5MPZ0UA2N3gVk9rAQw3u9rwhFUWh3zYiXcoUWy/RLYCFwnV5OTDCdA5zjYMMd9nHoiBJtLsVvQ==
   dependencies:
     "@feedloop/qore-sdk" "^2.0.0-alpha.5"
     axios "^0.21.0"

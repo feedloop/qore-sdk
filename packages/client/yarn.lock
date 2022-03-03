@@ -279,10 +279,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@feedloop/qore-sdk@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-sdk/-/qore-sdk-0.1.8.tgz#13aa50373e286cf60bd29e9fcc22a9e3d765d115"
-  integrity sha512-izH+4hqJ+qNxcSjhh6RP/t/62zbpIleNgzn4cGogDSS7YPOIodtXE4uf0IA2eaXYnWCcuFMUVYHm39PI9FjywQ==
+"@feedloop/qore-sdk@^2.0.0-alpha.5":
+  version "2.0.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/@feedloop/qore-sdk/-/qore-sdk-2.0.0-alpha.5.tgz#0eefd56b7de254f72980c7f13d76ce734f230d89"
+  integrity sha512-RMwiw0SxwITyTqr8KLV1FGo/cylYQqnxSCPjqztDe3sb3HjK+OdNFAUSSLIBAVe2AOFXWWLkb03+faISZ5ji5w==
   dependencies:
     axios "^0.21.0"
 
