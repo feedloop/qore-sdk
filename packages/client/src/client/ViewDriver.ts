@@ -175,7 +175,23 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         map(result => ({
           ...result,
           // @ts-ignore
-          data: { nodes: result.data?.results.data || [] }
+          data: {
+            nodes: (result.data?.results.data || []).map((row: any) =>
+              Object.fromEntries(
+                Object.entries(row).map(([key, val]) => [
+                  key,
+                  val && typeof val === "object" && "filename" in val
+                    ? `${this.project.config.endpoint}/v1/files/public/${
+                        this.id
+                      }/${row.id}/${key}/${
+                        // @ts-ignore
+                        val.filename
+                      }`
+                    : val
+                ])
+              )
+            )
+          }
         }))
       )
     ) as PromisifiedSource<
@@ -240,11 +256,28 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const stream = this.client.execute(operation, resultStream =>
       pipe(
         resultStream,
-        map(result => ({
-          ...result,
-          // @ts-ignore
-          data: result.data?.results?.data?.[0]
-        }))
+        map(result => {
+          const row = result.data?.results?.data?.[0];
+          return {
+            ...result,
+            // @ts-ignore
+            data:
+              row &&
+              Object.fromEntries(
+                Object.entries(row).map(([key, val]) => [
+                  key,
+                  val && typeof val === "object" && "filename" in val
+                    ? `${this.project.config.endpoint}/v1/files/public/${
+                        this.id
+                      }/${id}/${key}/${
+                        // @ts-ignore
+                        val.filename
+                      }`
+                    : val
+                ])
+              )
+          };
+        })
       )
     ) as PromisifiedSource<
       QoreOperationResult<AxiosRequestConfig, { nodes: T["read"] }>
