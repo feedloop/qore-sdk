@@ -488,24 +488,32 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     return true;
   }
 
-  private async generateFileUrl(filename: string): Promise<string> {
+  private async generateUploadToken(
+    rowId: string,
+    column: string
+  ): Promise<string> {
     const axiosConfig: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
-      url: `/${this.id}/upload-url?fileName=${filename}`,
+      url: `/v1/files/token/table/${this.id}/id/${rowId}/column/${column}?access=write`,
       method: "GET"
     };
     const result = await this.project.axios(axiosConfig);
-    return result.data.url;
+    return result.data.token;
   }
-  async upload(file: File): Promise<string> {
-    const [ext] = file.name.split(".").reverse();
-    const uploadUrl = await this.generateFileUrl(`${nanoid()}.${ext}`);
-    await Axios.put(uploadUrl, file, {
-      headers: {
-        "Content-Type": file.type
+  async upload(rowId: string, column: string, file: File): Promise<string> {
+    const uploadToken = await this.generateUploadToken(rowId, column);
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await Axios.post(
+      `/v1/files/upload?token=${uploadToken}`,
+      formData,
+      {
+        baseURL: this.project.config.endpoint,
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
       }
-    });
-    const [url] = uploadUrl.split("?");
-    return url;
+    );
+    return `${this.project.config.endpoint}/v1/files/public/${this.id}/${rowId}/${column}/${response.data.filename}`;
   }
 }
