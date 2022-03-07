@@ -33,6 +33,7 @@ export declare type QoreOperationConfig<T extends OptimisticResponse = {}> = {
   optimisticResponse?: T;
   optimisticStrategy?: "cache-first" | "optimistic-first";
   mode?: "sync" | "default" | "subscription";
+  skip?: boolean;
 };
 
 export type QoreOperation<

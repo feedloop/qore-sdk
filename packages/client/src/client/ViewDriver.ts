@@ -42,6 +42,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   client: QoreClient;
   actions: RowActions<T["actions"]>;
   forms: FormDrivers<T["forms"]>;
+  isTable: boolean = false;
   constructor(
     client: QoreClient,
     project: QoreProject,
@@ -59,6 +60,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       (map, field) => ({ ...map, [field.id]: field }),
       {}
     );
+    this.isTable = id === tableId;
     this.actions = new Proxy({} as RowActions<T["actions"]>, {
       get: (actions, key: string): RowActions<T["actions"]>[string] => {
         if (!actions[key]) {
@@ -131,6 +133,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       orderBy: Record<string, "ASC" | "DESC">;
       populate: Array<string>;
       condition: Record<string, any>;
+      params: Record<string, any>;
     }> &
       T["params"] = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
@@ -145,13 +148,14 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Select",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               populate: opts.populate,
               limit: opts.limit,
               offset: opts.offset,
               orderBy: opts.orderBy || {},
-              condition: opts.condition || { $and: [] }
+              condition: opts.condition || { $and: [] },
+              params: opts.params || {}
             }
           }
         ]
@@ -171,7 +175,23 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         map(result => ({
           ...result,
           // @ts-ignore
-          data: { nodes: result.data?.results.data || [] }
+          data: {
+            nodes: (result.data?.results.data || []).map((row: any) =>
+              Object.fromEntries(
+                Object.entries(row).map(([key, val]) => [
+                  key,
+                  val && typeof val === "object" && "filename" in val
+                    ? `${this.project.config.endpoint}/v1/files/public/${
+                        this.id
+                      }/${row.id}/${key}/${
+                        // @ts-ignore
+                        val.filename
+                      }`
+                    : val
+                ])
+              )
+            )
+          }
         }))
       )
     ) as PromisifiedSource<
@@ -209,7 +229,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Select",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -233,7 +253,36 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       mode: "subscription",
       ...{ ...defaultOperationConfig, ...config }
     };
-    return this.client.execute(operation);
+    const stream = this.client.execute(operation, resultStream =>
+      pipe(
+        resultStream,
+        map(result => {
+          const row = result.data?.results?.data?.[0];
+          return {
+            ...result,
+            // @ts-ignore
+            data:
+              row &&
+              Object.fromEntries(
+                Object.entries(row).map(([key, val]) => [
+                  key,
+                  val && typeof val === "object" && "filename" in val
+                    ? `${this.project.config.endpoint}/v1/files/public/${
+                        this.id
+                      }/${id}/${key}/${
+                        // @ts-ignore
+                        val.filename
+                      }`
+                    : val
+                ])
+              )
+          };
+        })
+      )
+    ) as PromisifiedSource<
+      QoreOperationResult<AxiosRequestConfig, { nodes: T["read"] }>
+    >;
+    return stream;
   }
   async updateRow(
     id: string,
@@ -249,7 +298,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Update",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -295,7 +344,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Delete",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               condition: {
                 $and: [
@@ -335,7 +384,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           {
             operation: "Insert",
             instruction: {
-              table: this.id,
+              [this.isTable ? "table" : "view"]: this.id,
               name: "data",
               data: input
             }
@@ -365,7 +414,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       return (refs as string[]).map(ref => ({
         operation: "AddRelation",
         instruction: {
-          table: this.id,
+          [this.isTable ? "table" : "view"]: this.id,
           name: `addRelation_${field}_${ref}`,
           relation: {
             name: field,
@@ -406,7 +455,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       return (refs as string[]).map(ref => ({
         operation: "RemoveRelation",
         instruction: {
-          table: this.id,
+          [this.isTable ? "table" : "view"]: this.id,
           name: `addRelation_${field}_${ref}`,
           relation: {
             name: field,
@@ -439,24 +488,32 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     return true;
   }
 
-  private async generateFileUrl(filename: string): Promise<string> {
+  private async generateUploadToken(
+    rowId: string,
+    column: string
+  ): Promise<string> {
     const axiosConfig: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
-      url: `/${this.id}/upload-url?fileName=${filename}`,
+      url: `/v1/files/token/table/${this.id}/id/${rowId}/column/${column}?access=write`,
       method: "GET"
     };
     const result = await this.project.axios(axiosConfig);
-    return result.data.url;
+    return result.data.token;
   }
-  async upload(file: File): Promise<string> {
-    const [ext] = file.name.split(".").reverse();
-    const uploadUrl = await this.generateFileUrl(`${nanoid()}.${ext}`);
-    await Axios.put(uploadUrl, file, {
-      headers: {
-        "Content-Type": file.type
+  async upload(rowId: string, column: string, file: File): Promise<string> {
+    const uploadToken = await this.generateUploadToken(rowId, column);
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await Axios.post(
+      `/v1/files/upload?token=${uploadToken}`,
+      formData,
+      {
+        baseURL: this.project.config.endpoint,
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
       }
-    });
-    const [url] = uploadUrl.split("?");
-    return url;
+    );
+    return `${this.project.config.endpoint}/v1/files/public/${this.id}/${rowId}/${column}/${response.data.filename}`;
   }
 }

@@ -40,12 +40,6 @@ export default class ImportSchema extends Command {
     }
   }
 
-  async getLatestMigrationID(client: object): Promise<number> {
-    const data = await this.getMigrationsDataInDB(client);
-    const id = data[data.length - 1].id;
-    return id;
-  }
-
   async run() {
     const client = new DefaultApi(
       new Configuration({
@@ -59,7 +53,7 @@ export default class ImportSchema extends Command {
       try {
         if (err) return this.error(err);
         this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
-        const latestID = await this.getLatestMigrationID(client);
+        const migrations = await this.getMigrationsDataInDB(client);
         const operations = [];
         files.sort(
           (a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]
@@ -68,8 +62,8 @@ export default class ImportSchema extends Command {
         for (const file of files) {
           const jsonFile = await import(`${location}/${file}`);
           const { id, name, schema } = jsonFile.default;
-
-          if (id > latestID) {
+          const existMigration = migrations.some(v => v.name === name);
+          if (!existMigration) {
             operations.push(schema);
             this.log(`${chalk.grey(`#ID-${id} - ${name}`)}`);
           }

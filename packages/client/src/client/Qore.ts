@@ -93,6 +93,7 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
 export type PromisifiedSource<
   T extends QoreOperationResult
 > = Wonka.Source<T> & {
+  operation: QoreOperation;
   toPromise: () => Promise<T>;
   revalidate: (config?: Partial<QoreOperationConfig>) => Promise<T>;
   subscribe: (callback: (data: T) => void) => Wonka.Subscription;
@@ -105,6 +106,7 @@ export function withHelpers<T extends QoreOperationResult>(
   resultModifier: (stream: Wonka.Source<T>) => Wonka.Source<T> = stream =>
     stream
 ): PromisifiedSource<T> {
+  (source$ as PromisifiedSource<T>).operation = operation;
   (source$ as PromisifiedSource<T>).toPromise = () =>
     Wonka.pipe(source$, Wonka.take(1), Wonka.toPromise);
   (source$ as PromisifiedSource<T>).subscribe = callback =>
@@ -136,6 +138,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   activeOperations: Record<string, number> = {};
   project: QoreProject;
   views: { [K in keyof T]: ViewDriver<T[K]> };
+  tables: { [K in keyof T]: ViewDriver<T[K]> };
   constructor(config: QoreConfig) {
     this.project = new QoreProject(config);
     const { next, source } = Wonka.makeSubject<
@@ -170,6 +173,23 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         return views[key];
       }
     });
+
+    this.tables = new Proxy({} as { [K in keyof T]: ViewDriver<T[K]> }, {
+      get: (views, key: string): ViewDriver<T[string]> => {
+        if (!views[key]) {
+          const currentView: ViewDriver<T[string]> = new ViewDriver<T[string]>(
+            this,
+            this.project,
+            key,
+            key,
+            []
+          );
+          // @ts-ignore
+          views[key] = currentView;
+        }
+        return views[key];
+      }
+    });
     // Keep the stream open
     Wonka.publish(this.results);
   }
@@ -185,6 +205,20 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
       this.views[viewId] = currentView;
     }
     return this.views[viewId];
+  }
+
+  table<K extends keyof T>(tableId: K): ViewDriver<T[K]> {
+    if (!this.tables[tableId]) {
+      const currentView: ViewDriver<T[K]> = new ViewDriver<T[K]>(
+        this,
+        this.project,
+        tableId as string,
+        tableId as string,
+        []
+      );
+      this.tables[tableId] = currentView;
+    }
+    return this.tables[tableId];
   }
 
   init(schema: Record<string, any>) {}
