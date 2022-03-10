@@ -176,21 +176,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
           ...result,
           // @ts-ignore
           data: {
-            nodes: (result.data?.results.data || []).map((row: any) =>
-              Object.fromEntries(
-                Object.entries(row).map(([key, val]) => [
-                  key,
-                  val && typeof val === "object" && "filename" in val
-                    ? `${this.project.config.endpoint}/v1/files/public/${
-                        this.id
-                      }/${row.id}/${key}/${
-                        // @ts-ignore
-                        val.filename
-                      }`
-                    : val
-                ])
-              )
-            )
+            nodes: result.data?.results.data || []
           }
         }))
       )
