@@ -34,6 +34,7 @@ export default class ImportSchema extends Command {
   async getMigrationsDataInDB(client: any): Promise<Migrations> {
     try {
       const { data } = await client.getMigrations();
+      if (!data || !data.items || data.items.length === 0) return [];
       return data.items;
     } catch (err) {
       this.error(`\n${chalk.red(`\n"${err}"`)}\n\n`);
@@ -50,33 +51,49 @@ export default class ImportSchema extends Command {
     const { flags } = this.parse(ImportSchema);
     const location = path.resolve(path.join(process.cwd(), flags.location));
     fs.readdir(location, async (err, files) => {
-      try {
-        if (err) return this.error(err);
-        this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
-        const migrations = await this.getMigrationsDataInDB(client);
-        const operations = [];
-        files.sort(
-          (a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]
-        );
-        files.splice(0, 6);
-        for (const file of files) {
-          const jsonFile = await import(`${location}/${file}`);
-          const { id, name, schema } = jsonFile.default;
-          const existMigration = migrations.some(v => v.name === name);
-          if (!existMigration) {
-            operations.push(schema);
-            this.log(`${chalk.grey(`#ID-${id} - ${name}`)}`);
+      if (err) return this.error(err);
+      this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
+      const migrations = await this.getMigrationsDataInDB(client);
+      const operations = [];
+      files.sort((a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]);
+      await client.rawsql({ query: "BEGIN" });
+      for (const file of files) {
+        const jsonFile = await import(`${location}/${file}`);
+        const {
+          id,
+          name,
+          schema,
+          description,
+          createdAt,
+          up,
+          down,
+          active
+        } = jsonFile.default;
+        const existMigration = migrations.some(v => v.name === name);
+        if (!existMigration) {
+          let parsedUp = up.replace(/'/g, "''");
+          let parsedDown = down.replace(/'/g, "''");
+          const migrationQuery = `insert into qore_engine_migrations ("name", "description", "schema", "created_at", "up", "down", "active")
+            values ('${name}', '${description}', '${JSON.stringify(
+            schema
+          )}', '${new Date(
+            createdAt
+          ).toISOString()}', '${parsedUp}', '${parsedDown}', ${active});`;
+          const query = `${migrationQuery}\n${up}`;
+          this.log(`${chalk.grey(`#ID-${id} - ${name}`)}`);
+          try {
+            const result = await client.rawsql({ query });
+          } catch (error) {
+            await client.rawsql({ query: "ROLLBACK" });
+            this.log(
+              `${chalk.red(`\n\nerror occured at #ID-${id} - ${name}\n\n`)}`
+            );
+            this.error(`${chalk.red(`\n\nerror: ${error}\n\n`)}`);
           }
         }
-
-        await client.migrate({
-          operations
-        });
-
-        this.log(`${chalk.green("\nSuccess\n\n")}`);
-      } catch (err) {
-        this.error(`\n${chalk.red(`\n"${err}"`)}\n\n`);
       }
+      await client.rawsql({ query: "COMMIT" });
+      this.log(`${chalk.green("\nSuccess\n\n")}`);
     });
   }
 }
