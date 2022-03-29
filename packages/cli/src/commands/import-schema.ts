@@ -56,7 +56,6 @@ export default class ImportSchema extends Command {
       const migrations = await this.getMigrationsDataInDB(client);
       const operations = [];
       files.sort((a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]);
-      await client.rawsql({ query: "BEGIN" });
       for (const file of files) {
         const jsonFile = await import(`${location}/${file}`);
         const {
@@ -82,17 +81,17 @@ export default class ImportSchema extends Command {
           const query = `${migrationQuery}\n${up}`;
           this.log(`${chalk.grey(`#ID-${id} - ${name}`)}`);
           try {
-            const result = await client.rawsql({ query });
+            await client.rawsql({ query });
           } catch (error) {
-            await client.rawsql({ query: "ROLLBACK" });
             this.log(
               `${chalk.red(`\n\nerror occured at #ID-${id} - ${name}\n\n`)}`
             );
-            this.error(`${chalk.red(`\n\nerror: ${error}\n\n`)}`);
+            // @ts-ignore
+            this.log(error?.response?.data?.message);
+            throw error;
           }
         }
       }
-      await client.rawsql({ query: "COMMIT" });
       this.log(`${chalk.green("\nSuccess\n\n")}`);
     });
   }

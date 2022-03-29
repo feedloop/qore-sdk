@@ -173,8 +173,12 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     return { status, error, user };
   };
 
-  function createViewHooks<K extends keyof ProjectSchema>(
+  function createViewHooks<
+    K extends keyof ProjectSchema,
+    T extends keyof ProjectSchema
+  >(
     currentViewId: K,
+    currentViewTable: T,
     isTable = false
   ): QoreHooks<ProjectSchema[K]> {
     const rowActions = {} as RowActionsHooks<ProjectSchema[string]["actions"]>;
@@ -204,7 +208,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const stream = React.useMemo(() => {
           const request = (isTable
             ? qoreClient.table(currentViewId)
-            : qoreClient.view(currentViewId)
+            : qoreClient.view(currentViewId, currentViewTable)
           ).readRows(opts, config);
           // We manually ensure reference equality if the key hasn't changed
           // source: https://github.com/FormidableLabs/urql/blob/main/packages/react-urql/src/hooks/useRequest.ts#L14
@@ -609,10 +613,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
   );
 
   function view<K extends keyof ProjectSchema>(
-    id: K
+    id: K,
+    table: K
   ): QoreHooks<ProjectSchema[K]> {
     if (!views[id]) {
-      views[id] = createViewHooks(id);
+      views[id] = createViewHooks(id, table);
     }
     return views[id];
   }
