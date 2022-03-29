@@ -287,9 +287,9 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@feedloop/qore-sdk@^2.0.0-alpha.4":
+"@qorebase/sdk@^2.0.0-alpha.4":
   version "2.0.0-alpha.4"
-  resolved "https://registry.npmjs.org/@feedloop/qore-sdk/-/qore-sdk-2.0.0-alpha.4.tgz#b6703ba3fca01594af57c3bcd88dbbab132399c5"
+  resolved "https://registry.npmjs.org/@qorebase/sdk/-/qore-sdk-2.0.0-alpha.4.tgz#b6703ba3fca01594af57c3bcd88dbbab132399c5"
   integrity sha512-dGP5JaOGmcUXEjfA3hqt205jIR2RP8ZJ7gr+pT8xhLpZfqcRPeLqkHumYOXhzi9FkaDj6ATkg/QgtyR+rzEp6g==
   dependencies:
     axios "^0.21.0"

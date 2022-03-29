@@ -91,5 +91,6 @@
   "types": "lib/index.d.ts",
   "qoreconfig": {
     "path": "export-dest"
-  }
+  },
+  "gitHead": "7ea349ab194776281fff28f8a00b4d4d5a0fd2f9"
 }

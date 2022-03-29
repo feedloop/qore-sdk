@@ -3,7 +3,7 @@ import {
   Configuration,
   V1MigrateOperationsOperationEnum,
   V1MigrateOperationsResourceEnum
-} from "@feedloop/qore-sdk";
+} from "@qorebase/sdk";
 import { Command } from "@oclif/command";
 import chalk from "chalk";
 import cli from "cli-ux";

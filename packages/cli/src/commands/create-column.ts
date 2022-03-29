@@ -4,7 +4,7 @@ import {
   Configuration,
   V1MigrateOperationsOperationEnum,
   V1MigrateOperationsResourceEnum
-} from "@feedloop/qore-sdk";
+} from "@qorebase/sdk";
 import chalk from "chalk";
 import config from "../config";
 import { cli } from "cli-ux";

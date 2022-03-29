@@ -1,4 +1,4 @@
-import { DefaultApi, Configuration } from "@feedloop/qore-sdk";
+import { DefaultApi, Configuration } from "@qorebase/sdk";
 import { Command, flags } from "@oclif/command";
 import config from "../config";
 import chalk from "chalk";
