@@ -8,7 +8,7 @@ import {
   QoreOperationResult,
   FormDriver,
   PromisifiedSource
-} from "@feedloop/qore-client";
+} from "@qorebase/client";
 import { AxiosRequestConfig } from "axios";
 import { ConditionalPick } from "type-fest";
 import stableHash from "stable-hash";

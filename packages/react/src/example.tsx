@@ -1,4 +1,4 @@
-import { QoreClient } from "@feedloop/qore-client";
+import { QoreClient } from "@qorebase/client";
 import React from "react";
 import createQoreContext from ".";
 

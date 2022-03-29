@@ -1,7 +1,7 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react-hooks";
 import createQoreContext from ".";
-import { QoreClient } from "@feedloop/qore-client";
+import { QoreClient } from "@qorebase/client";
 import nock from "nock";
 
 const createNewQoreContext = () => {
