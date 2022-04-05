@@ -68,7 +68,7 @@ export default class ImportSchema extends Command {
           down,
           active
         } = jsonFile.default;
-        const existMigration = migrations.some(v => v.name === name);
+        const existMigration = migrations.some(v => v.id === id);
         if (!existMigration) {
           let parsedUp = up.replace(/'/g, "''");
           let parsedDown = down.replace(/'/g, "''");
