@@ -41,11 +41,15 @@ export default class ImportSchema extends Command {
     }
   }
   mapMigrations(migrations: Migrations) {
-    const map: Map<string, true> = new Map();
+    const set: Set<string> = new Set();
     migrations.forEach(v => {
-      map.set(`${v.name} ${v.up} ${v.down}`, true);
+      set.add(this.getIdentifier(v));
     });
-    return map;
+    return set;
+  }
+  getIdentifier(migration: Migration) {
+    const { name, up, down } = migration;
+    return `${name} ${up} ${down}`;
   }
   async run() {
     const client = new DefaultApi(
@@ -74,7 +78,7 @@ export default class ImportSchema extends Command {
           down,
           active
         } = jsonFile.default;
-        if (!migrationMap.get(`${name} ${up} ${down}`)) {
+        if (!migrationMap.has(this.getIdentifier(jsonFile.default))) {
           let parsedUp = up.replace(/'/g, "''");
           let parsedDown = down.replace(/'/g, "''");
           const migrationQuery = `insert into qore_engine_migrations ("name", "description", "schema", "created_at", "up", "down", "active")
