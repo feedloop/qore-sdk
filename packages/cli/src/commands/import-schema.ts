@@ -40,7 +40,17 @@ export default class ImportSchema extends Command {
       this.error(`\n${chalk.red(`\n"${err}"`)}\n\n`);
     }
   }
-
+  mapMigrations(migrations: Migrations) {
+    const set: Set<string> = new Set();
+    migrations.forEach(v => {
+      set.add(this.getIdentifier(v));
+    });
+    return set;
+  }
+  getIdentifier(migration: Migration) {
+    const { name, up, down } = migration;
+    return `${name} ${up} ${down}`;
+  }
   async run() {
     const client = new DefaultApi(
       new Configuration({
@@ -54,8 +64,8 @@ export default class ImportSchema extends Command {
       if (err) return this.error(err);
       this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
       const migrations = await this.getMigrationsDataInDB(client);
-      const operations = [];
       files.sort((a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]);
+      const migrationMap = this.mapMigrations(migrations);
       for (const file of files) {
         const jsonFile = await import(`${location}/${file}`);
         const {
@@ -68,8 +78,7 @@ export default class ImportSchema extends Command {
           down,
           active
         } = jsonFile.default;
-        const existMigration = migrations.some(v => v.id === id);
-        if (!existMigration) {
+        if (!migrationMap.has(this.getIdentifier(jsonFile.default))) {
           let parsedUp = up.replace(/'/g, "''");
           let parsedDown = down.replace(/'/g, "''");
           const migrationQuery = `insert into qore_engine_migrations ("name", "description", "schema", "created_at", "up", "down", "active")
