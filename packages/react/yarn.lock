@@ -935,24 +935,6 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@qorebase/client@^2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@qorebase/client/-/qore-client-2.0.0-alpha.18.tgz#a49479283fd77fe044f963b0e902fd69a4d175fe"
-  integrity sha512-EKte2+cnYAuT5MPZ0UA2N3gVk9rAQw3u9rwhFUWh3zYiXcoUWy/RLYCFwnV5OTDCdA5zjYMMd9nHoiBJtLsVvQ==
-  dependencies:
-    "@feedloop/qore-sdk" "^2.0.0-alpha.5"
-    axios "^0.21.0"
-    nanoid "^3.1.20"
-    type-fest "^0.20.1"
-    wonka "^4.0.15"
-
-"@feedloop/qore-sdk@^2.0.0-alpha.5":
-  version "2.0.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@feedloop/qore-sdk/-/qore-sdk-2.0.0-alpha.5.tgz#0eefd56b7de254f72980c7f13d76ce734f230d89"
-  integrity sha512-RMwiw0SxwITyTqr8KLV1FGo/cylYQqnxSCPjqztDe3sb3HjK+OdNFAUSSLIBAVe2AOFXWWLkb03+faISZ5ji5w==
-  dependencies:
-    axios "^0.21.0"
-
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"
@@ -3301,11 +3283,6 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-nanoid@^3.1.20:
-  version "3.1.30"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.30.tgz#63f93cc548d2a113dc5dfbc63bfa09e2b9b64362"
-  integrity sha512-zJpuPDwOv8D2zq2WRoMe1HsfZthVewpel9CAvTfc/2mBD1uUT/agc5f7GHGWXlYkFvi1mVxe4IjvP2HNrop7nQ==
-
 nanomatch@^1.2.9:
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
@@ -4322,7 +4299,7 @@ type-fest@^0.11.0:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.11.0.tgz#97abf0872310fed88a5c466b25681576145e33f1"
   integrity sha512-OdjXJxnCN1AvyLSzeKIgXTXxV+99ZuXl3Hpo9XpJAv9MBcHrrJOQ5kV7ypXOuQie+AmWG25hLbiKdwYTifzcfQ==
 
-type-fest@^0.20.1, type-fest@^0.20.2:
+type-fest@^0.20.2:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.20.2.tgz#1bf207f4b28f91583666cb5fbd327887301cd5f4"
   integrity sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
@@ -4513,11 +4490,6 @@ which@^2.0.1, which@^2.0.2:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
-
-wonka@^4.0.15:
-  version "4.0.15"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.15.tgz#9aa42046efa424565ab8f8f451fcca955bf80b89"
-  integrity sha512-U0IUQHKXXn6PFo9nqsHphVCE5m3IntqZNB9Jjn7EB1lrR7YTDY3YWgFvEvwniTzXSvOH/XMzAZaIfJF/LvHYXg==
 
 word-wrap@~1.2.3:
   version "1.2.3"

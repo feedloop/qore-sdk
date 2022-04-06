@@ -13,6 +13,7 @@ import networkExchange from "../exchanges/networkExchange";
 import { ViewDriver } from "./ViewDriver";
 import cacheExchange from "../exchanges/cacheExchange";
 import dedupeExchange from "../exchanges/dedupeExchange";
+import { InsightDriver } from "./InsightDriver";
 
 export type RelationValue = { id: string } | Array<{ id: string }>;
 
@@ -139,6 +140,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
   project: QoreProject;
   views: { [K in keyof T]: ViewDriver<T[K]> };
   tables: { [K in keyof T]: ViewDriver<T[K]> };
+  insights: { [K in keyof T]: InsightDriver<T[K]> };
   constructor(config: QoreConfig) {
     this.project = new QoreProject(config);
     const { next, source } = Wonka.makeSubject<
@@ -190,6 +192,18 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         return views[key];
       }
     });
+    this.insights = new Proxy({} as { [K in keyof T]: InsightDriver<T[K]> }, {
+      get: (views, key: string): InsightDriver<T[string]> => {
+        if (!views[key]) {
+          const currentView: InsightDriver<T[string]> = new InsightDriver<
+            T[string]
+          >(this, this.project, key, key);
+          // @ts-ignore
+          views[key] = currentView;
+        }
+        return views[key];
+      }
+    });
     // Keep the stream open
     Wonka.publish(this.results);
   }
@@ -219,6 +233,19 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
       this.tables[tableId] = currentView;
     }
     return this.tables[tableId];
+  }
+
+  insight<K extends keyof T>(tableId: K, insightId: K): InsightDriver<T[K]> {
+    if (!this.insights[insightId]) {
+      const currentInsight: InsightDriver<T[K]> = new InsightDriver<T[K]>(
+        this,
+        this.project,
+        insightId as string,
+        tableId as string
+      );
+      this.insights[insightId] = currentInsight;
+    }
+    return this.insights[insightId];
   }
 
   init(schema: Record<string, any>) {}
