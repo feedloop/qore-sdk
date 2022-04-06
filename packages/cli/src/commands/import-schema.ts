@@ -4,6 +4,7 @@ import chalk from "chalk";
 import config from "../config";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 
 interface Migration {
   id: number;
@@ -40,7 +41,18 @@ export default class ImportSchema extends Command {
       this.error(`\n${chalk.red(`\n"${err}"`)}\n\n`);
     }
   }
-
+  createHash(val: string): string {
+    const hash = crypto.createHmac("sha512", config.get("adminSecret"));
+    hash.update(val);
+    return hash.digest("hex");
+  }
+  hashMigrations(migrations: Migrations): string[] {
+    const result: string[] = [];
+    migrations.forEach(v => {
+      result.push(this.createHash(`${v.name} ${v.up} ${v.down}`));
+    });
+    return result;
+  }
   async run() {
     const client = new DefaultApi(
       new Configuration({
@@ -56,6 +68,7 @@ export default class ImportSchema extends Command {
       const migrations = await this.getMigrationsDataInDB(client);
       const operations = [];
       files.sort((a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]);
+      const migrationHash = this.hashMigrations(migrations);
       for (const file of files) {
         const jsonFile = await import(`${location}/${file}`);
         const {
@@ -68,8 +81,7 @@ export default class ImportSchema extends Command {
           down,
           active
         } = jsonFile.default;
-        const existMigration = migrations.some(v => v.id === id);
-        if (!existMigration) {
+        if (!migrationHash.includes(this.createHash(`${name} ${up} ${down}`))) {
           let parsedUp = up.replace(/'/g, "''");
           let parsedDown = down.replace(/'/g, "''");
           const migrationQuery = `insert into qore_engine_migrations ("name", "description", "schema", "created_at", "up", "down", "active")
