@@ -4,7 +4,6 @@ import chalk from "chalk";
 import config from "../config";
 import path from "path";
 import fs from "fs";
-import crypto from "crypto";
 
 interface Migration {
   id: number;
@@ -41,17 +40,12 @@ export default class ImportSchema extends Command {
       this.error(`\n${chalk.red(`\n"${err}"`)}\n\n`);
     }
   }
-  createHash(val: string): string {
-    const hash = crypto.createHmac("sha512", config.get("adminSecret"));
-    hash.update(val);
-    return hash.digest("hex");
-  }
-  hashMigrations(migrations: Migrations): string[] {
-    const result: string[] = [];
+  mapMigrations(migrations: Migrations) {
+    const map: Map<string, true> = new Map();
     migrations.forEach(v => {
-      result.push(this.createHash(`${v.name} ${v.up} ${v.down}`));
+      map.set(`${v.name} ${v.up} ${v.down}`, true);
     });
-    return result;
+    return map;
   }
   async run() {
     const client = new DefaultApi(
@@ -66,9 +60,8 @@ export default class ImportSchema extends Command {
       if (err) return this.error(err);
       this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
       const migrations = await this.getMigrationsDataInDB(client);
-      const operations = [];
       files.sort((a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]);
-      const migrationHash = this.hashMigrations(migrations);
+      const migrationMap = this.mapMigrations(migrations);
       for (const file of files) {
         const jsonFile = await import(`${location}/${file}`);
         const {
@@ -81,7 +74,7 @@ export default class ImportSchema extends Command {
           down,
           active
         } = jsonFile.default;
-        if (!migrationHash.includes(this.createHash(`${name} ${up} ${down}`))) {
+        if (!migrationMap.get(`${name} ${up} ${down}`)) {
           let parsedUp = up.replace(/'/g, "''");
           let parsedDown = down.replace(/'/g, "''");
           const migrationQuery = `insert into qore_engine_migrations ("name", "description", "schema", "created_at", "up", "down", "active")
