@@ -174,7 +174,6 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
         resultStream,
         map(result => ({
           ...result,
-          // @ts-ignore
           data: {
             nodes: result.data?.results.data || []
           }
