@@ -1,7 +1,7 @@
 {
   "name": "@qorebase/cli",
   "description": "qore cli",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "bin": {
     "qore": "./bin/run"
   },
@@ -9,7 +9,7 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
-    "@qorebase/sdk": "^1.0.3",
+    "@qorebase/sdk": "^1.0.4",
     "@sentry/integrations": "^6.2.5",
     "@sentry/node": "^5.29.2",
     "@sentry/tracing": "^5.29.2",
