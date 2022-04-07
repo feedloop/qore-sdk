@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Qore Data
   description: qore-engine api docs
-  version: 1.0.21
+  version: 1.0.27-alpha.2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -458,6 +458,7 @@ paths:
                           - Role
                           - Table
                           - View
+                          - Insight
                       migration:
                         type: object
         required: true
@@ -845,6 +846,7 @@ paths:
                           - AddRelation
                           - RemoveRelation
                           - Aggregate
+                          - Insight
                       instruction:
                         type: object
                         required: []
@@ -1036,10 +1038,45 @@ paths:
                             type: object
                             required: []
                             additionalProperties: true
+                        insights:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              columns:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    type:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - name
+                                    - type
+                              baseCondition:
+                                additionalProperties: true
+                                type: object
+                              sorts:
+                                items:
+                                  type: object
+                                type: array
+                            required:
+                              - name
+                              - baseCondition
+                              - sorts
+                              - columns
                       required:
                         - name
                         - columns
                         - roles
+                        - insights
+                        - views
                 required:
                   - tables
       operationId: getSchema
@@ -1340,6 +1377,28 @@ paths:
       parameters:
         - name: token
           in: query
+          required: true
+          schema:
+            type: string
+  '/v1/action/{table}/{column}/{rowId}':
+    post:
+      responses:
+        '200':
+          description: Default Response
+      operationId: action
+      parameters:
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: column
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowId
+          in: path
           required: true
           schema:
             type: string
