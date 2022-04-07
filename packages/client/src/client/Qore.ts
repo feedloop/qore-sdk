@@ -197,7 +197,7 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
         if (!views[key]) {
           const currentView: InsightDriver<T[string]> = new InsightDriver<
             T[string]
-          >(this, this.project, key, key);
+          >(this, this.project, key);
           // @ts-ignore
           views[key] = currentView;
         }
@@ -235,13 +235,12 @@ export default class QoreClient<T extends QoreSchema = QoreSchema> {
     return this.tables[tableId];
   }
 
-  insight<K extends keyof T>(tableId: K, insightId: K): InsightDriver<T[K]> {
+  insight<K extends keyof T>(insightId: K): InsightDriver<T[K]> {
     if (!this.insights[insightId]) {
       const currentInsight: InsightDriver<T[K]> = new InsightDriver<T[K]>(
         this,
         this.project,
-        insightId as string,
-        tableId as string
+        insightId as string
       );
       this.insights[insightId] = currentInsight;
     }

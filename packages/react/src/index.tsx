@@ -144,6 +144,13 @@ type QoreContextViews<ProjectSchema extends QoreSchema> = {
   [ViewName in keyof ProjectSchema]: QoreHooks<ProjectSchema[ViewName]>;
 };
 
+type QoreContextInsights<ProjectSchema extends QoreSchema> = {
+  [InsightName in keyof ProjectSchema]: Pick<
+    QoreHooks<ProjectSchema[InsightName]>,
+    "useListRow"
+  >;
+};
+
 const createQoreContext = <ProjectSchema extends QoreSchema>(
   client: QoreClient<ProjectSchema>
 ) => {
@@ -572,6 +579,76 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     };
   }
 
+  function createInsightHooks<K extends keyof ProjectSchema>(
+    currentViewId: K
+  ): Pick<QoreHooks<ProjectSchema[K]>, "useListRow"> {
+    return {
+      useListRow: (opts = {}, config = {}) => {
+        const qoreClient = useClient();
+        const [data, setData] = React.useState<ProjectSchema[string]["read"][]>(
+          []
+        );
+        const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
+        const [error, setError] = React.useState<Error | null>(null);
+
+        const prev = React.useRef<
+          | undefined
+          | (PromisifiedSource<
+              QoreOperationResult<
+                AxiosRequestConfig,
+                {
+                  nodes: ProjectSchema[K]["read"][];
+                }
+              >
+            > & {
+              fetchMore: (fetchMoreOptions: typeof opts) => Promise<void>;
+            })
+        >(undefined);
+
+        const stream = React.useMemo(() => {
+          const request = qoreClient.insight(currentViewId).readRows(opts);
+          // We manually ensure reference equality if the key hasn't changed
+          // source: https://github.com/FormidableLabs/urql/blob/main/packages/react-urql/src/hooks/useRequest.ts#L14
+          if (prev.current?.operation.key === request.operation.key) {
+            return prev.current;
+          } else {
+            // @ts-ignore
+            prev.current = request;
+            return request;
+          }
+        }, [stableHash(opts), stableHash(config), currentViewId]);
+
+        React.useEffect(() => {
+          setStatus("loading");
+          const subscription = stream.subscribe(({ error, data }) => {
+            if (error) {
+              setError(error);
+              setStatus("error");
+            }
+            if (data) {
+              setError(null);
+              setData(data.nodes);
+              setStatus("success");
+            }
+          });
+          return () => {
+            subscription?.unsubscribe();
+          };
+        }, [stream]);
+
+        const revalidate = React.useCallback(
+          async (config?: Partial<QoreOperationConfig>) => {
+            const result = await stream.revalidate(config);
+
+            return result;
+          },
+          [stream.revalidate]
+        );
+        return { data, error, status, revalidate, fetchMore: async () => {} };
+      }
+    };
+  }
+
   const useClient = () => {
     const { client } = React.useContext(context);
     return client;
@@ -608,6 +685,22 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     }
   );
 
+  const insights = new Proxy<QoreContextInsights<ProjectSchema>>(
+    {} as QoreContextInsights<ProjectSchema>,
+    {
+      // @ts-ignore
+      get: <K extends keyof ProjectSchema>(
+        insights: QoreContextInsights<ProjectSchema>,
+        currentInsightId: K
+      ): Pick<QoreHooks<ProjectSchema[K]>, "useListRow"> => {
+        if (!insights[currentInsightId]) {
+          insights[currentInsightId] = createInsightHooks(currentInsightId);
+        }
+        return insights[currentInsightId];
+      }
+    }
+  );
+
   function view<K extends keyof ProjectSchema>(
     id: K
   ): QoreHooks<ProjectSchema[K]> {
@@ -626,10 +719,20 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
     return tables[id];
   }
 
+  function insight<K extends keyof ProjectSchema>(
+    id: K
+  ): Pick<QoreHooks<ProjectSchema[K]>, "useListRow"> {
+    if (!views[id]) {
+      insights[id] = createViewHooks(id);
+    }
+    return insights[id];
+  }
+
   return {
     views,
     view,
     table,
+    insight,
     client,
     context,
     useClient,

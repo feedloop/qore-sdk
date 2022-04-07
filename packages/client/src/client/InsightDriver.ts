@@ -13,21 +13,14 @@ import QoreClient, {
 } from "./Qore";
 
 export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
-  tableId: string;
   insightId: string;
   project: QoreProject;
   client: QoreClient;
 
-  constructor(
-    client: QoreClient,
-    project: QoreProject,
-    insightId: string,
-    tableId: string
-  ) {
+  constructor(client: QoreClient, project: QoreProject, insightId: string) {
     this.client = client;
     this.project = project;
     this.insightId = insightId;
-    this.tableId = tableId;
   }
 
   readRows(
@@ -44,7 +37,6 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
             operation: "Insight",
             instruction: {
               name: "insight",
-              table: this.tableId,
               insight: this.insightId
             }
           }
@@ -65,11 +57,12 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
         map(result => ({
           ...result,
           data: {
-            nodes: result.data?.results.data || []
+            nodes: result.data?.results.insight || []
           }
         }))
       )
     );
+
     return stream;
   }
 }
