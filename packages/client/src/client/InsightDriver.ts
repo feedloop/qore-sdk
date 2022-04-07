@@ -24,6 +24,10 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
   }
 
   readRows(
+    opts: Partial<{
+      start: string;
+      end: string;
+    }>,
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<
     QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
@@ -37,7 +41,9 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
             operation: "Insight",
             instruction: {
               name: "insight",
-              insight: this.insightId
+              insight: this.insightId,
+              start: opts.start,
+              end: opts.end
             }
           }
         ]
