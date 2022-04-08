@@ -39,6 +39,28 @@ export declare type RowActionsHooks<T extends QoreViewSchema["actions"]> = {
   };
 };
 
+type InsightHooks<T extends QoreSchema[string]> = {
+  useListRow: (opts?: {
+    start?: string;
+    end?: string;
+  }) => {
+    data: T["read"][];
+    status: QoreRequestStatus;
+    error: Error | null;
+    fetchMore(fetchMoreOpts: typeof opts): Promise<void>;
+    revalidate: (
+      config?: Partial<QoreOperationConfig>
+    ) => Promise<
+      QoreOperationResult<
+        AxiosRequestConfig,
+        {
+          nodes: T["read"][];
+        }
+      >
+    >;
+  };
+};
+
 type QoreHooks<T extends QoreSchema[string]> = {
   useListRow: (
     opts?: {
@@ -145,9 +167,8 @@ type QoreContextViews<ProjectSchema extends QoreSchema> = {
 };
 
 type QoreContextInsights<ProjectSchema extends QoreSchema> = {
-  [InsightName in keyof ProjectSchema]: Pick<
-    QoreHooks<ProjectSchema[InsightName]>,
-    "useListRow"
+  [InsightName in keyof ProjectSchema]: InsightHooks<
+    ProjectSchema[InsightName]
   >;
 };
 
@@ -581,7 +602,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
   function createInsightHooks<K extends keyof ProjectSchema>(
     currentViewId: K
-  ): Pick<QoreHooks<ProjectSchema[K]>, "useListRow"> {
+  ): InsightHooks<ProjectSchema[K]> {
     return {
       useListRow: (opts = {}, config = {}) => {
         const qoreClient = useClient();
@@ -606,7 +627,9 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         >(undefined);
 
         const stream = React.useMemo(() => {
-          const request = qoreClient.insight(currentViewId).readRows(opts);
+          const request = qoreClient
+            .insight(currentViewId)
+            .readRows(opts, config);
           // We manually ensure reference equality if the key hasn't changed
           // source: https://github.com/FormidableLabs/urql/blob/main/packages/react-urql/src/hooks/useRequest.ts#L14
           if (prev.current?.operation.key === request.operation.key) {
@@ -692,7 +715,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
       get: <K extends keyof ProjectSchema>(
         insights: QoreContextInsights<ProjectSchema>,
         currentInsightId: K
-      ): Pick<QoreHooks<ProjectSchema[K]>, "useListRow"> => {
+      ): InsightHooks<ProjectSchema[K]> => {
         if (!insights[currentInsightId]) {
           insights[currentInsightId] = createInsightHooks(currentInsightId);
         }
@@ -721,7 +744,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
 
   function insight<K extends keyof ProjectSchema>(
     id: K
-  ): Pick<QoreHooks<ProjectSchema[K]>, "useListRow"> {
+  ): InsightHooks<ProjectSchema[K]> {
     if (!views[id]) {
       insights[id] = createViewHooks(id);
     }
