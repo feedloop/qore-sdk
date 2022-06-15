@@ -63,7 +63,6 @@ export default class ImportSchema extends Command {
     fs.readdir(location, async (err, files) => {
       if (err) return this.error(err);
       this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
-      const migrations = await this.getMigrationsDataInDB(client);
       files.sort((a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]);
       const migrationMap = this.mapMigrations(migrations);
       for (const file of files) {
@@ -79,15 +78,14 @@ export default class ImportSchema extends Command {
           active
         } = jsonFile.default;
         if (!migrationMap.has(this.getIdentifier(jsonFile.default))) {
-          let parsedUp = up.replace(/'/g, "''");
-          let parsedDown = down.replace(/'/g, "''");
+          const parsedUp = up.replace(/'/g, "''");
+          const parsedDown = down.replace(/'/g, "''");
+          const parsedSchema = JSON.stringify(schema).replace(/'/g, "''");
+          const parsedCreatedAt = new Date(createdAt).toISOString();
           const migrationQuery = `insert into qore_engine_migrations ("name", "description", "schema", "created_at", "up", "down", "active")
-            values ('${name}', '${description}', '${JSON.stringify(
-            schema
-          )}', '${new Date(
-            createdAt
-          ).toISOString()}', '${parsedUp}', '${parsedDown}', ${active});`;
-          const query = `${migrationQuery}\n${up}`;
+            values ('${name}', '${description}', '${parsedSchema}', '${parsedCreatedAt}', '${parsedUp}', '${parsedDown}', ${active});`;
+          const query = `${migrationQuery}\n${up};`;
+
           this.log(`${chalk.grey(`#ID-${id} - ${name}`)}`);
           try {
             await client.rawsql({ query });
