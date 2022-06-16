@@ -1,7 +1,7 @@
 {
   "name": "@qorebase/cli",
   "description": "qore cli",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "bin": {
     "qore": "./bin/run"
   },
