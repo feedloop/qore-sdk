@@ -64,6 +64,7 @@ export default class ImportSchema extends Command {
       if (err) return this.error(err);
       this.log(`\n${chalk.yellow(`\nRunning import-schema`)} ...\n`);
       files.sort((a: string, b: string) => +a.split("-")[0] - +b.split("-")[0]);
+      const migrations = await this.getMigrationsDataInDB(client);
       const migrationMap = this.mapMigrations(migrations);
       for (const file of files) {
         const jsonFile = await import(`${location}/${file}`);
