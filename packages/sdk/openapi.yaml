@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Qore Data
   description: qore-engine api docs
-  version: 1.0.27-alpha.2
+  version: 1.0.57
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -17,8 +17,8 @@ security:
   - ApiKeyAuth: []
   - bearerAuth: []
 servers:
-  - url: 'http://localhost:8080'
-    description: 'http://localhost:8080'
+  - url: 'https://stg-qore-data.qore.one'
+    description: 'https://stg-qore-data.qore.one'
 paths:
   /v1/health:
     get:
@@ -459,6 +459,7 @@ paths:
                           - Table
                           - View
                           - Insight
+                          - Trigger
                       migration:
                         type: object
         required: true
@@ -1003,6 +1004,10 @@ paths:
                                     type: string
                                   origin:
                                     type: boolean
+                                  onDelete:
+                                    type: string
+                                  onUpdate:
+                                    type: string
                                 required:
                                   - column
                                   - targetTable
@@ -1036,8 +1041,44 @@ paths:
                           type: array
                           items:
                             type: object
-                            required: []
-                            additionalProperties: true
+                            properties:
+                              name:
+                                type: string
+                              baseCondition:
+                                additionalProperties: true
+                                type: object
+                              query:
+                                additionalProperties: true
+                                type: object
+                              sorts:
+                                type: array
+                                items:
+                                  type: object
+                                  additionalProperties: true
+                                  required: []
+                              roles:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    permissions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          action:
+                                            type: string
+                                          condition:
+                                            type: object
+                                            additionalProperties: true
+                                        required:
+                                          - action
+                                          - condition
+                                  required:
+                                    - name
+                                    - permissions
                         insights:
                           type: array
                           items:
@@ -1059,24 +1100,60 @@ paths:
                                   required:
                                     - name
                                     - type
+                              insight:
+                                type: object
+                                additionalProperties: true
+                                required: []
                               baseCondition:
                                 additionalProperties: true
                                 type: object
                               sorts:
                                 items:
                                   type: object
+                                  additionalProperties: true
                                 type: array
+                              params:
+                                type: array
+                                items:
+                                  type: string
                             required:
                               - name
                               - baseCondition
                               - sorts
                               - columns
+                              - insight
+                        triggers:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              event:
+                                type: string
+                              destination:
+                                type: string
+                              maxAttempts:
+                                type: number
+                              webhook:
+                                type: object
+                                additionalProperties: true
+                                required: []
+                            required:
+                              - name
+                              - event
+                              - maxAttempts
+                              - webhook
+                        primaryKey:
+                          type: string
                       required:
                         - name
                         - columns
                         - roles
                         - insights
                         - views
+                        - primaryKey
+                        - triggers
                 required:
                   - tables
       operationId: getSchema
@@ -1107,6 +1184,27 @@ paths:
                         type: number
                       total:
                         type: number
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: '401'
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
       operationId: getRows
       parameters:
         - name: limit
@@ -1131,7 +1229,53 @@ paths:
     post:
       responses:
         '200':
-          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: '401'
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Resource Not Found
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 404
+                  status:
+                    type: string
+                    default: '404'
+                  message:
+                    type: string
+                    default: Not found in this table
+          description: Resource Not Found
       operationId: createRow
       requestBody:
         content:
@@ -1161,6 +1305,48 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: '401'
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Resource Not Found
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 404
+                  status:
+                    type: string
+                    default: '404'
+                  message:
+                    type: string
+                    default: Not found in this table
+          description: Resource Not Found
       operationId: getRow
       parameters:
         - name: populate
@@ -1187,6 +1373,48 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: '401'
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Resource Not Found
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 404
+                  status:
+                    type: string
+                    default: '404'
+                  message:
+                    type: string
+                    default: Not found in this table
+          description: Resource Not Found
       operationId: updateRow
       requestBody:
         content:
@@ -1212,7 +1440,36 @@ paths:
     delete:
       responses:
         '200':
-          description: Default Response
+          content:
+            application/json:
+              schema:
+                required:
+                  - ok
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: '401'
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
       operationId: deleteRow
       parameters:
         - name: table
@@ -1248,6 +1505,7 @@ paths:
             enum:
               - write
               - read
+              - delete
         - name: table
           in: path
           required: true
@@ -1306,6 +1564,36 @@ paths:
           required: true
           schema:
             type: string
+    delete:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - filename
+                  - mimetype
+                  - size
+                properties:
+                  filename:
+                    type: string
+                  mimetype:
+                    type: string
+                  size:
+                    type: number
+      operationId: deleteFile
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
   '/v1/files/public/{table}/{id}/{column}/{filename}':
     get:
       responses:
@@ -1330,6 +1618,34 @@ paths:
             type: string
         - name: table
           in: path
+          required: true
+          schema:
+            type: string
+  /v1/multiple_files/upload:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - filename
+                    - mimetype
+                    - size
+                  properties:
+                    filename:
+                      type: string
+                    mimetype:
+                      type: string
+                    size:
+                      type: number
+      operationId: uploadFile
+      parameters:
+        - name: token
+          in: query
           required: true
           schema:
             type: string
@@ -1369,6 +1685,44 @@ paths:
               - csv
               - xlsx
   /v1/export:
+    get:
+      responses:
+        '200':
+          description: Default Response
+      operationId: export
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+  /v1/export/files/token:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                properties:
+                  token:
+                    type: string
+      operationId: issueExportFileToken
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Export Table Product:
+                value:
+                  name: Export Product
+                  table: product
+            schema:
+              type: object
+              required: []
+        required: true
+  /v1/export/files:
     get:
       responses:
         '200':
@@ -1438,3 +1792,15 @@ paths:
                 - query
               additionalProperties: false
         required: true
+  '/v1/role/{roleName}/openapi.yaml':
+    get:
+      responses:
+        '200':
+          description: Default Response
+      operationId: openapi.yaml
+      parameters:
+        - name: roleName
+          in: path
+          required: true
+          schema:
+            type: string
