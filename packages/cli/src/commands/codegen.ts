@@ -252,6 +252,7 @@ export default class Codegen extends Command {
                   }`
                   )}
                 }
+                forms: {}
               }`;
             });
           })
