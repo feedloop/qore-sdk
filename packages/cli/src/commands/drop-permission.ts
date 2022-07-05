@@ -1,8 +1,8 @@
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command, flags } from "@oclif/command";
 import cli from "cli-ux";
@@ -61,8 +61,8 @@ export default class DropPermission extends Command {
       await client.migrate({
         operations: [
           {
-            operation: V1MigrateOperationsOperationEnum.Drop,
-            resource: V1MigrateOperationsResourceEnum.Permission,
+            operation: MigrateRequestOperationsInnerOperationEnum.Drop,
+            resource: MigrateRequestOperationsInnerResourceEnum.Permission,
             migration: { role, action: args.action, tables: listTables }
           }
         ]

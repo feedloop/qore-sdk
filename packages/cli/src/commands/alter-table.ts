@@ -1,8 +1,8 @@
 import {
   Configuration,
   DefaultApi,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command } from "@oclif/command";
 import cli from "cli-ux";
@@ -33,8 +33,8 @@ export default class AlterTable extends Command {
     await client.migrate({
       operations: [
         {
-          operation: V1MigrateOperationsOperationEnum.Alter,
-          resource: V1MigrateOperationsResourceEnum.Table,
+          operation: MigrateRequestOperationsInnerOperationEnum.Alter,
+          resource: MigrateRequestOperationsInnerResourceEnum.Table,
           migration: { from: formerName, to: newName }
         }
       ]

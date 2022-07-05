@@ -1,8 +1,8 @@
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command } from "@oclif/command";
 import chalk from "chalk";
@@ -31,8 +31,8 @@ export default class AlterRole extends Command {
     await client.migrate({
       operations: [
         {
-          operation: V1MigrateOperationsOperationEnum.Alter,
-          resource: V1MigrateOperationsResourceEnum.Role,
+          operation: MigrateRequestOperationsInnerOperationEnum.Alter,
+          resource: MigrateRequestOperationsInnerResourceEnum.Role,
           migration: { from: formerName, to: newName }
         }
       ]

@@ -1,7 +1,7 @@
 import {
   Configuration,
   DefaultApi,
-  V1ExecuteOperationsOperationEnum
+  ExecuteRequestOperationsInnerOperationEnum
 } from "@qorebase/sdk";
 import { Command } from "@oclif/command";
 import { cli } from "cli-ux";
@@ -55,7 +55,7 @@ export default class Select extends Command {
     const { data } = await client.execute({
       operations: [
         {
-          operation: V1ExecuteOperationsOperationEnum.Select,
+          operation: ExecuteRequestOperationsInnerOperationEnum.Select,
           instruction: {
             table: tableName,
             name: identityName,

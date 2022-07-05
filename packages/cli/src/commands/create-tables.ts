@@ -2,8 +2,8 @@ import { Command } from "@oclif/command";
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import chalk from "chalk";
 import config from "../config";
@@ -35,8 +35,8 @@ export default class CreateTable extends Command {
 
     const operations = listTables.map((table: string) => {
       return {
-        operation: V1MigrateOperationsOperationEnum.Create,
-        resource: V1MigrateOperationsResourceEnum.Table,
+        operation: MigrateRequestOperationsInnerOperationEnum.Create,
+        resource: MigrateRequestOperationsInnerResourceEnum.Table,
         migration: {
           name: table
         }

@@ -1,8 +1,8 @@
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command } from "@oclif/command";
 import chalk from "chalk";
@@ -47,8 +47,8 @@ export default class DropRole extends Command {
     if (response.dropRoles) {
       const operations = roles.map((role: string) => {
         return {
-          operation: V1MigrateOperationsOperationEnum.Drop,
-          resource: V1MigrateOperationsResourceEnum.Role,
+          operation: MigrateRequestOperationsInnerOperationEnum.Drop,
+          resource: MigrateRequestOperationsInnerResourceEnum.Role,
           migration: { name: role }
         };
       });

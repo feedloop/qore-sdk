@@ -9,7 +9,7 @@ import { configFlags, promptFlags } from "../flags";
 import {
   Configuration,
   DefaultApi,
-  InlineResponse2007Columns
+  GetSchema200ResponseTablesInnerColumnsInner
 } from "@qorebase/sdk";
 
 const toTsType = (input: string = "") => voca.capitalize(voca.camelCase(input));
@@ -82,7 +82,7 @@ export default class Codegen extends Command {
     "relation"
   ]);
 
-  readFieldType(field: InlineResponse2007Columns) {
+  readFieldType(field: GetSchema200ResponseTablesInnerColumnsInner) {
     switch (field.type) {
       case "float":
       case "integer":
@@ -112,7 +112,7 @@ export default class Codegen extends Command {
         return field.type;
     }
   }
-  writeFieldType(field: InlineResponse2007Columns) {
+  writeFieldType(field: GetSchema200ResponseTablesInnerColumnsInner) {
     switch (field.type) {
       case "float":
       case "integer":
@@ -138,7 +138,7 @@ export default class Codegen extends Command {
         return field.type;
     }
   }
-  isWriteField(field: InlineResponse2007Columns) {
+  isWriteField(field: GetSchema200ResponseTablesInnerColumnsInner) {
     return this.writeFieldTypes.has(field.type);
   }
 
@@ -204,7 +204,7 @@ export default class Codegen extends Command {
           .map(table => {
             const getFieldType = (
               fieldId: string
-            ): InlineResponse2007Columns | undefined => {
+            ): GetSchema200ResponseTablesInnerColumnsInner | undefined => {
               if (fieldId === "id") return idField;
               const field = table.columns.find(field => field.name === fieldId);
               return field;
@@ -228,7 +228,10 @@ export default class Codegen extends Command {
                   ...query.fields
                     .map(field => getFieldType(field))
                     .filter(
-                      (field): field is InlineResponse2007Columns => !!field
+                      (
+                        field
+                      ): field is GetSchema200ResponseTablesInnerColumnsInner =>
+                        !!field
                     ),
                   idField
                 ];

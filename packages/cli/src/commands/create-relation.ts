@@ -1,8 +1,8 @@
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
@@ -57,8 +57,8 @@ export default class CreateRelation extends Command {
       await client.migrate({
         operations: [
           {
-            operation: V1MigrateOperationsOperationEnum.Create,
-            resource: V1MigrateOperationsResourceEnum[typeOfRelation],
+            operation: MigrateRequestOperationsInnerOperationEnum.Create,
+            resource: MigrateRequestOperationsInnerResourceEnum[typeOfRelation],
             migration: {
               name: relationName,
               one: { table: tableOrigin },
@@ -82,8 +82,8 @@ export default class CreateRelation extends Command {
       await client.migrate({
         operations: [
           {
-            operation: V1MigrateOperationsOperationEnum.Create,
-            resource: V1MigrateOperationsResourceEnum[typeOfRelation],
+            operation: MigrateRequestOperationsInnerOperationEnum.Create,
+            resource: MigrateRequestOperationsInnerResourceEnum[typeOfRelation],
             migration: {
               name: relationName,
               origin: { table: tableOrigin },

@@ -2,8 +2,8 @@ import { Command, flags } from "@oclif/command";
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import chalk from "chalk";
 import config from "../config";
@@ -101,8 +101,8 @@ export default class CreateColumn extends Command {
       new Configuration({ apiKey: config.get("adminSecret") })
     );
     operations.push({
-      operation: V1MigrateOperationsOperationEnum.Create,
-      resource: V1MigrateOperationsResourceEnum.Column,
+      operation: MigrateRequestOperationsInnerOperationEnum.Create,
+      resource: MigrateRequestOperationsInnerResourceEnum.Column,
       migration: {
         name,
         table,
@@ -114,8 +114,8 @@ export default class CreateColumn extends Command {
     });
     if (unique || not_null) {
       operations.push({
-        operation: V1MigrateOperationsOperationEnum.Alter,
-        resource: V1MigrateOperationsResourceEnum.Column,
+        operation: MigrateRequestOperationsInnerOperationEnum.Alter,
+        resource: MigrateRequestOperationsInnerResourceEnum.Column,
         migration: {
           from: name,
           to: name,

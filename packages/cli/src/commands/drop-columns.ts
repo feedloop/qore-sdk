@@ -2,8 +2,8 @@ import { Command, flags } from "@oclif/command";
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import chalk from "chalk";
 import inquirer from "inquirer";
@@ -53,8 +53,8 @@ export default class DropColumn extends Command {
     if (response.dropColumns) {
       const operations = listColumns.map((column: string) => {
         return {
-          operation: V1MigrateOperationsOperationEnum.Drop,
-          resource: V1MigrateOperationsResourceEnum.Column,
+          operation: MigrateRequestOperationsInnerOperationEnum.Drop,
+          resource: MigrateRequestOperationsInnerResourceEnum.Column,
           migration: { table: flags.table, column }
         };
       });

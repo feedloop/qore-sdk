@@ -1,8 +1,8 @@
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command } from "@oclif/command";
 import chalk from "chalk";
@@ -32,8 +32,8 @@ export default class CreateRole extends Command {
     const roles = args.roles.split(",");
     const operations = roles.map((role: string, i: number) => {
       return {
-        operation: V1MigrateOperationsOperationEnum.Create,
-        resource: V1MigrateOperationsResourceEnum.Role,
+        operation: MigrateRequestOperationsInnerOperationEnum.Create,
+        resource: MigrateRequestOperationsInnerResourceEnum.Role,
         migration: {
           name: role,
           deletionProtection: false

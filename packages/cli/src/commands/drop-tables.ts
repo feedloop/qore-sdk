@@ -2,8 +2,8 @@ import { Command } from "@oclif/command";
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import chalk from "chalk";
 import cli from "cli-ux";
@@ -50,8 +50,8 @@ export default class DropTable extends Command {
     if (confirmation.dropTables) {
       const operations = listTables.map((table: string) => {
         return {
-          operation: V1MigrateOperationsOperationEnum.Drop,
-          resource: V1MigrateOperationsResourceEnum.Table,
+          operation: MigrateRequestOperationsInnerOperationEnum.Drop,
+          resource: MigrateRequestOperationsInnerResourceEnum.Table,
           migration: { name: table }
         };
       });

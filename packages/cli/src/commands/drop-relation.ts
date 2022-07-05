@@ -1,8 +1,8 @@
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
@@ -74,8 +74,9 @@ export default class DropRelation extends Command {
         await client.migrate({
           operations: [
             {
-              operation: V1MigrateOperationsOperationEnum.Drop,
-              resource: V1MigrateOperationsResourceEnum.OneToManyRelation,
+              operation: MigrateRequestOperationsInnerOperationEnum.Drop,
+              resource:
+                MigrateRequestOperationsInnerResourceEnum.OneToManyRelation,
               migration: {
                 one: { table: args["tableOrigin/tableOne"] },
                 many: { table: args["tableTarget/tableMany"] },
@@ -88,8 +89,9 @@ export default class DropRelation extends Command {
         await client.migrate({
           operations: [
             {
-              operation: V1MigrateOperationsOperationEnum.Drop,
-              resource: V1MigrateOperationsResourceEnum.ManyToManyRelation,
+              operation: MigrateRequestOperationsInnerOperationEnum.Drop,
+              resource:
+                MigrateRequestOperationsInnerResourceEnum.ManyToManyRelation,
               migration: {
                 origin: { table: args["tableOrigin/tableOne"] },
                 target: { table: args["tableTarget/tableMany"] },

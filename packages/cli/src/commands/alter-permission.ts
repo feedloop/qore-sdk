@@ -1,8 +1,8 @@
 import {
   DefaultApi,
   Configuration,
-  V1MigrateOperationsOperationEnum,
-  V1MigrateOperationsResourceEnum
+  MigrateRequestOperationsInnerOperationEnum,
+  MigrateRequestOperationsInnerResourceEnum
 } from "@qorebase/sdk";
 import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
@@ -52,8 +52,8 @@ export default class AlterPermission extends Command {
     await client.migrate({
       operations: [
         {
-          operation: V1MigrateOperationsOperationEnum.Alter,
-          resource: V1MigrateOperationsResourceEnum.Permission,
+          operation: MigrateRequestOperationsInnerOperationEnum.Alter,
+          resource: MigrateRequestOperationsInnerResourceEnum.Permission,
           migration: {
             role: role,
             action: action,
