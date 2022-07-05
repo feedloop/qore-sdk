@@ -71,6 +71,8 @@ export default class Codegen extends Command {
   private writeFieldTypes = new Set<string>([
     "text",
     "number",
+    "float",
+    "integer",
     "date",
     "file",
     "password",
@@ -164,6 +166,21 @@ export default class Codegen extends Command {
         })
       );
       const { data: schema } = await client.getSchema();
+      for (const table of schema.tables) {
+        table.views.push({
+          baseCondition: {},
+          query: {
+            name: table.name,
+            fields: table.columns.map(col => col.name),
+            table: table.name,
+            registeredParams: {}
+          },
+          // @ts-ignore
+          name: table.name,
+          roles: [],
+          sorts: []
+        });
+      }
       const idField = { id: "id", type: "text", name: "id" };
 
       const typeDef = `
@@ -187,13 +204,9 @@ export default class Codegen extends Command {
           .map(table => {
             const getFieldType = (
               fieldId: string
-            ): InlineResponse2007Columns => {
+            ): InlineResponse2007Columns | undefined => {
               if (fieldId === "id") return idField;
               const field = table.columns.find(field => field.name === fieldId);
-              if (!field)
-                throw new Error(
-                  `Field ${fieldId} not found from ${table?.name}`
-                );
               return field;
             };
             type Param = { name: string; type: string; enum: string[] };
@@ -203,16 +216,24 @@ export default class Codegen extends Command {
                 return param.enum.map(en => `"${en}"`).join("|");
               return param.type;
             };
-            return table.views.map(view => {
-              const id = (view.name as unknown) as string;
-              const query = (view.query as unknown) as {
-                fields: string[];
-                registeredParams: Record<string, Param>;
-              };
-              const parameters = Object.values(query.registeredParams);
-              const fields = query.fields.map(field => getFieldType(field));
+            return table.views
+              .map(view => {
+                const id = (view.name as unknown) as string;
+                const query = (view.query as unknown) as {
+                  fields: string[];
+                  registeredParams: Record<string, Param>;
+                };
+                const parameters = Object.values(query.registeredParams);
+                const fields = [
+                  ...query.fields
+                    .map(field => getFieldType(field))
+                    .filter(
+                      (field): field is InlineResponse2007Columns => !!field
+                    ),
+                  idField
+                ];
 
-              return `
+                return `
               type ${toTsType(id)}ViewRow = {
                 read: {${[...fields]
                   .filter(field => field.type !== "action")
@@ -254,7 +275,8 @@ export default class Codegen extends Command {
                 }
                 forms: {}
               }`;
-            });
+              })
+              .join("\n");
           })
           .join("\n")}
         type ProjectSchema = {
