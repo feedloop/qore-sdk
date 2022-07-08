@@ -139,15 +139,6 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   ): PromisifiedSource<
     QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
   > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> } {
-    const {
-      offset,
-      limit,
-      order,
-      orderBy,
-      populate,
-      condition,
-      ...params
-    } = opts;
     const axiosConfig: AxiosRequestConfig = {
       url: `/v1/execute`,
       method: "POST",
@@ -163,7 +154,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
               offset: opts.offset,
               orderBy: opts.orderBy || {},
               condition: opts.condition || { $and: [] },
-              params: params || {}
+              params: opts.params || {}
             }
           }
         ]

@@ -27,6 +27,7 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
     opts: Partial<{
       start: string;
       end: string;
+      params: Record<string, any>;
     }>,
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<
@@ -43,7 +44,8 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
               name: "insight",
               insight: this.insightId,
               start: opts.start,
-              end: opts.end
+              end: opts.end,
+              params: opts.params
             }
           }
         ]
