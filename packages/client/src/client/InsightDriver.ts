@@ -30,9 +30,7 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
       params: Record<string, any>;
     }>,
     config: Partial<QoreOperationConfig> = defaultOperationConfig
-  ): PromisifiedSource<
-    QoreOperationResult<AxiosRequestConfig, { nodes: T["read"][] }>
-  > {
+  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"][]>> {
     const axiosConfig: AxiosRequestConfig = {
       url: `/v1/execute`,
       method: "POST",
@@ -64,9 +62,7 @@ export class InsightDriver<T extends QoreViewSchema = QoreViewSchema> {
         resultStream,
         map(result => ({
           ...result,
-          data: {
-            nodes: result.data?.results.insight || []
-          }
+          data: result.data?.results.insight || []
         }))
       )
     );
