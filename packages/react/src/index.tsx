@@ -6,7 +6,6 @@ import {
   RowActions,
   QoreViewSchema,
   QoreOperationResult,
-  FormDriver,
   PromisifiedSource
 } from "@qorebase/client";
 import { AxiosRequestConfig } from "axios";
@@ -50,27 +49,24 @@ type InsightHooks<T extends QoreSchema[string]> = {
     fetchMore(fetchMoreOpts: typeof opts): Promise<void>;
     revalidate: (
       config?: Partial<QoreOperationConfig>
-    ) => Promise<
-      QoreOperationResult<
-        AxiosRequestConfig,
-        {
-          nodes: T["read"][];
-        }
-      >
-    >;
+    ) => Promise<QoreOperationResult<AxiosRequestConfig, T["read"][]>>;
   };
 };
 
 type QoreHooks<T extends QoreSchema[string]> = {
   useListRow: (
-    opts?: {
-      limit?: number;
-      offset?: number;
-      order?: "asc" | "desc";
-      orderBy?: Record<string, "ASC" | "DESC">;
-      condition?: Record<string, any>;
-      populate?: Array<string>;
-    } & T["params"],
+    opts?: Partial<{
+      offset: number;
+      limit: number;
+      params: Record<string, any>;
+      orderBy: Record<string, "ASC" | "DESC">;
+      fields: string[];
+      groupBy: string[];
+      populate: Array<string>;
+      condition: Record<string, any>;
+      join: string;
+      view: string;
+    }>,
     config?: Partial<QoreOperationConfig>
   ) => {
     data: T["read"][];
@@ -79,18 +75,19 @@ type QoreHooks<T extends QoreSchema[string]> = {
     fetchMore(fetchMoreOpts: typeof opts): Promise<void>;
     revalidate: (
       config?: Partial<QoreOperationConfig>
-    ) => Promise<
-      QoreOperationResult<
-        AxiosRequestConfig,
-        {
-          nodes: T["read"][];
-        }
-      >
-    >;
+    ) => Promise<QoreOperationResult<AxiosRequestConfig, T["read"][]>>;
   };
 
   useGetRow: (
     rowId: string,
+    opts?: Partial<{
+      populate: string[];
+      params: Record<string, any>;
+      join: string;
+      fields: string[];
+      view: string;
+      rowId: string;
+    }>,
     config?: Partial<QoreOperationConfig>
   ) => {
     data: T["read"] | null;
@@ -151,14 +148,6 @@ type QoreHooks<T extends QoreSchema[string]> = {
       relations: Partial<ConditionalPick<T["write"], string[]>>
     ) => Promise<boolean>
   >;
-
-  useForm: <K extends keyof T["forms"]>(
-    formId: K
-  ) => {
-    send: (params: T["forms"][K]) => Promise<{ id: string }>;
-    status: QoreRequestStatus;
-    error: Error | null;
-  };
 };
 
 type QoreContextViews<ProjectSchema extends QoreSchema> = {
@@ -219,9 +208,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           | (PromisifiedSource<
               QoreOperationResult<
                 AxiosRequestConfig,
-                {
-                  nodes: ProjectSchema[K]["read"][];
-                }
+                ProjectSchema[K]["read"][]
               >
             > & {
               fetchMore: (fetchMoreOptions: typeof opts) => Promise<void>;
@@ -252,7 +239,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             }
             if (data) {
               setError(null);
-              setData(data.nodes);
+              setData(data);
               setStatus("success");
             }
           });
@@ -272,7 +259,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         return { data, error, status, revalidate, fetchMore: stream.fetchMore };
       },
 
-      useGetRow: (rowId, config = {}) => {
+      useGetRow: (rowId, opts = {}, config = {}) => {
         const qoreClient = useClient();
         const [data, setData] = React.useState<
           ProjectSchema[string]["read"] | null
@@ -291,7 +278,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           const request = (isTable
             ? qoreClient.table(currentViewId)
             : qoreClient.view(currentViewId)
-          ).readRow(rowId, config);
+          ).readRow(rowId, opts, config);
           // We manually ensure reference equality if the key hasn't changed
           // source: https://github.com/FormidableLabs/urql/blob/main/packages/react-urql/src/hooks/useRequest.ts#L14
           if (prev.current?.operation.key === request.operation.key) {
@@ -569,32 +556,6 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           addRelation,
           removeRelation
         };
-      },
-      useForm: <F extends keyof ProjectSchema[K]["forms"]>(formId: F) => {
-        const qoreClient = useClient();
-        const form = (isTable
-          ? qoreClient.table(currentViewId)
-          : qoreClient.view(currentViewId)
-        ).form(formId);
-        const [status, setStatus] = React.useState<QoreRequestStatus>("idle");
-        const [error, setError] = React.useState<Error | null>(null);
-        const send = React.useCallback(
-          async (params: ProjectSchema[K]["forms"][F]) => {
-            try {
-              setStatus("loading");
-              const resp = await form.sendForm(params);
-              setError(null);
-              setStatus("success");
-              return resp;
-            } catch (error: any) {
-              setStatus("error");
-              setError(error);
-              throw error;
-            }
-          },
-          []
-        );
-        return { send, error, status };
       }
     };
   }
@@ -616,9 +577,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           | (PromisifiedSource<
               QoreOperationResult<
                 AxiosRequestConfig,
-                {
-                  nodes: ProjectSchema[K]["read"][];
-                }
+                ProjectSchema[K]["read"][]
               >
             > & {
               fetchMore: (fetchMoreOptions: typeof opts) => Promise<void>;
@@ -649,7 +608,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
             }
             if (data) {
               setError(null);
-              setData(data.nodes);
+              setData(data);
               setStatus("success");
             }
           });
@@ -744,8 +703,8 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
   function insight<K extends keyof ProjectSchema>(
     id: K
   ): InsightHooks<ProjectSchema[K]> {
-    if (!views[id]) {
-      insights[id] = createViewHooks(id);
+    if (!insights[id]) {
+      insights[id] = createInsightHooks(id);
     }
     return insights[id];
   }

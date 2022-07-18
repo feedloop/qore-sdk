@@ -493,28 +493,6 @@ describe("useRelation", () => {
   });
 });
 
-describe("useForm", () => {
-  it("should send form", async () => {
-    scope = scope
-      .post("/FAKE_PROJECT/allTasks/forms/newTask")
-      .reply(200, { id: "new-task-id" });
-
-    const qoreContext = createNewQoreContext();
-
-    const { result } = renderHook(() =>
-      qoreContext.views.allTasks.useForm("newTask")
-    );
-
-    expect(result.current.status).toEqual("idle");
-    await act(async () => {
-      const resp = await result.current.send({ title: "New task" });
-      expect(resp).toEqual({ id: "new-task-id" });
-    });
-
-    expect(result.current.status).toEqual("success");
-  });
-});
-
 describe("useCurrentUser", () => {
   it("should fetch current user", async () => {
     scope = scope.get("/FAKE_PROJECT/me").reply(200, {

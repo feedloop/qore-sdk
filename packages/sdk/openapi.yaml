@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Qore Data
   description: qore-engine api docs
-  version: 1.0.57
+  version: 1.0.60
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -17,28 +17,28 @@ security:
   - ApiKeyAuth: []
   - bearerAuth: []
 servers:
-  - url: 'https://stg-qore-data.qore.one'
-    description: 'https://stg-qore-data.qore.one'
+  - url: "https://stg-qore-data.qore.one"
+    description: "https://stg-qore-data.qore.one"
 paths:
   /v1/health:
     get:
       responses:
-        '200':
+        "200":
           description: default response
   /v1/inspect:
     get:
       responses:
-        '200':
+        "200":
           description: default response
   /v1/user:
     get:
       responses:
-        '200':
+        "200":
           description: default response
   /v1/authorize:
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -71,7 +71,7 @@ paths:
   /v1/migrate:
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -118,7 +118,7 @@ paths:
         content:
           application/json:
             examples:
-              'Create user role, picker role, order table, and product table':
+              "Create user role, picker role, order table, and product table":
                 value:
                   operations:
                     - operation: Create
@@ -134,7 +134,7 @@ paths:
                           type: text
                           definition:
                             textType: text
-                            default: ''
+                            default: ""
                             unique: false
                     - operation: Create
                       resource: Table
@@ -196,8 +196,8 @@ paths:
                           $and:
                             - userOrder:
                                 external_id:
-                                  $eq: '{{user.id}}'
-              'Create todo and person table (m:1)':
+                                  $eq: "{{user.id}}"
+              "Create todo and person table (m:1)":
                 value:
                   operations:
                     - operation: Create
@@ -253,7 +253,7 @@ paths:
                           definition:
                             relation: persontodo
                             column: name
-              'Create actor and movie table (m:m)':
+              "Create actor and movie table (m:m)":
                 value:
                   operations:
                     - operation: Create
@@ -396,7 +396,7 @@ paths:
                           $and:
                             - memberTask:
                                 name:
-                                  $eq: '{{user.id}}'
+                                  $eq: "{{user.id}}"
                     - operation: Create
                       resource: Permission
                       migration:
@@ -408,7 +408,7 @@ paths:
                         condition:
                           $and:
                             - name:
-                                $eq: '{{user.id}}'
+                                $eq: "{{user.id}}"
                     - operation: Create
                       resource: View
                       migration:
@@ -417,7 +417,7 @@ paths:
                         condition:
                           $and:
                             - is_done:
-                                $eq: '{{done}}'
+                                $eq: "{{done}}"
                         populate:
                           - memberTask
                         join: left
@@ -466,7 +466,7 @@ paths:
   /v1/rollback:
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -495,7 +495,7 @@ paths:
   /v1/migrations:
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -567,7 +567,7 @@ paths:
   /v1/execute:
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -588,7 +588,7 @@ paths:
         content:
           application/json:
             examples:
-              'Insert user, product, and order':
+              "Insert user, product, and order":
                 value:
                   operations:
                     - operation: Insert
@@ -632,15 +632,15 @@ paths:
                         table: order
                         name: insertRokOrder
                         data:
-                          userOrder: '{{insertAyu[0].id}}'
-                          productOrder: '{{insertRok[0].id}}'
+                          userOrder: "{{insertAyu[0].id}}"
+                          productOrder: "{{insertRok[0].id}}"
                     - operation: Insert
                       instruction:
                         table: order
                         name: insertRokOrder
                         data:
-                          userOrder: '{{insertBudi[0].id}}'
-                          productOrder: '{{insertBaju[0].id}}'
+                          userOrder: "{{insertBudi[0].id}}"
+                          productOrder: "{{insertBaju[0].id}}"
               Insert a new task:
                 value:
                   operations:
@@ -665,14 +665,14 @@ paths:
                         name: insertCoding
                         data:
                           title: Coding
-                          persontodo: '{{insertPerson[0].id}}'
+                          persontodo: "{{insertPerson[0].id}}"
                     - operation: Insert
                       instruction:
                         table: todo
                         name: insertLeha
                         data:
                           title: Leha - leha
-                          persontodo: '{{insertPerson[0].id}}'
+                          persontodo: "{{insertPerson[0].id}}"
               Populate View:
                 value:
                   operations:
@@ -740,8 +740,8 @@ paths:
                         relation:
                           name: memberTask
                           data:
-                            origin: '{{insertLayouting[0].id}}'
-                            target: '{{insertAlexMember[0].id}}'
+                            origin: "{{insertLayouting[0].id}}"
+                            target: "{{insertAlexMember[0].id}}"
                     - operation: AddRelation
                       instruction:
                         name: insertCodingTask
@@ -749,8 +749,8 @@ paths:
                         relation:
                           name: memberTask
                           data:
-                            origin: '{{insertCodingBackEnd[0].id}}'
-                            target: '{{insertAlexMember[0].id}}'
+                            origin: "{{insertCodingBackEnd[0].id}}"
+                            target: "{{insertAlexMember[0].id}}"
                     - operation: AddRelation
                       instruction:
                         name: insertCodingTask
@@ -758,8 +758,8 @@ paths:
                         relation:
                           name: memberTask
                           data:
-                            origin: '{{insertCodingFrontEnd[0].id}}'
-                            target: '{{insertAlexMember[0].id}}'
+                            origin: "{{insertCodingFrontEnd[0].id}}"
+                            target: "{{insertAlexMember[0].id}}"
                     - operation: AddRelation
                       instruction:
                         name: insertCodingTask
@@ -767,8 +767,8 @@ paths:
                         relation:
                           name: memberTask
                           data:
-                            origin: '{{insertStudying[0].id}}'
-                            target: '{{insertAlexMember[0].id}}'
+                            origin: "{{insertStudying[0].id}}"
+                            target: "{{insertAlexMember[0].id}}"
                     - operation: AddRelation
                       instruction:
                         name: insertCodingTask
@@ -776,8 +776,8 @@ paths:
                         relation:
                           name: memberTask
                           data:
-                            origin: '{{insertCooking[0].id}}'
-                            target: '{{insertGloriaMember[0].id}}'
+                            origin: "{{insertCooking[0].id}}"
+                            target: "{{insertGloriaMember[0].id}}"
               Get all tasks:
                 value:
                   operations:
@@ -855,7 +855,7 @@ paths:
   /v1/tables:
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -940,7 +940,7 @@ paths:
   /v1/roles:
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -958,7 +958,7 @@ paths:
   /v1/schema:
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1116,12 +1116,16 @@ paths:
                                 type: array
                                 items:
                                   type: string
+                              registeredParams:
+                                type: object
+                                additionalProperties: true
                             required:
                               - name
                               - baseCondition
                               - sorts
                               - columns
                               - insight
+                              - registeredParams
                         triggers:
                           type: array
                           items:
@@ -1157,10 +1161,10 @@ paths:
                 required:
                   - tables
       operationId: getSchema
-  '/v1/table/{table}':
+  "/v1/grid/{view}":
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1184,7 +1188,7 @@ paths:
                         type: number
                       total:
                         type: number
-        '401':
+        "401":
           content:
             application/json:
               schema:
@@ -1200,7 +1204,188 @@ paths:
                     default: 401
                   status:
                     type: string
-                    default: '401'
+                    default: "401"
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
+      operationId: getViewRows
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: offset
+          in: query
+          schema:
+            type: number
+        - name: condition
+          in: query
+          schema:
+            type: object
+            additionalProperties: true
+        - name: params
+          in: query
+          schema:
+            type: object
+            additionalProperties: true
+        - name: fields
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: groupBy
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: populate
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: join
+          in: query
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          schema:
+            type: object
+            additionalProperties: true
+        - name: view
+          in: path
+          required: true
+          schema:
+            type: string
+  "/v1/grid/{view}/row/{rowId}":
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - pagination
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  pagination:
+                    type: object
+                    required:
+                      - page
+                      - total
+                    properties:
+                      page:
+                        type: number
+                      total:
+                        type: number
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: "401"
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
+      operationId: getViewRow
+      parameters:
+        - name: populate
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: params
+          in: query
+          schema:
+            type: object
+            additionalProperties: true
+        - name: join
+          in: query
+          schema:
+            type: string
+        - name: fields
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: view
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowId
+          in: path
+          required: true
+          schema:
+            type: string
+  "/v1/table/{table}":
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - pagination
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  pagination:
+                    type: object
+                    required:
+                      - page
+                      - total
+                    properties:
+                      page:
+                        type: number
+                      total:
+                        type: number
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: "401"
                   message:
                     type: string
                     default: Please login to proceed
@@ -1215,12 +1400,38 @@ paths:
           in: query
           schema:
             type: number
+        - name: condition
+          in: query
+          schema:
+            type: object
+            additionalProperties: true
+        - name: fields
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
         - name: populate
           in: query
           schema:
             type: array
             items:
               type: string
+        - name: groupBy
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: join
+          in: query
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          schema:
+            type: object
+            additionalProperties: true
         - name: table
           in: path
           required: true
@@ -1228,13 +1439,13 @@ paths:
             type: string
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
                 type: object
                 additionalProperties: true
-        '401':
+        "401":
           content:
             application/json:
               schema:
@@ -1250,12 +1461,12 @@ paths:
                     default: 401
                   status:
                     type: string
-                    default: '401'
+                    default: "401"
                   message:
                     type: string
                     default: Please login to proceed
           description: Unauthorized
-        '404':
+        "404":
           content:
             application/json:
               schema:
@@ -1271,7 +1482,7 @@ paths:
                     default: 404
                   status:
                     type: string
-                    default: '404'
+                    default: "404"
                   message:
                     type: string
                     default: Not found in this table
@@ -1296,16 +1507,16 @@ paths:
           required: true
           schema:
             type: string
-  '/v1/table/{table}/row/{rowID}':
+  "/v1/table/{table}/row/{rowID}":
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
                 type: object
                 additionalProperties: true
-        '401':
+        "401":
           content:
             application/json:
               schema:
@@ -1321,12 +1532,12 @@ paths:
                     default: 401
                   status:
                     type: string
-                    default: '401'
+                    default: "401"
                   message:
                     type: string
                     default: Please login to proceed
           description: Unauthorized
-        '404':
+        "404":
           content:
             application/json:
               schema:
@@ -1342,7 +1553,7 @@ paths:
                     default: 404
                   status:
                     type: string
-                    default: '404'
+                    default: "404"
                   message:
                     type: string
                     default: Not found in this table
@@ -1355,6 +1566,11 @@ paths:
             type: array
             items:
               type: string
+        - name: condition
+          in: query
+          schema:
+            type: object
+            additionalProperties: true
         - name: table
           in: path
           required: true
@@ -1367,13 +1583,13 @@ paths:
             type: string
     patch:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
                 type: object
                 additionalProperties: true
-        '401':
+        "401":
           content:
             application/json:
               schema:
@@ -1389,12 +1605,12 @@ paths:
                     default: 401
                   status:
                     type: string
-                    default: '401'
+                    default: "401"
                   message:
                     type: string
                     default: Please login to proceed
           description: Unauthorized
-        '404':
+        "404":
           content:
             application/json:
               schema:
@@ -1410,7 +1626,7 @@ paths:
                     default: 404
                   status:
                     type: string
-                    default: '404'
+                    default: "404"
                   message:
                     type: string
                     default: Not found in this table
@@ -1439,7 +1655,7 @@ paths:
             type: string
     delete:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1449,7 +1665,7 @@ paths:
                 properties:
                   ok:
                     type: boolean
-        '401':
+        "401":
           content:
             application/json:
               schema:
@@ -1465,7 +1681,7 @@ paths:
                     default: 401
                   status:
                     type: string
-                    default: '401'
+                    default: "401"
                   message:
                     type: string
                     default: Please login to proceed
@@ -1482,10 +1698,10 @@ paths:
           required: true
           schema:
             type: string
-  '/v1/files/token/table/{table}/id/{id}/column/{column}':
+  "/v1/files/token/table/{table}/id/{id}/column/{column}":
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1524,7 +1740,7 @@ paths:
   /v1/files/upload:
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1547,10 +1763,10 @@ paths:
           required: true
           schema:
             type: string
-  '/v1/files/{filename}':
+  "/v1/files/{filename}":
     get:
       responses:
-        '200':
+        "200":
           description: Default Response
       operationId: downloadFile
       parameters:
@@ -1566,7 +1782,7 @@ paths:
             type: string
     delete:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1594,10 +1810,10 @@ paths:
           required: true
           schema:
             type: string
-  '/v1/files/public/{table}/{id}/{column}/{filename}':
+  "/v1/files/public/{table}/{id}/{column}/{filename}":
     get:
       responses:
-        '200':
+        "200":
           description: Default Response
       operationId: downloadPublicFile
       parameters:
@@ -1624,7 +1840,7 @@ paths:
   /v1/multiple_files/upload:
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1649,10 +1865,10 @@ paths:
           required: true
           schema:
             type: string
-  '/v1/export/token/extension/{extension}':
+  "/v1/export/token/extension/{extension}":
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1687,7 +1903,7 @@ paths:
   /v1/export:
     get:
       responses:
-        '200':
+        "200":
           description: Default Response
       operationId: export
       parameters:
@@ -1699,7 +1915,7 @@ paths:
   /v1/export/files/token:
     post:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1725,7 +1941,7 @@ paths:
   /v1/export/files:
     get:
       responses:
-        '200':
+        "200":
           description: Default Response
       operationId: export
       parameters:
@@ -1734,10 +1950,10 @@ paths:
           required: true
           schema:
             type: string
-  '/v1/action/{table}/{column}/{rowId}':
+  "/v1/action/{table}/{column}/{rowId}":
     post:
       responses:
-        '200':
+        "200":
           description: Default Response
       operationId: action
       parameters:
@@ -1759,7 +1975,7 @@ paths:
   /v1/version:
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
@@ -1773,7 +1989,7 @@ paths:
   /v1/rawsql:
     post:
       responses:
-        '200':
+        "200":
           description: Default Response
       operationId: rawsql
       requestBody:
@@ -1792,10 +2008,10 @@ paths:
                 - query
               additionalProperties: false
         required: true
-  '/v1/role/{roleName}/openapi.yaml':
+  "/v1/role/{roleName}/openapi.yaml":
     get:
       responses:
-        '200':
+        "200":
           description: Default Response
       operationId: openapi.yaml
       parameters:
