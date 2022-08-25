@@ -14,6 +14,7 @@
     "nock-record": "^0.3.9",
     "ts-jest": "^26.4.4",
     "tslib": "^2.0.3",
+    "type-fest": "^0.20.1",
     "typescript": "^4.1.2"
   },
   "scripts": {
@@ -26,7 +27,6 @@
     "axios": "^0.21.0",
     "nanoid": "^3.1.20",
     "qs": "^6.11.0",
-    "type-fest": "^0.20.1",
     "wonka": "^4.0.15"
   },
   "gitHead": "7ea349ab194776281fff28f8a00b4d4d5a0fd2f9"

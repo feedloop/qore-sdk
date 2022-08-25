@@ -9,9 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "stable-hash": "^0.0.2",
-    "type-fest": "^0.20.2",
-    "typescript": "^4.1.2"
+    "stable-hash": "^0.0.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.12.11",
@@ -27,7 +25,9 @@
     "nock": "^13.0.5",
     "react": "^17.0.1",
     "react-test-renderer": "^17.0.1",
-    "tslib": "^2.0.3"
+    "tslib": "^2.0.3",
+    "type-fest": "^0.20.2",
+    "typescript": "^4.1.2"
   },
   "peerDependencies": {
     "react": "^17.0.1"
