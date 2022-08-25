@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Qore Data
   description: qore-engine api docs
-  version: 1.0.60
+  version: 1.0.80
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -460,6 +460,7 @@ paths:
                           - View
                           - Insight
                           - Trigger
+                          - Query
                       migration:
                         type: object
         required: true
@@ -578,11 +579,7 @@ paths:
                   results:
                     type: object
                     required: []
-                    additionalProperties:
-                      type: array
-                      items:
-                        type: object
-                        additionalProperties: true
+                    additionalProperties: true
       operationId: execute
       requestBody:
         content:
@@ -1011,6 +1008,8 @@ paths:
                                 required:
                                   - column
                                   - targetTable
+                              isHidden:
+                                type: boolean
                             required:
                               - name
                               - type
@@ -1158,6 +1157,39 @@ paths:
                         - views
                         - primaryKey
                         - triggers
+                  queries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        columns:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                              - name
+                              - type
+                        type:
+                          type: string
+                        query:
+                          type: string
+                        params:
+                          type: object
+                          required: []
+                          additionalProperties: true
+                          nullable: true
+                    required:
+                      - name
+                      - columns
+                      - type
+                      - query
                 required:
                   - tables
       operationId: getSchema
@@ -1359,6 +1391,8 @@ paths:
                     items:
                       type: object
                       additionalProperties: true
+                  total_rows:
+                    type: number
                   pagination:
                     type: object
                     required:
@@ -1972,6 +2006,45 @@ paths:
           required: true
           schema:
             type: string
+  "/v1/query/{queryName}":
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Unauthorized
+                required:
+                  - statusCode
+                  - status
+                  - message
+                properties:
+                  statusCode:
+                    type: number
+                    default: 401
+                  status:
+                    type: string
+                    default: "401"
+                  message:
+                    type: string
+                    default: Please login to proceed
+          description: Unauthorized
+      operationId: query
+      parameters:
+        - name: queryName
+          in: path
+          required: true
+          schema:
+            type: string
   /v1/version:
     get:
       responses:
@@ -2020,3 +2093,20 @@ paths:
           required: true
           schema:
             type: string
+  "/v1/search/location/{query}":
+    get:
+      responses:
+        "200":
+          description: Default Response
+      operationId: query
+      parameters:
+        - name: query
+          in: path
+          required: true
+          schema:
+            type: string
+  /v1/rawschema:
+    get:
+      responses:
+        "200":
+          description: default response
