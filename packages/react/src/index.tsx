@@ -56,17 +56,14 @@ type InsightHooks<T extends QoreSchema[string]> = {
 type QoreHooks<T extends QoreSchema[string]> = {
   useListRow: (
     opts?: Partial<{
-      offset: number;
       limit: number;
-      params: Record<string, any>;
+      offset: number;
+      order: "asc" | "desc";
       orderBy: Record<string, "ASC" | "DESC">;
-      fields: string[];
-      groupBy: string[];
-      populate: Array<string>;
       condition: Record<string, any>;
-      join: string;
-      view: string;
-    }>,
+      populate: Array<string>;
+    }> &
+      T["params"],
     config?: Partial<QoreOperationConfig>
   ) => {
     data: T["read"][];
@@ -80,14 +77,6 @@ type QoreHooks<T extends QoreSchema[string]> = {
 
   useGetRow: (
     rowId: string,
-    opts?: Partial<{
-      populate: string[];
-      params: Record<string, any>;
-      join: string;
-      fields: string[];
-      view: string;
-      rowId: string;
-    }>,
     config?: Partial<QoreOperationConfig>
   ) => {
     data: T["read"] | null;
@@ -259,7 +248,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         return { data, error, status, revalidate, fetchMore: stream.fetchMore };
       },
 
-      useGetRow: (rowId, opts = {}, config = {}) => {
+      useGetRow: (rowId, config = {}) => {
         const qoreClient = useClient();
         const [data, setData] = React.useState<
           ProjectSchema[string]["read"] | null
@@ -278,7 +267,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
           const request = (isTable
             ? qoreClient.table(currentViewId)
             : qoreClient.view(currentViewId)
-          ).readRow(rowId, opts, config);
+          ).readRow(rowId, config);
           // We manually ensure reference equality if the key hasn't changed
           // source: https://github.com/FormidableLabs/urql/blob/main/packages/react-urql/src/hooks/useRequest.ts#L14
           if (prev.current?.operation.key === request.operation.key) {
