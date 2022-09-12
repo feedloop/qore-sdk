@@ -1,5 +1,4 @@
 import Axios, { AxiosRequestConfig } from "axios";
-import { nanoid } from "nanoid";
 import {
   QoreOperation,
   QoreOperationConfig,
@@ -14,7 +13,6 @@ import QoreClient, {
 } from "./Qore";
 import { ConditionalPick, ConditionalExcept } from "type-fest";
 import { map, pipe } from "wonka";
-import qs from "qs";
 
 export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   id: string;
@@ -92,7 +90,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       }
     };
   }
-  selectRows(
+
+  readRows(
     opts: Partial<{
       offset: number;
       limit: number;
@@ -151,10 +150,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
       const existingItems = await stream.revalidate({
         networkPolicy: "cache-only"
       });
-      const moreItems = await this.selectRows(
-        fetchMoreOpts,
-        config
-      ).toPromise();
+      const moreItems = await this.readRows(fetchMoreOpts, config).toPromise();
       await stream.revalidate({
         networkPolicy: "network-only",
         optimisticResponse: [
@@ -168,22 +164,32 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
 
   readRow(
     id: string,
-    opts: Partial<{
-      populate: string[];
-      params: Record<string, any>;
-      join: string;
-      fields: string[];
-      view: string;
-      rowId: string;
-    }> = {},
     config: Partial<QoreOperationConfig> = defaultOperationConfig
   ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"]>> {
     const axiosConfig: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
-      method: "GET",
-      url: `/v1/${this.isTable ? "table" : "grid"}/${this.id}/row/${id}`,
-      params: opts,
-      paramsSerializer: params => qs.stringify(params)
+      url: `/v1/execute`,
+      method: "POST",
+      data: {
+        operations: [
+          {
+            operation: "Select",
+            instruction: {
+              [this.isTable ? "table" : "view"]: this.id,
+              name: "data",
+              condition: {
+                $and: [
+                  {
+                    id: {
+                      $eq: id
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
     };
     const operation: QoreOperation = {
       key: JSON.stringify(axiosConfig),
@@ -196,72 +202,30 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
     const stream = this.client.execute(operation, resultStream =>
       pipe(
         resultStream,
-        map(result => ({
-          ...result,
-          // @ts-ignore
-          data: result.data
-        }))
+        map(result => {
+          const row = result.data?.results?.data?.[0];
+          return {
+            ...result,
+            // @ts-ignore
+            data:
+              row &&
+              Object.fromEntries(
+                Object.entries(row).map(([key, val]) => [
+                  key,
+                  val && typeof val === "object" && "filename" in val
+                    ? `${this.project.config.endpoint}/v1/files/public/${
+                        this.id
+                      }/${id}/${key}/${
+                        // @ts-ignore
+                        val.filename
+                      }`
+                    : val
+                ])
+              )
+          };
+        })
       )
     ) as PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"]>>;
-    return stream;
-  }
-  readRows(
-    opts: Partial<{
-      offset: number;
-      limit: number;
-      params: Record<string, any>;
-      orderBy: Record<string, "ASC" | "DESC">;
-      fields: string[];
-      groupBy: string[];
-      populate: Array<string>;
-      condition: Record<string, any>;
-      join: string;
-      view: string;
-    }> = {},
-    config: Partial<QoreOperationConfig> = defaultOperationConfig
-  ): PromisifiedSource<QoreOperationResult<AxiosRequestConfig, T["read"][]>> & {
-    fetchMore: (fetchMoreOptions: typeof opts) => Promise<void>;
-  } {
-    const axiosConfig: AxiosRequestConfig = {
-      baseURL: this.project.config.endpoint,
-      url: `/v1/${this.isTable ? "table" : "grid"}/${this.id}`,
-      method: "GET",
-      params: opts,
-      paramsSerializer: params => qs.stringify(params)
-    };
-    const operation: QoreOperation = {
-      key: JSON.stringify(axiosConfig),
-      request: axiosConfig,
-      type: axiosConfig.method,
-      meta: {},
-      mode: "subscription",
-      ...{ ...defaultOperationConfig, ...config }
-    };
-    const stream = this.client.execute(operation, resultStream =>
-      pipe(
-        resultStream,
-        map(result => ({
-          ...result,
-          // @ts-ignore
-          data: result.data?.items || []
-        }))
-      )
-    ) as PromisifiedSource<
-      QoreOperationResult<AxiosRequestConfig, T["read"][]>
-    > & { fetchMore: (fetchMoreOptions: typeof opts) => Promise<void> };
-    stream.fetchMore = async fetchMoreOpts => {
-      const existingItems = await stream.revalidate({
-        networkPolicy: "cache-only"
-      });
-      const moreItems = await this.readRows(fetchMoreOpts, config).toPromise();
-      await stream.revalidate({
-        networkPolicy: "network-only",
-        optimisticResponse: [
-          ...(existingItems.data || []),
-          ...(moreItems.data || [])
-        ]
-      });
-    };
     return stream;
   }
   async updateRow(

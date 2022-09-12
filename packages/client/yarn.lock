@@ -466,10 +466,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@qorebase/sdk@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@qorebase/sdk/-/sdk-1.0.5.tgz#57ad97d367c65dd1266039ff4a018f861fd58e6e"
-  integrity sha512-4jCO3PfoPN1JG5sTpMbun3OzSkooqQcq9HC7Z/wYxRVEQv4AhXmxBZpkZvcGuChAY6KW0ZFZQIzbOZIvkmAn6g==
+"@qorebase/sdk@^1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@qorebase/sdk/-/sdk-1.0.7.tgz#0526c31b82fc53c0bb35ff679a211f175f1c3b57"
+  integrity sha512-QU0SSbMqz96cWkpU8ZWdS/6QTicPyM+PXIgMle4BHau/Ne4wP02XkmIACNOrdqtGKxf0QKPEP8MwgV5f+Rf4sQ==
   dependencies:
     axios "^0.21.0"
 
