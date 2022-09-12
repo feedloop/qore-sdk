@@ -1,6 +1,6 @@
 {
   "name": "@qorebase/react",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
@@ -15,7 +15,7 @@
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
     "@babel/preset-typescript": "^7.12.7",
-    "@qorebase/client": "^1.0.12",
+    "@qorebase/client": "^1.0.13",
     "@testing-library/react-hooks": "^3.7.0",
     "@types/jest": "^26.0.19",
     "@types/nock": "^11.1.0",
