@@ -4,3 +4,5 @@ lib
 coverage
 sdk/lib
 qore/lib
+.npmrc
+.yarnrc

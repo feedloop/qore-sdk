@@ -37,38 +37,42 @@ export default class ExportSchema extends Command {
     }
   }
 
-  async getDataMigrations(client: DefaultApi): Promise<Migrations> {
-    const { data } = await client.getMigrations(undefined, undefined, {});
-    return data.items as Migrations;
-  }
-
-  async exportFile(location: string, data: Migrations) {
+  async exportFile(location: string, client: DefaultApi) {
     const existing = fs.readdirSync("./migrations").map(v => +v.split("-")[0]);
     let emptyCheck = true;
-    data.forEach(file => {
-      if (!existing.includes(file.id)) {
-        emptyCheck = false;
-        this.log(
-          `${chalk.grey(
-            `#${file.id} ${new Date(file.createdAt).toISOString()}-${file.name}`
-          )}`
-        );
-        fs.writeFile(
-          `${location}/${file.id}-${new Date(
-            file.createdAt
-          ).toISOString()}.json`,
-          JSON.stringify(file, null, 2),
-          {
-            encoding: "utf8",
-            flag: "w",
-            mode: 0o666
-          },
-          err => {
-            if (err) return this.error(`${chalk.red(err)}`);
-          }
-        );
+    let offset = 0;
+    while (true) {
+      const { data } = await client.getMigrations(250, offset, {});
+      for (const file of data.items) {
+        if (!existing.includes(file.id)) {
+          emptyCheck = false;
+          this.log(
+            `${chalk.grey(
+              `#${file.id} ${new Date(file.createdAt).toISOString()}-${
+                file.name
+              }`
+            )}`
+          );
+          fs.writeFile(
+            `${location}/${file.id}-${new Date(
+              file.createdAt
+            ).toISOString()}.json`,
+            JSON.stringify(file, null, 2),
+            {
+              encoding: "utf8",
+              flag: "w",
+              mode: 0o666
+            },
+            err => {
+              if (err) return this.error(`${chalk.red(err)}`);
+            }
+          );
+        }
       }
-    });
+      offset += data.items.length;
+      this.log(`Exported ${offset} files so far...`);
+      if (data.items.length === 0) break;
+    }
     if (emptyCheck)
       this.log(
         `${chalk.green(
@@ -93,7 +97,6 @@ export default class ExportSchema extends Command {
 
     await this.findOrCreateLoc(location);
     this.log(`${chalk.yellow("\n\nRunning process")} ...\n`);
-    const data = await this.getDataMigrations(client);
-    await this.exportFile(location, data);
+    await this.exportFile(location, client);
   }
 }
