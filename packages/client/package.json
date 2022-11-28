@@ -1,6 +1,6 @@
 {
   "name": "@qorebase/client",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "main": "lib/index.js",
   "license": "MIT",
   "files": [
@@ -23,7 +23,7 @@
     "test": "jest --testTimeout 10000"
   },
   "dependencies": {
-    "@qorebase/sdk": "^1.0.7",
+    "@qorebase/sdk": "^1.0.8",
     "axios": "^0.21.0",
     "nanoid": "^3.1.20",
     "qs": "^6.11.0",
