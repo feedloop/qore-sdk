@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Qore Data
   description: qore-engine api docs
-  version: 1.0.80
+  version: 1.5.8
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -30,44 +30,6 @@ paths:
       responses:
         "200":
           description: default response
-  /v1/user:
-    get:
-      responses:
-        "200":
-          description: default response
-  /v1/authorize:
-    post:
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                properties:
-                  token:
-                    type: string
-                type: object
-                required:
-                  - token
-      operationId: authorize
-      requestBody:
-        content:
-          application/json:
-            examples:
-              as user:
-                value:
-                  identifier: Ayu
-                  password: my-password
-            schema:
-              properties:
-                identifier:
-                  type: string
-                password:
-                  type: string
-                  nullable: true
-              required:
-                - identifier
-              type: object
-        required: true
   /v1/migrate:
     post:
       responses:
@@ -461,6 +423,8 @@ paths:
                           - Insight
                           - Trigger
                           - Query
+                          - Index
+                          - AuthProvider
                       migration:
                         type: object
         required: true
@@ -1147,6 +1111,32 @@ paths:
                               - event
                               - maxAttempts
                               - webhook
+                        indexes:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              type:
+                                type: string
+                              condition:
+                                type: string
+                              unique:
+                                type: boolean
+                              columns:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                            required:
+                              - name
+                              - type
+                              - condition
+                              - unique
+                              - columns
                         primaryKey:
                           type: string
                       required:
@@ -1157,6 +1147,7 @@ paths:
                         - views
                         - primaryKey
                         - triggers
+                        - indexes
                   queries:
                     type: array
                     items:
@@ -1190,6 +1181,28 @@ paths:
                       - columns
                       - type
                       - query
+                  authProviders:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        id:
+                          type: string
+                        client_id:
+                          type: string
+                        client_secret:
+                          type: string
+                        provider_name:
+                          type: string
+                        type:
+                          type: string
+                    required:
+                      - id
+                      - client_id
+                      - client_secret
+                      - provider_name
+                      - type
                 required:
                   - tables
       operationId: getSchema
@@ -1732,6 +1745,180 @@ paths:
           required: true
           schema:
             type: string
+  /v1/user:
+    get:
+      responses:
+        "200":
+          description: default response
+  /v1/authorize:
+    post:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                    type: string
+                type: object
+                required:
+                  - token
+      operationId: authorize
+      requestBody:
+        content:
+          application/json:
+            examples:
+              as user:
+                value:
+                  identifier: Ayu
+                  password: my-password
+            schema:
+              properties:
+                identifier:
+                  type: string
+                password:
+                  type: string
+                  nullable: true
+              required:
+                - identifier
+              type: object
+        required: true
+  /v1/link:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                type: object
+                required:
+                  - message
+      operationId: link_account
+      parameters:
+        - name: target_account_token
+          in: query
+          required: true
+          schema:
+            type: string
+  "/v1/login/{provider}":
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                    type: string
+                type: object
+                required:
+                  - token
+      operationId: login_provider
+      parameters:
+        - name: callback
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+  "/v1/login/{provider}/callback":
+    get:
+      responses:
+        "200":
+          description: Default Response
+      operationId: callback_provider
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+  /v1/auth/recovery:
+    post:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties:
+                  ok:
+                    type: boolean
+                type: object
+                required:
+                  - ok
+      operationId: recovery
+      requestBody:
+        content:
+          application/json:
+            examples:
+              as user:
+                value:
+                  identifier: Ayu
+            schema:
+              properties:
+                identifier:
+                  type: string
+              required:
+                - identifier
+              type: object
+        required: true
+      parameters:
+        - name: redirect
+          in: query
+          schema:
+            type: string
+  /v1/auth/recovery/submit:
+    post:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties:
+                  ok:
+                    type: boolean
+                type: object
+                required:
+                  - ok
+      operationId: submitPassword
+      requestBody:
+        content:
+          application/json:
+            examples:
+              new-password:
+                value:
+                  newPassword: admin-secret123
+            schema:
+              properties:
+                newPassword:
+                  type: string
+              required:
+                - newPassword
+              type: object
+        required: true
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
   "/v1/files/token/table/{table}/id/{id}/column/{column}":
     get:
       responses:
@@ -1790,6 +1977,8 @@ paths:
                     type: string
                   size:
                     type: number
+                  path:
+                    type: string
       operationId: uploadFile
       parameters:
         - name: token
@@ -1832,6 +2021,8 @@ paths:
                     type: string
                   size:
                     type: number
+                  path:
+                    type: string
       operationId: deleteFile
       parameters:
         - name: token
@@ -1892,6 +2083,8 @@ paths:
                       type: string
                     size:
                       type: number
+                    path:
+                      type: string
       operationId: uploadFile
       parameters:
         - name: token
@@ -2045,6 +2238,52 @@ paths:
           required: true
           schema:
             type: string
+  /v1/storage/token:
+    post:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                    type: string
+                type: object
+                required:
+                  - token
+      operationId: storage-token
+  "/v1/storage/files/{table}/{rowId}/{column}/{filename}":
+    get:
+      responses:
+        "200":
+          description: Default Response
+      operationId: storage-file
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: column
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
   /v1/version:
     get:
       responses:
@@ -2106,6 +2345,16 @@ paths:
           schema:
             type: string
   /v1/rawschema:
+    get:
+      responses:
+        "200":
+          description: default response
+  /v1/env:
+    get:
+      responses:
+        "200":
+          description: default response
+  /authenticate:
     get:
       responses:
         "200":
