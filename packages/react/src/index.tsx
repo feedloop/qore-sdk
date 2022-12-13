@@ -371,7 +371,7 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [error, setError] = React.useState<Error | null | any>(null);
 
         const deleteRow = React.useCallback(
-          async (rowId: string, config?: Partial<QoreOperationConfig>, params?: QoreSchema["params"]) => {
+          async (rowId: string, config?: Partial<QoreOperationConfig>, params?: ProjectSchema[K]["params"]) => {
             try {
               setStatus("loading");
               const result = await (isTable
