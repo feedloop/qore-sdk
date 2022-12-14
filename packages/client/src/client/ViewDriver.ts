@@ -300,7 +300,7 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
                   }
                 ]
               },
-              params: params || {},
+              params: params || {}
             }
           }
         ]

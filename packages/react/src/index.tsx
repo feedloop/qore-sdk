@@ -110,7 +110,7 @@ type QoreHooks<T extends QoreSchema[string]> = {
     deleteRow: (
       rowId: string,
       config?: Partial<QoreOperationConfig>,
-      params?: T["params"],
+      params?: T["params"]
     ) => Promise<boolean | undefined>;
     status: QoreRequestStatus;
     error: Error | null;
@@ -371,7 +371,11 @@ const createQoreContext = <ProjectSchema extends QoreSchema>(
         const [error, setError] = React.useState<Error | null | any>(null);
 
         const deleteRow = React.useCallback(
-          async (rowId: string, config?: Partial<QoreOperationConfig>, params?: ProjectSchema[K]["params"]) => {
+          async (
+            rowId: string,
+            config?: Partial<QoreOperationConfig>,
+            params?: ProjectSchema[K]["params"]
+          ) => {
             try {
               setStatus("loading");
               const result = await (isTable
