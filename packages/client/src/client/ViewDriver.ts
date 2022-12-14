@@ -277,7 +277,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
   }
   async deleteRow(
     id: string,
-    config: Partial<QoreOperationConfig> = defaultOperationConfig
+    config: Partial<QoreOperationConfig> = defaultOperationConfig,
+    params?: T["params"]
   ): Promise<boolean> {
     const axiosConfig: AxiosRequestConfig = {
       baseURL: this.project.config.endpoint,
@@ -298,7 +299,8 @@ export class ViewDriver<T extends QoreViewSchema = QoreViewSchema> {
                     }
                   }
                 ]
-              }
+              },
+              params: params || {},
             }
           }
         ]
