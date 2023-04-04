@@ -1,9 +1,8 @@
 {
-  "name": "query-builder",
-  "version": "1.0.0",
+  "name": "@qorebase/client",
+  "version": "2.0.0",
   "main": "index.js",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "generate-schema": "openapi-typescript 'https://stg-qore-data.qore.one/documentation/json' --output ./src/schema.d.ts"
   },
