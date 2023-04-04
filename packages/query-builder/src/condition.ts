@@ -62,12 +62,12 @@ export type ConditionBuilder = Record<
   }
 >;
 
-const fromEntries = <K extends string, V>(
+export const fromEntries = <K extends string, V>(
   entries: Iterable<[K, V]>
 ): { [key in K]: V } =>
   // @ts-ignore -- typescript Object.fromEntries doesn't support generic key type
   Object.fromEntries(entries);
-const keys = <K extends string>(obj: { [key in K]: any }): K[] =>
+export const keys = <K extends string>(obj: { [key in K]: any }): K[] =>
   // @ts-ignore -- typescript Object.keys doesn't support generic key type
   Object.keys(obj);
 

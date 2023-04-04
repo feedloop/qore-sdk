@@ -54,6 +54,7 @@ export type Operation =
   | DeleteOperation;
 
 export type SelectTableQueryBuilder = {
+  instruction: SelectOperation["instruction"];
   populate: (fields: string[]) => SelectTableQueryBuilder;
   orderBy: (fields: string[]) => SelectTableQueryBuilder;
   where: (
@@ -66,10 +67,12 @@ export type SelectTableQueryBuilder = {
 };
 
 export type InsertTableQueryBuilder = {
+  instruction: InsertOperation["instruction"];
   build: () => InsertOperation;
 };
 
 export type UpdateTableQueryBuilder = {
+  instruction: UpdateOperation["instruction"];
   where: (
     builderFn: (
       builder: ConditionBuilder,
@@ -80,6 +83,7 @@ export type UpdateTableQueryBuilder = {
 };
 
 export type DeleteTableQueryBuilder = {
+  instruction: DeleteOperation["instruction"];
   where: (
     builderFn: (
       builder: ConditionBuilder,
@@ -94,13 +98,6 @@ export type TableQueryBuilder =
   | InsertTableQueryBuilder
   | UpdateTableQueryBuilder
   | DeleteTableQueryBuilder;
-
-type QoreTable = {
-  select: (fields: string[]) => SelectTableQueryBuilder;
-  insert: (data: Record<string, any>) => InsertTableQueryBuilder;
-  update: (data: Record<string, any>) => UpdateTableQueryBuilder;
-  delete: () => DeleteTableQueryBuilder;
-};
 
 const evaluateJsonFunction = (value: any) => {
   if (typeof value === "function") {
@@ -125,12 +122,14 @@ export const select = (
   fields: "*" | string[] = "*"
 ): SelectTableQueryBuilder => {
   const instruction: SelectOperation["instruction"] = {
-    table
+    table,
+    name: "data"
   };
   if (Array.isArray(fields)) {
     instruction.select = fields;
   }
   const builder: SelectTableQueryBuilder = {
+    instruction,
     populate: fields => {
       instruction.populate = fields;
       return builder;
@@ -160,9 +159,11 @@ export const insert = (
 ): InsertTableQueryBuilder => {
   const instruction = {
     table,
+    name: "data",
     data: evaluateJsonFunction(data)
   };
   const builder: InsertTableQueryBuilder = {
+    instruction,
     build: () => {
       return {
         operation: "Insert",
@@ -179,9 +180,11 @@ export const update = (
 ): UpdateTableQueryBuilder => {
   const instruction: UpdateOperation["instruction"] = {
     table,
+    name: "data",
     set: evaluateJsonFunction(data)
   };
   const builder: UpdateTableQueryBuilder = {
+    instruction,
     where: builderFn => {
       const conditionBuilder = createConditionBuilder();
       instruction.condition = builderFn(conditionBuilder, logicalBuilder)();
@@ -199,9 +202,11 @@ export const update = (
 
 export const del = (table: string): DeleteTableQueryBuilder => {
   const instruction: DeleteOperation["instruction"] = {
-    table
+    table,
+    name: "data"
   };
   const builder: DeleteTableQueryBuilder = {
+    instruction,
     where: builderFn => {
       const conditionBuilder = createConditionBuilder();
       instruction.condition = builderFn(conditionBuilder, logicalBuilder)();
@@ -213,16 +218,6 @@ export const del = (table: string): DeleteTableQueryBuilder => {
         instruction
       };
     }
-  };
-  return builder;
-};
-
-export const table = (name: string): QoreTable => {
-  const builder: QoreTable = {
-    select: fields => select(name, fields),
-    insert: data => insert(name, data),
-    update: data => update(name, data),
-    delete: () => del(name)
   };
   return builder;
 };

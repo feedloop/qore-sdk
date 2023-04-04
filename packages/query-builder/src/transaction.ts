@@ -18,7 +18,7 @@ type TableTransactionBuilderMapper<B extends TableQueryBuilder> = {
     : (
         // @ts-ignore -- idk
         ...args: Parameters<B[key]>
-      ) => SelectTableTransactionBuilder & ToString & TransactionGetter;
+      ) => TableTransactionBuilder & ToString & TransactionGetter;
 } &
   ToString &
   TransactionGetter;
@@ -57,7 +57,7 @@ type TransactionItemBuilder = {
   [key in string]: QoreTransactionTable;
 };
 
-type TransactionBuilder = (
+export type TransactionBuilder = (
   builderFn: (
     builder: TransactionItemBuilder
   ) => TableTransactionBuilder | Record<string, TableTransactionBuilder>
@@ -88,6 +88,7 @@ export const transaction: TransactionBuilder = builderFn => {
       operationName) as TableTransactionBuilderMapper<T>;
     transactionItem.result = createDynamicGetter(operationName);
     Object.keys(builder).forEach(key => {
+      if (typeof builder[key] !== "function") return;
       const method = builder[key]?.bind(builder);
       transactionItem[key] =
         key === "build"

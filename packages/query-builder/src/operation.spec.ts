@@ -5,6 +5,7 @@ describe("Operation Builder", () => {
     expect(select("users").build()).toMatchInlineSnapshot(`
       {
         "instruction": {
+          "name": "data",
           "table": "users",
         },
         "operation": "Select",
@@ -14,6 +15,7 @@ describe("Operation Builder", () => {
     expect(select("users", ["id", "name"]).build()).toMatchInlineSnapshot(`
       {
         "instruction": {
+          "name": "data",
           "select": [
             "id",
             "name",
@@ -38,6 +40,7 @@ describe("Operation Builder", () => {
               "$eq": 1,
             },
           },
+          "name": "data",
           "select": [
             "id",
             "name",
@@ -56,6 +59,7 @@ describe("Operation Builder", () => {
           "data": {
             "name": "test",
           },
+          "name": "data",
           "table": "users",
         },
         "operation": "Insert",
@@ -67,6 +71,7 @@ describe("Operation Builder", () => {
     expect(update("users", { name: "test" }).build()).toMatchInlineSnapshot(`
       {
         "instruction": {
+          "name": "data",
           "set": {
             "name": "test",
           },
@@ -97,6 +102,7 @@ describe("Operation Builder", () => {
               },
             ],
           },
+          "name": "data",
           "set": {
             "name": "test",
           },
@@ -111,6 +117,7 @@ describe("Operation Builder", () => {
     expect(del("users").build()).toMatchInlineSnapshot(`
       {
         "instruction": {
+          "name": "data",
           "table": "users",
         },
         "operation": "Delete",
@@ -138,6 +145,7 @@ describe("Operation Builder", () => {
               },
             ],
           },
+          "name": "data",
           "table": "users",
         },
         "operation": "Delete",
