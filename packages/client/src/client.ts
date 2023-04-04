@@ -173,7 +173,10 @@ export const createClient = (config: ClientConfig): QoreClient => {
         return result[transactionResult.returns];
       } else {
         return fromEntries(
-          keys(transactionResult.returns).map(key => [key, result[key]])
+          keys(transactionResult.returns).map(key => [
+            key,
+            result[transactionResult.returns[key]]
+          ])
         );
       }
     },
