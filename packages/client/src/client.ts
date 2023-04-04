@@ -67,11 +67,27 @@ type ClientDeleteTableQueryBuilder = TableQueryBuilderMapper<
     id: string | number;
   }
 >;
+
 type ClientTableQueryBuilder = {
   select: (fields?: "*" | string[]) => ClientSelectTableQueryBuilder;
   insert: (data: Record<string, any>) => ClientInsertTableQueryBuilder;
   update: (data: Record<string, any>) => ClientUpdateTableQueryBuilder;
   delete: () => ClientDeleteTableQueryBuilder;
+};
+
+type ClientTable = ClientTableQueryBuilder & {
+  rows: (options?: {
+    limit?: number;
+    offset?: number;
+    orderBy?: Record<string, "ASC" | "DESC">;
+    params?: Record<string, any>;
+    populate?: string[];
+    fields?: string[];
+  }) => Promise<Record<string, any>[]>;
+  action: (column: string, rowId: string | number, params: any) => Promise<any>;
+};
+type ClientView = {
+  rows: ClientTable["rows"];
 };
 
 type QoreClient = {
@@ -83,7 +99,8 @@ type QoreClient = {
     builderFn: Parameters<TransactionBuilder>[0]
   ) => Promise<Record<string, any>>;
 
-  table: (table: string) => ClientTableQueryBuilder;
+  table: (table: string) => ClientTable;
+  view: (view: string) => ClientView;
 };
 
 type ClientConfig = {
@@ -179,13 +196,58 @@ export const createClient = (config: ClientConfig): QoreClient => {
           exec: () => execute([build()]).then(results => results["data"])
         } as TableQueryBuilderMapper<T, R>;
       };
-      const tableQueryBuilder: ClientTableQueryBuilder = {
+      const tableQueryBuilder: ClientTable = {
         select: fields => toExecutable(select(table, fields)),
         insert: data => toExecutable(insert(table, data)),
         update: data => toExecutable(update(table, data)),
-        delete: () => toExecutable(del(table))
+        delete: () => toExecutable(del(table)),
+
+        rows: async options => {
+          const { data } = await execute([
+            {
+              operation: "Select",
+              instruction: {
+                ...options,
+                table: table,
+                name: "data"
+              }
+            }
+          ]);
+          return data;
+        },
+        action: async (column, rowId, params) => {
+          const { data } = await axiosClient.post(
+            `/v1/action/${table}/${column}/${rowId}`,
+            { args: params },
+            {
+              headers: {
+                accept: "application/json, text/plain, */*"
+              }
+            }
+          );
+          return data.result;
+        }
       };
       return tableQueryBuilder;
+    },
+
+    view: view => {
+      const viewQueryBuilder: ClientView = {
+        rows: async options => {
+          const { data } = await execute([
+            {
+              operation: "Select",
+              instruction: {
+                ...options,
+                view: view,
+                name: "data"
+              }
+            }
+          ]);
+          return data;
+        }
+      };
+      return viewQueryBuilder;
     }
   };
 

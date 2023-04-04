@@ -11,10 +11,11 @@ export type SelectOperation = {
   operation: "Select";
   instruction: {
     name?: string;
-    table: string;
-    select?: string[];
+    table?: string;
+    view?: string;
+    fields?: string[];
     populate?: string[];
-    orderBy?: string[];
+    orderBy?: Record<string, "ASC" | "DESC">;
     condition?: Expression;
   };
 };
@@ -23,7 +24,8 @@ export type InsertOperation = {
   operation: "Insert";
   instruction: {
     name?: string;
-    table: string;
+    table?: string;
+    view?: string;
     data: Record<string, any>;
   };
 };
@@ -32,7 +34,8 @@ export type UpdateOperation = {
   operation: "Update";
   instruction: {
     name?: string;
-    table: string;
+    table?: string;
+    view?: string;
     condition?: Expression;
     set: Record<string, any>;
   };
@@ -42,7 +45,8 @@ export type DeleteOperation = {
   operation: "Delete";
   instruction: {
     name?: string;
-    table: string;
+    table?: string;
+    view?: string;
     condition?: Expression;
   };
 };
@@ -56,7 +60,7 @@ export type Operation =
 export type SelectTableQueryBuilder = {
   instruction: SelectOperation["instruction"];
   populate: (fields: string[]) => SelectTableQueryBuilder;
-  orderBy: (fields: string[]) => SelectTableQueryBuilder;
+  orderBy: (fields: Record<string, "ASC" | "DESC">) => SelectTableQueryBuilder;
   where: (
     builderFn: (
       builder: ConditionBuilder,
@@ -126,7 +130,7 @@ export const select = (
     name: "data"
   };
   if (Array.isArray(fields)) {
-    instruction.select = fields;
+    instruction.fields = fields;
   }
   const builder: SelectTableQueryBuilder = {
     instruction,
