@@ -114,7 +114,7 @@ export const createClient = (config: ClientConfig): QoreClient => {
   const axiosClient = axios.create({
     baseURL: config.url,
     headers: config.adminSecret
-      ? { "x-qore-admin-secret": config.adminSecret }
+      ? { "x-qore-engine-admin-secret": config.adminSecret }
       : config.token
       ? { Authorization: `Bearer ${config.token}` }
       : {}
@@ -168,7 +168,7 @@ export const createClient = (config: ClientConfig): QoreClient => {
 
     execute: async builderFn => {
       const transactionResult = transaction(builderFn);
-      const result = execute(transactionResult.transactions);
+      const result = await execute(transactionResult.transactions);
       if (typeof transactionResult.returns === "string") {
         return result[transactionResult.returns];
       } else {
@@ -263,7 +263,14 @@ type ConnectConfig = {
 };
 
 export const connect = async (url: string, config: ConnectConfig = {}) => {
-  const { data } = await axios.get("/v1/schema");
+  const { data } = await axios.get("/v1/schema", {
+    baseURL: url,
+    headers: config.adminSecret
+      ? { "x-qore-engine-admin-secret": config.adminSecret }
+      : config.token
+      ? { Authorization: `Bearer ${config.token}` }
+      : {}
+  });
   return createClient({
     url,
     schema: data,
