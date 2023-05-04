@@ -1,0 +1,623 @@
+{
+  "tables": [
+    {
+      "name": "foo",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "description": "",
+          "definition": {
+            "type": "text",
+            "definition": {
+              "textType": "text",
+              "default": null,
+              "unique": false,
+              "nullable": true
+            }
+          },
+          "metadata": { "width": 391 },
+          "isHidden": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "description": "",
+          "definition": {
+            "type": "datetime",
+            "definition": {
+              "default": "now()",
+              "exact": false,
+              "nullable": true,
+              "triggers": [],
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "description": "",
+          "definition": {
+            "type": "datetime",
+            "definition": {
+              "default": "now()",
+              "exact": false,
+              "nullable": true,
+              "triggers": ["updatedAt"],
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "sales",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "date",
+          "type": "date",
+          "description": "",
+          "definition": {
+            "type": "date",
+            "definition": {
+              "default": null,
+              "exact": false,
+              "nullable": true,
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "operation_action",
+          "type": "action",
+          "description": "",
+          "definition": {
+            "type": "action",
+            "definition": { "action": "Operations", "nullable": true }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "rich_text",
+          "type": "richtext",
+          "description": "",
+          "definition": {
+            "type": "richtext",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "formula",
+          "type": "formula",
+          "description": "",
+          "definition": {
+            "type": "formula",
+            "definition": {
+              "expression": {
+                "type": "string",
+                "kind": "function",
+                "name": "Uppercase",
+                "arguments": [
+                  {
+                    "kind": "string",
+                    "expressions": [],
+                    "parts": [{ "value": "hello", "start": 7, "end": 12 }],
+                    "start": 6,
+                    "end": 13,
+                    "type": "string"
+                  }
+                ],
+                "start": 0,
+                "end": 14
+              },
+              "type": "integer",
+              "evaluation": "eager",
+              "unique": false,
+              "default": null,
+              "nullable": true
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "num",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        }
+      ],
+      "roles": [
+        {
+          "name": "public",
+          "permissions": [
+            { "action": "aggregate", "condition": { "$and": [] } },
+            { "action": "select", "condition": { "$and": [] } }
+          ]
+        }
+      ],
+      "views": [
+        {
+          "name": "foo_grid",
+          "baseCondition": {
+            "$or": [
+              {
+                "$or": [
+                  {
+                    "Formula: DateFormat(date, \"YYYY/MM/DD\") == DateFormat(params.date, \"YYYY/MM/DD\")": {
+                      "$eq": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "query": {
+            "name": "foo_grid",
+            "table": "foo",
+            "fields": [
+              "name",
+              "created_at",
+              "updated_at",
+              "sales",
+              "date",
+              "operation_action",
+              "id"
+            ],
+            "orderBy": { "id": "ASC" },
+            "condition": {
+              "$or": [
+                {
+                  "$or": [
+                    {
+                      "Formula: DateFormat(date, \"YYYY/MM/DD\") == DateFormat(params.date, \"YYYY/MM/DD\")": {
+                        "$eq": true
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "registeredParams": {
+              "date": { "name": "date", "type": "date", "required": false }
+            }
+          },
+          "sorts": [],
+          "roles": [
+            {
+              "name": "public",
+              "permissions": [
+                { "action": "aggregate", "condition": { "$and": [] } },
+                { "action": "select", "condition": { "$and": [] } }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "foo_name_grid",
+          "baseCondition": {},
+          "query": {
+            "name": "foo_name_grid",
+            "table": "foo",
+            "fields": [
+              "name",
+              "sales",
+              "date",
+              "operation_action",
+              "mala_1",
+              "mila_1",
+              "kala_1"
+            ],
+            "orderBy": { "id": "ASC" },
+            "condition": {},
+            "registeredParams": {}
+          },
+          "sorts": [],
+          "roles": []
+        }
+      ],
+      "insights": [
+        {
+          "name": "timeseries_foo",
+          "columns": [
+            { "name": "date", "type": "datetime", "description": "" },
+            { "name": "count", "type": "float", "description": "" }
+          ],
+          "insight": {
+            "aggregates": {
+              "count": {
+                "as": {
+                  "kind": "function",
+                  "name": "Count",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "id",
+                      "start": 6,
+                      "end": 8,
+                      "type": "string"
+                    }
+                  ],
+                  "start": 0,
+                  "end": 9,
+                  "type": "number"
+                }
+              }
+            },
+            "groups": {
+              "date": { "as": { "column": "date", "interval": [1, "month"] } }
+            }
+          },
+          "baseCondition": {},
+          "sorts": [],
+          "params": [],
+          "registeredParams": {}
+        },
+        {
+          "name": "one_insight_foo",
+          "columns": [
+            { "name": "sales", "type": "text", "description": "" },
+            { "name": "sum", "type": "float", "description": "" }
+          ],
+          "insight": {
+            "aggregates": {
+              "sum": {
+                "as": {
+                  "kind": "function",
+                  "name": "Sum",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "sales",
+                      "start": 4,
+                      "end": 9,
+                      "type": "number"
+                    }
+                  ],
+                  "start": 0,
+                  "end": 10,
+                  "type": "number"
+                }
+              }
+            },
+            "groups": { "sales": { "as": { "column": "sales" } } }
+          },
+          "baseCondition": {
+            "$or": [{ "$or": [{ "sales": { "$ne": "{{sales}}" } }] }]
+          },
+          "sorts": [],
+          "params": [],
+          "registeredParams": {
+            "sales": { "name": "sales", "type": "number", "required": false }
+          }
+        }
+      ],
+      "triggers": [],
+      "indexes": [],
+      "primaryKey": "UUID"
+    },
+    {
+      "name": "foo_2",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "description": "",
+          "definition": {
+            "type": "text",
+            "definition": {
+              "textType": "text",
+              "default": null,
+              "unique": false,
+              "nullable": true
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "description": "",
+          "definition": {
+            "type": "datetime",
+            "definition": {
+              "default": "now()",
+              "exact": false,
+              "nullable": true,
+              "triggers": [],
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "description": "",
+          "definition": {
+            "type": "datetime",
+            "definition": {
+              "default": "now()",
+              "exact": false,
+              "nullable": true,
+              "triggers": ["updatedAt"],
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "add_action",
+          "type": "action",
+          "description": "",
+          "definition": {
+            "type": "action",
+            "definition": { "action": "Operations", "nullable": true }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "int",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "float",
+          "type": "float",
+          "description": "",
+          "definition": {
+            "type": "float",
+            "definition": {
+              "precision": 8,
+              "scale": 2,
+              "default": null,
+              "nullable": true,
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "max",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "min",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "formula",
+          "type": "formula",
+          "description": "",
+          "definition": {
+            "type": "formula",
+            "definition": {
+              "expression": {
+                "type": "string",
+                "kind": "function",
+                "name": "Uppercase",
+                "arguments": [
+                  {
+                    "kind": "string",
+                    "expressions": [],
+                    "parts": [{ "value": "hello", "start": 7, "end": 12 }],
+                    "start": 6,
+                    "end": 13,
+                    "type": "string"
+                  }
+                ],
+                "start": 0,
+                "end": 14
+              },
+              "type": "integer",
+              "evaluation": "eager",
+              "nullable": true,
+              "unique": false,
+              "default": null
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        }
+      ],
+      "roles": [
+        {
+          "name": "public",
+          "permissions": [
+            { "action": "aggregate", "condition": { "$and": [] } },
+            { "action": "select", "condition": { "$and": [] } }
+          ]
+        }
+      ],
+      "views": [
+        {
+          "name": "mala_saved_filter",
+          "baseCondition": {
+            "$or": [{ "$or": [{ "name": { "$eq": "mila" } }] }]
+          },
+          "query": {
+            "name": "mala_saved_filter",
+            "table": "foo_2",
+            "fields": [
+              "name",
+              "add_action",
+              "int",
+              "float",
+              "max",
+              "min",
+              "relation",
+              "relation_lagi_foo_items",
+              "lookup"
+            ],
+            "orderBy": { "id": "ASC" },
+            "condition": { "$or": [{ "$or": [{ "name": { "$eq": "mila" } }] }] }
+          },
+          "sorts": [{ "id": "ASC", "active": true }],
+          "roles": []
+        },
+        {
+          "name": "filter_date_before",
+          "baseCondition": {},
+          "query": {
+            "name": "filter_date_before",
+            "table": "foo_2",
+            "fields": [
+              "name",
+              "add_action",
+              "int",
+              "float",
+              "max",
+              "min",
+              "relation",
+              "relation_lagi_foo_items",
+              "lookup"
+            ],
+            "orderBy": { "id": "ASC" },
+            "condition": {},
+            "registeredParams": {}
+          },
+          "sorts": [],
+          "roles": [
+            {
+              "name": "public",
+              "permissions": [
+                { "action": "select", "condition": { "$and": [] } },
+                { "action": "aggregate", "condition": { "$and": [] } }
+              ]
+            }
+          ]
+        }
+      ],
+      "insights": [],
+      "triggers": [],
+      "indexes": [],
+      "primaryKey": "SERIAL"
+    }
+  ],
+  "queries": [
+    {
+      "name": "cobaah",
+      "columns": [
+        { "name": "id", "type": "integer" },
+        { "name": "created_at", "type": "timestamp with time zone" },
+        { "name": "updated_at", "type": "timestamp with time zone" },
+        { "name": "meals_photo", "type": "json" },
+        { "name": "meals", "type": "integer" },
+        { "name": "bool", "type": "boolean" },
+        { "name": "json", "type": "json" },
+        { "name": "rollup", "type": "numeric" },
+        { "name": "date", "type": "date" },
+        { "name": "float", "type": "numeric" },
+        { "name": "integer", "type": "integer" },
+        { "name": "date_time", "type": "timestamp with time zone" },
+        { "name": "multiple_file", "type": "json" },
+        { "name": "rolls", "type": "numeric" },
+        { "name": "cat_photo", "type": "json" },
+        { "name": "happy_photo", "type": "json" },
+        { "name": "sidedish_photo", "type": "json" },
+        { "name": "count_relation_sidedish", "type": "numeric" },
+        { "name": "images_baru", "type": "json" },
+        { "name": "test_2", "type": "integer" },
+        { "name": "melas_type_product_rels", "type": "uuid" },
+        { "name": "inini", "type": "bytea" },
+        { "name": "restaurant_meal", "type": "uuid" },
+        { "name": "multiple_files_2", "type": "json" },
+        { "name": "float_check", "type": "numeric" },
+        { "name": "float_check_lagi", "type": "numeric" },
+        { "name": "meal_user", "type": "integer" },
+        { "name": "lookup_float_lagi", "type": "numeric" },
+        { "name": "lookup_float_float", "type": "numeric" },
+        { "name": "user_point", "type": "numeric" },
+        { "name": "multiple_pdf", "type": "json" },
+        { "name": "multiple_excel", "type": "json" },
+        { "name": "multiple_mp_4", "type": "json" },
+        { "name": "richtext", "type": "json" },
+        { "name": "action_add", "type": "character varying" },
+        { "name": "deno_action", "type": "character varying" },
+        { "name": "location_dua", "type": "text" },
+        { "name": "phonenumber_string", "type": "text" },
+        { "name": "qeqwe_1", "type": "text" },
+        { "name": "select_column", "type": "text" },
+        { "name": "operation_action", "type": "character varying" },
+        { "name": "insert_lagi", "type": "character varying" },
+        { "name": "get_id", "type": "character varying" },
+        { "name": "name", "type": "text" },
+        { "name": "print", "type": "character varying" },
+        { "name": "description", "type": "text" },
+        { "name": "print_all_meals_sidedish", "type": "character varying" },
+        { "name": "meals_type", "type": "text" },
+        { "name": "add_meals", "type": "character varying" },
+        { "name": "link", "type": "text" },
+        { "name": "lookup", "type": "text" },
+        { "name": "print_action", "type": "character varying" },
+        { "name": "operations", "type": "character varying" }
+      ],
+      "type": "prql",
+      "query": "from meals \n take 1..20",
+      "params": null
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "cd9a3acf-bc5e-413d-9c00-f5754257e763",
+      "client_id": "0b1e7cd5-d79d-405c-bad0-9e0260a2a21a",
+      "client_secret": "******",
+      "provider_name": "azure",
+      "type": "oauth2",
+      "tenantId": "8f2b2b84-4231-4336-81df-95a57c3078cc"
+    },
+    {
+      "id": "c1a14d0b-6b3a-4a71-922a-b70d1260c131",
+      "client_id": "",
+      "client_secret": "******",
+      "provider_name": "username_password",
+      "type": "jwt"
+    }
+  ]
+}

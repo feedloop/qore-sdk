@@ -1,2 +1,1 @@
-export * from "./types";
-export * from "./client";
+export { connect, createClient } from "./client";

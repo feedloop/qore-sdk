@@ -1,0 +1,244 @@
+{
+  "tables": [
+    {
+      "name": "foo_2",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "description": "",
+          "definition": {
+            "type": "text",
+            "definition": {
+              "textType": "text",
+              "default": null,
+              "unique": false,
+              "nullable": true
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "description": "",
+          "definition": {
+            "type": "datetime",
+            "definition": {
+              "default": "now()",
+              "exact": false,
+              "nullable": true,
+              "triggers": [],
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "description": "",
+          "definition": {
+            "type": "datetime",
+            "definition": {
+              "default": "now()",
+              "exact": false,
+              "nullable": true,
+              "triggers": ["updatedAt"],
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "add_action",
+          "type": "action",
+          "description": "",
+          "definition": {
+            "type": "action",
+            "definition": { "action": "Operations", "nullable": true }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "int",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "float",
+          "type": "float",
+          "description": "",
+          "definition": {
+            "type": "float",
+            "definition": {
+              "precision": 8,
+              "scale": 2,
+              "default": null,
+              "nullable": true,
+              "unique": false
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "max",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "min",
+          "type": "integer",
+          "description": "",
+          "definition": {
+            "type": "integer",
+            "definition": { "default": null, "nullable": true, "unique": false }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        },
+        {
+          "name": "formula",
+          "type": "formula",
+          "description": "",
+          "definition": {
+            "type": "formula",
+            "definition": {
+              "expression": {
+                "type": "string",
+                "kind": "function",
+                "name": "Uppercase",
+                "arguments": [
+                  {
+                    "kind": "string",
+                    "expressions": [],
+                    "parts": [{ "value": "hello", "start": 7, "end": 12 }],
+                    "start": 6,
+                    "end": 13,
+                    "type": "string"
+                  }
+                ],
+                "start": 0,
+                "end": 14
+              },
+              "type": "integer",
+              "evaluation": "eager",
+              "nullable": true,
+              "unique": false,
+              "default": null
+            }
+          },
+          "metadata": { "width": 200 },
+          "isHidden": false
+        }
+      ],
+      "roles": [
+        {
+          "name": "public",
+          "permissions": [
+            { "action": "aggregate", "condition": { "$and": [] } },
+            { "action": "select", "condition": { "$and": [] } }
+          ]
+        }
+      ],
+      "views": [
+        {
+          "name": "mala_saved_filter",
+          "baseCondition": {
+            "$or": [{ "$or": [{ "name": { "$eq": "mila" } }] }]
+          },
+          "query": {
+            "name": "mala_saved_filter",
+            "table": "foo_2",
+            "fields": [
+              "name",
+              "add_action",
+              "int",
+              "float",
+              "max",
+              "min",
+              "relation",
+              "relation_lagi_foo_items",
+              "lookup"
+            ],
+            "orderBy": { "id": "ASC" },
+            "condition": { "$or": [{ "$or": [{ "name": { "$eq": "mila" } }] }] }
+          },
+          "sorts": [{ "id": "ASC", "active": true }],
+          "roles": []
+        },
+        {
+          "name": "filter_date_before",
+          "baseCondition": {},
+          "query": {
+            "name": "filter_date_before",
+            "table": "foo_2",
+            "fields": [
+              "name",
+              "add_action",
+              "int",
+              "float",
+              "max",
+              "min",
+              "relation",
+              "relation_lagi_foo_items",
+              "lookup"
+            ],
+            "orderBy": { "id": "ASC" },
+            "condition": {},
+            "registeredParams": {}
+          },
+          "sorts": [],
+          "roles": [
+            {
+              "name": "public",
+              "permissions": [
+                { "action": "select", "condition": { "$and": [] } },
+                { "action": "aggregate", "condition": { "$and": [] } }
+              ]
+            }
+          ]
+        }
+      ],
+      "insights": [],
+      "triggers": [],
+      "indexes": [],
+      "primaryKey": "SERIAL"
+    }
+  ],
+  "queries": [],
+  "authProviders": [
+    {
+      "id": "cd9a3acf-bc5e-413d-9c00-f5754257e763",
+      "client_id": "0b1e7cd5-d79d-405c-bad0-9e0260a2a21a",
+      "client_secret": "******",
+      "provider_name": "azure",
+      "type": "oauth2",
+      "tenantId": "8f2b2b84-4231-4336-81df-95a57c3078cc"
+    },
+    {
+      "id": "c1a14d0b-6b3a-4a71-922a-b70d1260c131",
+      "client_id": "",
+      "client_secret": "******",
+      "provider_name": "username_password",
+      "type": "jwt"
+    }
+  ]
+}
