@@ -46,12 +46,13 @@ describe("Transaction Builder", () => {
     expect(
       transaction(tx => {
         const user = tx.users.select().where(({ name }) => name.equal("test"));
+        tx.users.select(["id"]).where(({ id }) => id.equal(user.result[0].id));
         const comments = tx.comments.insert({ content: "test", user });
         return comments;
       })
     ).toMatchInlineSnapshot(`
       {
-        "returns": "operation1",
+        "returns": "operation2",
         "transactions": [
           {
             "instruction": {
@@ -67,11 +68,26 @@ describe("Transaction Builder", () => {
           },
           {
             "instruction": {
+              "condition": {
+                "id": {
+                  "$eq": "{{operation0[0].id}}",
+                },
+              },
+              "fields": [
+                "id",
+              ],
+              "name": "operation1",
+              "table": "users",
+            },
+            "operation": "Select",
+          },
+          {
+            "instruction": {
               "data": {
                 "content": "test",
                 "user": "{{operation0}}",
               },
-              "name": "operation1",
+              "name": "operation2",
               "table": "comments",
             },
             "operation": "Insert",

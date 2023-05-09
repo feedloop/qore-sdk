@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "outDir": "lib",
+    "rootDir": "src",
+    "target": "es2017"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.spec.ts", "src/mocks/**/*"]
+}

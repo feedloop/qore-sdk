@@ -15,11 +15,11 @@ describe("Operation Builder", () => {
     expect(select("users", ["id", "name"]).build()).toMatchInlineSnapshot(`
       {
         "instruction": {
-          "name": "data",
-          "select": [
+          "fields": [
             "id",
             "name",
           ],
+          "name": "data",
           "table": "users",
         },
         "operation": "Select",
@@ -40,11 +40,11 @@ describe("Operation Builder", () => {
               "$eq": 1,
             },
           },
-          "name": "data",
-          "select": [
+          "fields": [
             "id",
             "name",
           ],
+          "name": "data",
           "table": "users",
         },
         "operation": "Select",

@@ -112,7 +112,8 @@ const createBinaryBuilder = (field: string): BinaryBuilder =>
       value => {
         const expression = {
           [field]: {
-            [binaryOps[op]]: typeof value === "function" ? value() : value
+            [binaryOps[op]]:
+              typeof value === "function" ? `{{${value()}}}` : value
           } as BinaryExpression[string]
         };
         return createChainableLogicalBuilder(expression);

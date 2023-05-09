@@ -11,7 +11,7 @@ import {
   update,
   del
 } from "./operation";
-import schema from "./schema";
+import * as schema from "./schema";
 import axios from "axios";
 import { TransactionBuilder, transaction } from "./transaction";
 

@@ -20,7 +20,10 @@ describe("Client", () => {
 
   test("connect", async () => {
     const promise = connect("http://localhost:8080", { adminSecret: "admin" });
-    expect(mockAxios.get).toHaveBeenCalledWith("/v1/schema");
+    expect(mockAxios.get).toHaveBeenCalledWith("/v1/schema", {
+      baseURL: "http://localhost:8080",
+      headers: { "x-qore-engine-admin-secret": "admin" }
+    });
     mockAxios.mockResponseFor({ url: "/v1/schema" }, { data: schemaAdmin });
     const client = await promise;
     const tables = client.tables();
