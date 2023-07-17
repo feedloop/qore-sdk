@@ -15,6 +15,8 @@ export type SelectOperation = {
     view?: string;
     fields?: string[];
     populate?: string[];
+    limit?: number;
+    offset?: number;
     orderBy?: Record<string, "ASC" | "DESC">;
     condition?: Expression;
   };
@@ -60,6 +62,8 @@ export type Operation =
 export type SelectTableQueryBuilder = {
   instruction: SelectOperation["instruction"];
   populate: (fields: string[]) => SelectTableQueryBuilder;
+  limit: (limit: number) => SelectTableQueryBuilder;
+  offset: (offset: number) => SelectTableQueryBuilder;
   orderBy: (fields: Record<string, "ASC" | "DESC">) => SelectTableQueryBuilder;
   where: (
     builderFn: (
@@ -136,6 +140,14 @@ export const select = (
     instruction,
     populate: fields => {
       instruction.populate = fields;
+      return builder;
+    },
+    limit: limit => {
+      instruction.limit = limit;
+      return builder;
+    },
+    offset: offset => {
+      instruction.offset = offset;
       return builder;
     },
     orderBy: fields => {
