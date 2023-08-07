@@ -114,7 +114,7 @@ const evaluateJsonFunction = (value: any) => {
   if (Array.isArray(value)) {
     return value.map(v => evaluateJsonFunction(v));
   }
-  if (typeof value === "object") {
+  if (typeof value === "object" && value !== null) {
     return Object.fromEntries(
       Object.entries(value).map(([key, val]) => [
         key,

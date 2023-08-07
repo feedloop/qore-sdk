@@ -68,11 +68,13 @@ describe("Operation Builder", () => {
   });
 
   test("update query builder", () => {
-    expect(update("users", { name: "test" }).build()).toMatchInlineSnapshot(`
+    expect(update("users", { name: "test", description: null }).build())
+      .toMatchInlineSnapshot(`
       {
         "instruction": {
           "name": "data",
           "set": {
+            "description": null,
             "name": "test",
           },
           "table": "users",
